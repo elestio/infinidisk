@@ -17,7 +17,7 @@
 #     requests into I/O errors and corrupts ext4.
 #
 set -euo pipefail
-VERSION="0.4.3"
+VERSION="0.4.4"
 
 # ------------------------------------------------------------------ config ----
 : "${INFINIDISK_HOME:=/opt/elestio/infinidisk}"   # secrets: <name>.key, <name>.env (0600)
@@ -222,7 +222,7 @@ RestartSec=2
 # _up does mkfs + mount during start
 TimeoutStartSec=300
 # drain can take a while on large dirty sets; never SIGKILL mid-drain
-TimeoutStopSec=900
+TimeoutStopSec=60
 KillSignal=SIGTERM
 
 [Install]
@@ -257,7 +257,7 @@ _lease(){ # $1=name $2=claim|release
   local name="$1" act="$2"; load_meta "$name"
   local nfs=$(( NFS_PORT_BASE + INDEX )) tmp lf host now who ts
   tmp=$(mktemp -d)
-  mount -t nfs -o "nolock,vers=3,tcp,port=$nfs,mountport=$nfs" 127.0.0.1:/ "$tmp" 2>/dev/null || { rmdir "$tmp"; return 0; }
+  timeout 12 mount -t nfs -o "nolock,vers=3,tcp,port=$nfs,mountport=$nfs" 127.0.0.1:/ "$tmp" 2>/dev/null || { rmdir "$tmp" 2>/dev/null; return 0; }
   lf="$tmp/.infinidisk-lease"; host=$(hostname); now=$(date +%s)
   if [ "$act" = claim ]; then
     if [ -f "$lf" ]; then who=$(cut -d'|' -f1 "$lf" 2>/dev/null); ts=$(cut -d'|' -f2 "$lf" 2>/dev/null)
@@ -293,9 +293,20 @@ cmd__up(){
 # then SIGTERM'd by systemd and drains the remaining WAL.
 cmd__down(){
   local name="$1"; load_meta "$name" 2>/dev/null || return 0
-  _lease "$name" release                       # release single-mount guard (daemon still up here)
-  is_mounted "$name" && { sync; umount "$(vmount "$name")" 2>/dev/null || umount -l "$(vmount "$name")" 2>/dev/null || true; }
-  [ -f "$(vstate "$name")/device" ] && { nbd-client -d "$(cat "$(vstate "$name")/device")" >/dev/null 2>&1 || true; rm -f "$(vstate "$name")/device"; }
+  local mp dev; mp="$(vmount "$name")"; dev=""
+  [ -f "$(vstate "$name")/device" ] && dev=$(cat "$(vstate "$name")/device" 2>/dev/null)
+  # NEVER block the shutdown path. A clean umount is tried but bounded; if the bucket
+  # or S3 is gone the flush would hang forever, so on timeout we detach lazily and
+  # force-disconnect the NBD device, which errors any stuck I/O so the umount completes.
+  # No blocking `sync` (it hangs on a dead backend).
+  if is_mounted "$name"; then
+    timeout 20 umount "$mp" 2>/dev/null || {
+      umount -l "$mp" 2>/dev/null || true
+      [ -n "$dev" ] && timeout 10 nbd-client -d "$dev" >/dev/null 2>&1 || true
+    }
+  fi
+  [ -n "$dev" ] && { timeout 10 nbd-client -d "$dev" >/dev/null 2>&1 || true; rm -f "$(vstate "$name")/device"; }
+  _lease "$name" release 2>/dev/null || true   # best-effort (its NFS mount is time-bounded)
   return 0
 }
 

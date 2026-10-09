@@ -15,7 +15,7 @@ RestartSec=2
 # _up does mkfs + mount during start
 TimeoutStartSec=300
 # drain can take a while on large dirty sets; never SIGKILL mid-drain
-TimeoutStopSec=900
+TimeoutStopSec=60
 KillSignal=SIGTERM
 
 [Install]
