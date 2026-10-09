@@ -168,6 +168,15 @@ cmd_install(){
     elif command -v yum >/dev/null; then yum install -y nbd >/dev/null
     else die "no supported package manager to install nbd-client"; fi
   fi
+  # nfs client: the ZeroFS volume exposes its block devices under .nbd/ over NFS,
+  # which infinidisk mounts briefly to declare/resize a device. Without it, create fails.
+  if ! command -v mount.nfs >/dev/null; then
+    log "installing nfs-common (needed to declare the volume's block device)"
+    if command -v apt-get >/dev/null; then DEBIAN_FRONTEND=noninteractive apt-get install -y nfs-common >/dev/null 2>&1 || true
+    elif command -v dnf >/dev/null; then dnf install -y nfs-utils >/dev/null 2>&1 || true
+    elif command -v yum >/dev/null; then yum install -y nfs-utils >/dev/null 2>&1 || true; fi
+  fi
+  command -v mount.nfs >/dev/null || die "nfs client missing: install nfs-common (Debian/Ubuntu) or nfs-utils (RHEL)"
   command -v mkfs.ext4 >/dev/null || die "mkfs.ext4 missing (install e2fsprogs)"
   if ! command -v rsync >/dev/null; then
     log "installing rsync (used by clone/rollback)"
@@ -408,7 +417,7 @@ _make_device(){
   local name="$1" size="$2"; load_meta "$name"
   local nfs=$(( NFS_PORT_BASE + INDEX )) tmp; tmp=$(mktemp -d)
   mount -t nfs -o "nolock,vers=3,tcp,port=$nfs,mountport=$nfs" 127.0.0.1:/ "$tmp" \
-    || { rmdir "$tmp"; die "could not mount ZeroFS NFS to declare device"; }
+    || { rmdir "$tmp"; die "could not mount ZeroFS NFS to declare device (is nfs-common installed? run: infinidisk install)"; }
   mkdir -p "$tmp/.nbd"
   if [ ! -e "$tmp/.nbd/$EXPORT" ]; then truncate -s "$size" "$tmp/.nbd/$EXPORT"; log "declared NBD export '$EXPORT' size=$size"; fi
   umount "$tmp"; rmdir "$tmp"
