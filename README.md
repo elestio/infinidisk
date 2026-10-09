@@ -20,12 +20,20 @@ ZeroFS daemon running in **write-back mode (`ignore_fsync`)**.
 
 ## Install
 
+One line (downloads the CLI, then fetches the runtime):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/elestio/infinidisk/main/install.sh | sudo bash
+```
+
+Pin a version with `INFINIDISK_REF=v0.4.0`. Or install manually:
+
 ```
 infinidisk install                 # auto-downloads the latest ZeroFS release, verifies
                                    # sha256, installs nbd tooling + a systemd template
 infinidisk install --binary ./zerofs   # or use a local binary
 ```
-Pin a version with `INFINIDISK_ZEROFS_VERSION=v2.3.5 infinidisk install`.
+Pin the ZeroFS version with `INFINIDISK_ZEROFS_VERSION=v2.3.5 infinidisk install`.
 
 ## Usage
 
