@@ -82,10 +82,11 @@ errors; override with `INFINIDISK_FORCE=1`. Each volume exposes Prometheus metri
 ### Encryption key
 
 Each volume is encrypted at rest. The password is, in order of preference:
-`--key` → derived from the per-VM secret `/opt/server_token.secret`
-(`sha256(secret|infinidisk|<name>)`, reproducible on the same VM, nothing random to
-lose) → a random key (dev fallback, with a warning). `key export <vol>` prints it so
-the backend can escrow it in a vault. **Losing the key = losing the volume.**
+`--key` → **derived from a stable per-VM secret** (`sha256(secret|infinidisk|<name>)`,
+reproducible, nothing random to lose). The secret is `/opt/server_token.secret`; if it
+does not exist it is bootstrapped from the VM token in `/opt/renew-vm-cert.sh` (present
+on every Elestio VM), or generated once as a last resort. `key export <vol>` prints the
+key so the backend can escrow it in a vault. **Losing the key = losing the volume.**
 
 ### Disaster recovery (`adopt`)
 

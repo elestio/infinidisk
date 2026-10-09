@@ -17,7 +17,7 @@
 #     requests into I/O errors and corrupts ext4.
 #
 set -euo pipefail
-VERSION="0.4.0"
+VERSION="0.4.1"
 
 # ------------------------------------------------------------------ config ----
 : "${INFINIDISK_HOME:=/opt/elestio/infinidisk}"   # secrets: <name>.key, <name>.env (0600)
@@ -339,8 +339,31 @@ load_secrets(){ set -a; . "$(venv "$1")"; set +a; }
 # derive a stable per-volume encryption password from the per-VM secret
 # (/opt/server_token.secret). Reproducible on the SAME VM -> no random key to
 # lose for the common case. Returns non-zero if the VM secret is absent (dev).
-SERVER_SECRET="${INFINIDISK_SERVER_SECRET:-/opt/server_token.secret}"
-_derive_key(){ local sec; [ -r "$SERVER_SECRET" ] || return 1; sec=$(cat "$SERVER_SECRET"); printf '%s' "${sec}|infinidisk|$1" | sha256sum | cut -d' ' -f1; }
+# The stable per-VM secret used to derive encryption keys. Priority:
+#   1. $INFINIDISK_SERVER_SECRET (a file path, for tests)
+#   2. /opt/server_token.secret (if present)
+#   3. SRVTOKEN embedded in /opt/renew-vm-cert.sh (always present on Elestio VMs)
+#   4. a freshly generated /opt/server_token.secret (non-Elestio VMs; stays stable)
+SECRET_FILE="${INFINIDISK_SERVER_SECRET:-/opt/server_token.secret}"
+# Ensure the per-VM secret file exists. If absent, bootstrap it from the SRVTOKEN
+# embedded in /opt/renew-vm-cert.sh (always present on Elestio VMs); otherwise
+# generate a stable random one. /opt/server_token.secret then is the single source
+# of truth, so the derived key is reproducible across destroy/recreate.
+_ensure_server_secret(){
+  [ -r "$SECRET_FILE" ] && return 0
+  local t=""
+  [ -r /opt/renew-vm-cert.sh ] && t=$(grep -oE "SRVTOKEN=[^&\"' ]+" /opt/renew-vm-cert.sh | head -1 | cut -d= -f2-)
+  if [ -n "$t" ]; then
+    ( umask 077; printf '%s\n' "$t" > "$SECRET_FILE" ) 2>/dev/null || return 1
+    log "wrote $SECRET_FILE from the VM token (/opt/renew-vm-cert.sh)"
+  else
+    ( umask 077; head -c 32 /dev/urandom | base64 > "$SECRET_FILE" ) 2>/dev/null || return 1
+    log "generated $SECRET_FILE (stable encryption-key source)"
+  fi
+  chmod 600 "$SECRET_FILE" 2>/dev/null || true
+}
+_vm_secret(){ _ensure_server_secret || return 1; cat "$SECRET_FILE" 2>/dev/null; }
+_derive_key(){ local sec; sec=$(_vm_secret) || return 1; [ -n "$sec" ] || return 1; printf '%s' "${sec}|infinidisk|$1" | sha256sum | cut -d' ' -f1; }
 # write the encryption password to <name>.key and sync it into <name>.env
 _set_key(){ local name="$1" k="$2"; umask 077; printf '%s\n' "$k" > "$(vkey "$name")"; chmod 0600 "$(vkey "$name")"
   [ -f "$(venv "$name")" ] && sed -i "s|^INFINIDISK_PASSWORD=.*|INFINIDISK_PASSWORD=$k|" "$(venv "$name")"; }
@@ -384,8 +407,8 @@ cmd_create(){
   umask 077; install -d -m 0700 "$INFINIDISK_HOME"
   local key
   if [ -n "$keyarg" ]; then key="$keyarg"; log "using provided encryption key"
-  elif key=$(_derive_key "$name"); then log "encryption key derived from $SERVER_SECRET (reproducible on this VM)"
-  else key=$(openssl rand -base64 32); log "WARNING: $SERVER_SECRET absent -> RANDOM key. Back it up now: infinidisk key export $name"; fi
+  elif key=$(_derive_key "$name"); then log "encryption key derived from the per-VM secret (reproducible on this VM)"
+  else key=$(openssl rand -base64 32); log "WARNING: no per-VM secret available -> RANDOM key. Back it up now: infinidisk key export $name"; fi
   printf '%s\n' "$key" > "$(vkey "$name")"; chmod 0600 "$(vkey "$name")"
   { echo "AWS_ACCESS_KEY_ID=$ak"; echo "AWS_SECRET_ACCESS_KEY=$sk"; echo "INFINIDISK_PASSWORD=$key"; } > "$(venv "$name")"
   chmod 0600 "$(venv "$name")"
@@ -693,7 +716,7 @@ cmd_key(){
   case "$sub" in
     export|show) [ -n "$name" ] || die "usage: infinidisk key export <volume>"; load_meta "$name"; cat "$(vkey "$name")";;
     import) name="${2:-}"; local k="${3:-}"; [ -n "$name" ] && [ -n "$k" ] || die "usage: infinidisk key import <volume> <keyvalue>"; load_meta "$name"; _set_key "$name" "$k"; log "key updated for '$name' — remount (umount+mount) to apply";;
-    derive) [ -n "$name" ] || die "usage: infinidisk key derive <volume>"; _derive_key "$name" || die "no $SERVER_SECRET on this VM";;
+    derive) [ -n "$name" ] || die "usage: infinidisk key derive <volume>"; _derive_key "$name" || die "no per-VM secret available on this VM";;
     *) die "usage: infinidisk key <export|import|derive> <volume> [keyvalue]";;
   esac
 }
@@ -723,7 +746,7 @@ cmd_adopt(){
   local INDEX="$idx" BUCKET="$bucket" PREFIX="$prefix" ENDPOINT="$endpoint" REGION="$region" SIZE="0" CACHE_GB="$cache" MEM_GB="$mem"
   local key
   if [ -n "$keyarg" ]; then key="$keyarg"; log "adopt: using provided key"
-  elif key=$(_derive_key "$name"); then log "adopt: key derived from $SERVER_SECRET (assumes same VM as origin)"
+  elif key=$(_derive_key "$name"); then log "adopt: key derived from the per-VM secret (assumes same VM as origin)"
   else die "adopt needs the original encryption key: pass --key <value> (from escrow)"; fi
   umask 077; install -d -m 0700 "$INFINIDISK_HOME"
   printf '%s\n' "$key" > "$(vkey "$name")"; chmod 0600 "$(vkey "$name")"
