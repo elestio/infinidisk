@@ -8,3 +8,5 @@
 
 /rustup-init.sh
 /*.state
+
+__pycache__/

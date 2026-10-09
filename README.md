@@ -137,3 +137,16 @@ python3 scripts/validate_vm.py --s3 --credentials /chemin/credentials.env --post
 Le script vérifie que son export nouvellement créé est vierge avant formatage. Il réalise les tests sur un NBD libre, utilise des conteneurs PostgreSQL isolés sans réseau et laisse les résultats sous `test-output/run-<id>`. Il ne vide jamais le cache global de la VM. Les rapports ne certifient pas une panne électrique réelle, une destruction du disque matériel ou une charge longue de plusieurs téraoctets.
 
 Voir [les spécifications et décisions](docs/architecture.md), [la review et les mesures](validation/rapport.html) et [les résultats bruts](validation/s3-report.json).
+
+## Comparaison avec ZeroFS
+
+La [comparaison mesurée](validation/comparaison-zerofs.html) et son [protocole détaillé](docs/comparaison-zerofs.md) utilisent des volumes S3 neufs sur la même VM, huit connexions NBD et trois répétitions par charge. Les résultats distinguent le `fsync` local d'InfiniDisk2 du `fsync` vers S3 de ZeroFS : leurs garanties après perte du SSD diffèrent.
+
+Sur la VM de validation, avec les credentials privés déjà configurés :
+
+```sh
+python3 scripts/compare_zerofs.py
+python3 scripts/compare_zerofs.py --postgres-only
+```
+
+Les scripts réservent un NBD libre et leurs propres préfixes S3 UUID, sans modifier les volumes existants. Résultats sous `test-output/comparison-<id>` ; les objets de test restent conservés pour audit.
