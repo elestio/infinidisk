@@ -17,7 +17,7 @@
 #     requests into I/O errors and corrupts ext4.
 #
 set -euo pipefail
-VERSION="0.4.2"
+VERSION="0.4.3"
 
 # ------------------------------------------------------------------ config ----
 : "${INFINIDISK_HOME:=/opt/elestio/infinidisk}"   # secrets: <name>.key, <name>.env (0600)
@@ -72,6 +72,8 @@ alloc_index(){
 
 # first free /dev/nbdX (no backing pid)
 alloc_nbd_dev(){
+  # after a reboot the nbd module may not be loaded yet -> no /dev/nbd* at all
+  [ -e /dev/nbd0 ] || modprobe nbd nbds_max=64 2>/dev/null || modprobe nbd 2>/dev/null || true
   local d; for d in /dev/nbd*; do
     [[ "$d" =~ /dev/nbd[0-9]+$ ]] || continue
     local n=${d#/dev/nbd}
@@ -157,9 +159,13 @@ cmd_install(){
     *) die "install: unknown arg $1";;
   esac; done
 
-  log "ensuring nbd kernel module"
+  log "ensuring nbd kernel module (now + persisted across reboots)"
   modprobe nbd nbds_max=64 2>/dev/null || modprobe nbd 2>/dev/null || die "cannot load nbd module"
   grep -q nbd /proc/modules || die "nbd module not present after modprobe"
+  # load nbd at every boot, with enough devices (otherwise volumes don't auto-mount after a reboot)
+  install -d /etc/modules-load.d /etc/modprobe.d
+  echo nbd > /etc/modules-load.d/infinidisk-nbd.conf
+  echo "options nbd nbds_max=64" > /etc/modprobe.d/infinidisk-nbd.conf
 
   if ! command -v nbd-client >/dev/null; then
     log "installing nbd-client"
