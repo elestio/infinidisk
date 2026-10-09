@@ -65,6 +65,8 @@ infinidisk doctor                           # preflight checks
 infinidisk destroy  <name> [--yes]          # removes the volume locally; S3 data is kept
 ```
 
+> `--mountpoint /path` (on `create` and `adopt`) mounts the volume at a custom **empty** directory instead of `/mnt/infinidisk/<name>`.
+
 Site-wide defaults go in `/etc/infinidisk/infinidisk.conf` (sourced at startup), e.g.
 `INFINIDISK_DEFAULT_ENDPOINT`, `INFINIDISK_DEFAULT_REGION`, `AWS_ACCESS_KEY_ID`,
 `AWS_SECRET_ACCESS_KEY`, `INFINIDISK_DEFAULT_CACHE_GB` — so `create` can be shorter.

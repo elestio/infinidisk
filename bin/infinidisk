@@ -17,7 +17,7 @@
 #     requests into I/O errors and corrupts ext4.
 #
 set -euo pipefail
-VERSION="0.4.1"
+VERSION="0.4.2"
 
 # ------------------------------------------------------------------ config ----
 : "${INFINIDISK_HOME:=/opt/elestio/infinidisk}"   # secrets: <name>.key, <name>.env (0600)
@@ -53,7 +53,7 @@ vtoml(){ echo "$INFINIDISK_CONF/$1.toml"; }
 vkey(){  echo "$INFINIDISK_HOME/$1.key"; }
 venv(){  echo "$INFINIDISK_HOME/$1.env"; }
 vstate(){ echo "$INFINIDISK_STATE/$1"; }
-vmount(){ echo "$INFINIDISK_MNT/$1"; }
+vmount(){ local mp=""; [ -f "$(vconf "$1")" ] && mp=$(. "$(vconf "$1")" 2>/dev/null; printf '%s' "${MOUNTPOINT:-}"); echo "${mp:-$INFINIDISK_MNT/$1}"; }
 unit(){  echo "infinidisk@$1.service"; }
 exists(){ [ -f "$(vconf "$1")" ]; }
 valid_name(){ [[ "$1" =~ ^[a-z0-9][a-z0-9_-]{1,40}$ ]] || die "invalid volume name '$1' (use [a-z0-9_-], 2-41 chars)"; }
@@ -375,10 +375,11 @@ cmd_create(){
   need_root
   local name="" size="" bucket="" prefix="" endpoint="$INFINIDISK_DEFAULT_ENDPOINT"
   local region="$INFINIDISK_DEFAULT_REGION" cache="$INFINIDISK_DEFAULT_CACHE_GB" mem="$INFINIDISK_DEFAULT_MEM_GB"
-  local ak="${AWS_ACCESS_KEY_ID:-}" sk="${AWS_SECRET_ACCESS_KEY:-}" keyarg=""
+  local ak="${AWS_ACCESS_KEY_ID:-}" sk="${AWS_SECRET_ACCESS_KEY:-}" keyarg="" mountpoint=""
   while [ $# -gt 0 ]; do case "$1" in
     --size) size="$2"; shift 2;;
     --key) keyarg="$2"; shift 2;;
+    --mountpoint|--mount) mountpoint="$2"; shift 2;;
     --bucket) bucket="$2"; shift 2;;
     --prefix) prefix="$2"; shift 2;;
     --endpoint) endpoint="$2"; shift 2;;
@@ -397,6 +398,13 @@ cmd_create(){
   [ -n "$ak" ] && [ -n "$sk" ] || die "S3 credentials required (--access-key/--secret-key or AWS_* env)"
   ensure_zerofs   # auto-install zerofs if missing
   [ -z "$prefix" ] && prefix="infinidisk/$name"
+  if [ -n "$mountpoint" ]; then   # custom mount point: must be an absolute, safe, empty path
+    case "$mountpoint" in /*) ;; *) die "--mountpoint must be an absolute path";; esac
+    [[ "$mountpoint" =~ ^[A-Za-z0-9_./-]+$ ]] || die "--mountpoint has invalid characters"
+    mountpoint -q "$mountpoint" 2>/dev/null && die "--mountpoint '$mountpoint' is already a mount point"
+    [ -e "$mountpoint" ] && [ ! -d "$mountpoint" ] && die "--mountpoint '$mountpoint' exists and is not a directory"
+    [ -d "$mountpoint" ] && [ -n "$(ls -A "$mountpoint" 2>/dev/null)" ] && die "--mountpoint '$mountpoint' is not empty"
+  fi
 
   local idx; idx=$(alloc_index)
   local INDEX="$idx" BUCKET="$bucket" PREFIX="$prefix" ENDPOINT="$endpoint" REGION="$region"
@@ -424,6 +432,7 @@ SIZE=$size
 CACHE_GB=$cache
 MEM_GB=$mem
 EXPORT=$name
+MOUNTPOINT=$mountpoint
 CREATED=$(date -u +%FT%TZ)
 META
   write_configs "$name"
@@ -729,11 +738,12 @@ cmd_key(){
 cmd_adopt(){
   need_root; local name="" bucket="" prefix="" endpoint="$INFINIDISK_DEFAULT_ENDPOINT"
   local region="$INFINIDISK_DEFAULT_REGION" cache="$INFINIDISK_DEFAULT_CACHE_GB" mem="$INFINIDISK_DEFAULT_MEM_GB"
-  local ak="${AWS_ACCESS_KEY_ID:-}" sk="${AWS_SECRET_ACCESS_KEY:-}" keyarg=""
+  local ak="${AWS_ACCESS_KEY_ID:-}" sk="${AWS_SECRET_ACCESS_KEY:-}" keyarg="" mountpoint=""
   while [ $# -gt 0 ]; do case "$1" in
     --bucket) bucket="$2"; shift 2;; --prefix) prefix="$2"; shift 2;; --endpoint) endpoint="$2"; shift 2;;
     --region) region="$2"; shift 2;; --cache-gb) cache="$2"; shift 2;; --mem-gb) mem="$2"; shift 2;;
     --key) keyarg="$2"; shift 2;; --access-key) ak="$2"; shift 2;; --secret-key) sk="$2"; shift 2;;
+    --mountpoint|--mount) mountpoint="$2"; shift 2;;
     -*) die "adopt: unknown flag $1";; *) [ -z "$name" ] && name="$1" && shift || die "adopt: unexpected $1";;
   esac; done
   [ -n "$name" ] || die "usage: infinidisk adopt <name> --bucket <b> [--prefix p] [--key k] [--access-key.. --secret-key..]"
@@ -742,6 +752,13 @@ cmd_adopt(){
   [ -n "$ak" ] && [ -n "$sk" ] || die "S3 credentials required"
   ensure_zerofs
   [ -z "$prefix" ] && prefix="infinidisk/$name"
+  if [ -n "$mountpoint" ]; then   # custom mount point: absolute, safe, empty
+    case "$mountpoint" in /*) ;; *) die "--mountpoint must be an absolute path";; esac
+    [[ "$mountpoint" =~ ^[A-Za-z0-9_./-]+$ ]] || die "--mountpoint has invalid characters"
+    mountpoint -q "$mountpoint" 2>/dev/null && die "--mountpoint '$mountpoint' is already a mount point"
+    [ -e "$mountpoint" ] && [ ! -d "$mountpoint" ] && die "--mountpoint '$mountpoint' exists and is not a directory"
+    [ -d "$mountpoint" ] && [ -n "$(ls -A "$mountpoint" 2>/dev/null)" ] && die "--mountpoint '$mountpoint' is not empty"
+  fi
   local idx; idx=$(alloc_index)
   local INDEX="$idx" BUCKET="$bucket" PREFIX="$prefix" ENDPOINT="$endpoint" REGION="$region" SIZE="0" CACHE_GB="$cache" MEM_GB="$mem"
   local key
@@ -762,6 +779,7 @@ SIZE=0
 CACHE_GB=$cache
 MEM_GB=$mem
 EXPORT=$name
+MOUNTPOINT=$mountpoint
 CREATED=$(date -u +%FT%TZ)
 META
   write_configs "$name"
@@ -862,9 +880,9 @@ infinidisk $VERSION - S3-backed block volumes via ZeroFS (ignore_fsync, no HA)
 
   infinidisk install [--binary <path-to-zerofs>]
   infinidisk create  <name> --size 20G --bucket <b> [--prefix p] [--endpoint u]
-                            [--region r] [--cache-gb 4] [--mem-gb 1] [--key k]
+                            [--region r] [--cache-gb 4] [--mem-gb 1] [--key k] [--mountpoint /path]
                             [--access-key .. --secret-key ..]   (or AWS_* env)
-  infinidisk adopt   <name> --bucket <b> [--prefix p] [--key k] ...  # re-attach existing (DR)
+  infinidisk adopt   <name> --bucket <b> [--prefix p] [--key k] [--mountpoint /path] ...  # re-attach (DR)
   infinidisk mount    <name>
   infinidisk umount   <name>
   infinidisk enable   <name>                  # auto-mount at boot
