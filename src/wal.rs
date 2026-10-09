@@ -301,6 +301,12 @@ impl Watermark {
         })
     }
     pub fn persist(&mut self, seq: u64) -> Result<()> {
+        self.persist_using(seq, false)
+    }
+    pub fn persist_data(&mut self, seq: u64) -> Result<()> {
+        self.persist_using(seq, true)
+    }
+    fn persist_using(&mut self, seq: u64, data_only: bool) -> Result<()> {
         // Alternate independently checksummed slots. Generation increments even for repeated seq.
         let slot = self.next_slot;
         let mut b = [0; 16];
@@ -309,7 +315,11 @@ impl Watermark {
         let crc = crc32fast::hash(&b[..12]);
         b[12..].copy_from_slice(&crc.to_le_bytes());
         self.file.write_all_at(&b, slot * 16)?;
-        self.file.sync_all()?;
+        if data_only {
+            self.file.sync_data()?;
+        } else {
+            self.file.sync_all()?;
+        }
         self.seq = seq;
         self.next_slot ^= 1;
         Ok(())

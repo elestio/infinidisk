@@ -120,6 +120,8 @@ La collecte est hors ligne, limitée au préfixe du volume et protège les objet
 
 Le chemin chaud utilise le disque local. Le cache SSD doit couvrir le working set de la base ; une lecture froide S3 conserve la latence du réseau. Les tests mesurent séparément données récentes locales, cache distant insuffisant et cache distant suffisant. La synchronisation actuelle ajoute une amplification de barrières et deux synchronisations locales ; c'est le principal coût restant pour les écritures durables.
 
+Le défaut `sync_data_only=true` utilise maintenant `fdatasync` pour les segments WAL et le watermark : les données et métadonnées nécessaires à leur lecture restent persistées, sans imposer la persistance des horodatages internes. Les créations, répertoires et écritures atomiques gardent leurs barrières de métadonnées. `sync_data_only=false` conserve le chemin `fsync` initial pour comparaison. Les compteurs `flush_calls`, `flush_groups`, `flush_wait_ns`, `wal_sync_ns` et `watermark_sync_ns` apparaissent dans les statuts périodiques ; ils sont cumulés depuis le démarrage.
+
 Le journal en attente, les segments récents et le cache SSD ont des limites séparées. Un journal plein applique une attente jusqu'à 50 secondes, puis renvoie une erreur si aucune publication ne libère de place. Prévoir l'espace local correspondant aux trois budgets, plus la marge du système hôte.
 
 L'index de pages est actuellement en RAM, avec limite conservatrice `max_index_mib` (128 octets budgétés par page allouée). Le défaut de 1 Gio autorise environ 32 Gio de pages non nulles. Les volumes virtuels peuvent être plus grands s'ils sont creux, mais les très gros volumes remplis nécessitent davantage de RAM ou une prochaine implémentation d'index paginé. Atteindre la limite refuse une nouvelle allocation ; la taille virtuelle ne réserve pas toute la RAM au démarrage.
@@ -150,3 +152,11 @@ python3 scripts/compare_zerofs.py --postgres-only
 ```
 
 Les scripts réservent un NBD libre et leurs propres préfixes S3 UUID, sans modifier les volumes existants. Résultats sous `test-output/comparison-<id>` ; les objets de test restent conservés pour audit.
+
+Voir aussi [l’optimisation des commits et MySQL](validation/optimisation-mysql.html), son [protocole et la review](docs/optimisation-mysql.md).
+
+```sh
+python3 scripts/compare_zerofs.py --mysql-only
+```
+
+Ce test lance des conteneurs MySQL isolés sans réseau, vérifie les réglages InnoDB/binlog et mesure les modes ZeroFS S3, ZeroFS qui ignore fsync, InfiniDisk2 et disque natif. Les mots de passe des comptes d’essai sont conservés uniquement dans des fichiers `*.secret` privés sous le répertoire d’essai, exclus des exports de preuves.

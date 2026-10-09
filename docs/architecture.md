@@ -116,3 +116,9 @@ Le client natif négocie les sockets TCP puis utilise `NBD_SET_SOCK`, `NBD_SET_B
 * [Modes de PUT object_store](https://docs.rs/object_store/0.14.2/object_store/enum.PutMode.html) — création conditionnelle et update CAS.
 
 Le code de ZeroFS a servi de référence pour identifier les compromis du premier essai. Ce moteur a été écrit séparément ; il ne compile ni ne lance ZeroFS et ne réutilise pas son format de stockage.
+
+## Optimisation des barrières locales
+
+`sync_data_only=true` utilise `File::sync_data` pour les segments WAL puis le watermark, dans cet ordre, en conservant deux barrières durables. Les créations et synchronisations de répertoires conservent leurs fsync. Le format disque ne change pas. `false` permet de mesurer le chemin `sync_all` original. Les compteurs de statut distinguent attentes, WAL et watermark ; les premiers profils ne montrent presque aucun regroupement de FLUSH dans le moteur.
+
+La santé du volume est vérifiée à nouveau après prise du verrou de flush ; une barrière en attente ne peut donc être acquittée après une erreur antérieure. Une erreur ou panique du worker bloque les nouvelles écritures. Les chiffres et limites de la campagne MySQL sont dans [optimisation-mysql.md](optimisation-mysql.md).

@@ -18,7 +18,7 @@ use std::{
     num::NonZeroUsize,
     sync::{
         Arc,
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicU64, Ordering},
     },
     time::Instant,
 };
@@ -77,6 +77,19 @@ pub struct Status {
     pub poisoned: bool,
     pub uptime_seconds: u64,
     pub hot_wal_bytes: u64,
+    pub flush_calls: u64,
+    pub flush_groups: u64,
+    pub flush_wait_ns: u64,
+    pub wal_sync_ns: u64,
+    pub watermark_sync_ns: u64,
+}
+#[derive(Default)]
+struct FlushMetrics {
+    calls: AtomicU64,
+    groups: AtomicU64,
+    wait_ns: AtomicU64,
+    wal_ns: AtomicU64,
+    watermark_ns: AtomicU64,
 }
 pub struct Engine {
     pub config: Config,
@@ -94,6 +107,7 @@ pub struct Engine {
     poisoned: AtomicBool,
     _lock: File,
     started: Instant,
+    flush_metrics: FlushMetrics,
 }
 fn encode(h: &Head) -> Result<Bytes> {
     let payload = bincode::serialize(h)?;
@@ -414,6 +428,7 @@ impl Engine {
             poisoned: AtomicBool::new(false),
             _lock: lock,
             started: Instant::now(),
+            flush_metrics: FlushMetrics::default(),
         }))
     }
     fn healthy(&self) -> Result<()> {
@@ -647,8 +662,15 @@ impl Engine {
     }
     pub async fn flush(&self) -> Result<()> {
         self.healthy()?;
+        self.flush_metrics.calls.fetch_add(1, Ordering::Relaxed);
         let target = self.state.lock().await.seq;
+        let wait = Instant::now();
         let _guard = self.flush_lock.lock().await;
+        // A previous barrier may have failed while this request was queued.
+        self.healthy()?;
+        self.flush_metrics
+            .wait_ns
+            .fetch_add(wait.elapsed().as_nanos() as u64, Ordering::Relaxed);
         if self.state.lock().await.durable >= target {
             return Ok(());
         }
@@ -666,18 +688,38 @@ impl Engine {
             )
         };
         let wm = self.watermark.clone();
-        let r: Result<()> = tokio::task::spawn_blocking(move || {
+        let data_only = self.config.sync_data_only;
+        let r: Result<(u64, u64)> = tokio::task::spawn_blocking(move || {
+            let start = Instant::now();
             for f in files {
-                f.sync_all()?;
+                if data_only {
+                    f.sync_data()?;
+                } else {
+                    f.sync_all()?;
+                }
             }
-            wm.lock().unwrap().persist(seq)?;
-            Ok(())
+            let wal_ns = start.elapsed().as_nanos() as u64;
+            let start = Instant::now();
+            let mut wm = wm.lock().unwrap();
+            if data_only {
+                wm.persist_data(seq)?;
+            } else {
+                wm.persist(seq)?;
+            }
+            Ok((wal_ns, start.elapsed().as_nanos() as u64))
         })
-        .await?;
-        if let Err(e) = r {
-            self.fail_closed();
-            return Err(e.context("local durability failed"));
-        }
+        .await
+        .inspect_err(|_| self.fail_closed())?;
+        let (wal_ns, watermark_ns) = r
+            .inspect_err(|_| self.fail_closed())
+            .context("local durability failed")?;
+        self.flush_metrics.groups.fetch_add(1, Ordering::Relaxed);
+        self.flush_metrics
+            .wal_ns
+            .fetch_add(wal_ns, Ordering::Relaxed);
+        self.flush_metrics
+            .watermark_ns
+            .fetch_add(watermark_ns, Ordering::Relaxed);
         self.state.lock().await.durable = seq;
         Ok(())
     }
@@ -835,6 +877,11 @@ impl Engine {
             poisoned: self.poisoned.load(Ordering::Acquire),
             uptime_seconds: self.started.elapsed().as_secs(),
             hot_wal_bytes: s.resident_bytes,
+            flush_calls: self.flush_metrics.calls.load(Ordering::Relaxed),
+            flush_groups: self.flush_metrics.groups.load(Ordering::Relaxed),
+            flush_wait_ns: self.flush_metrics.wait_ns.load(Ordering::Relaxed),
+            wal_sync_ns: self.flush_metrics.wal_ns.load(Ordering::Relaxed),
+            watermark_sync_ns: self.flush_metrics.watermark_ns.load(Ordering::Relaxed),
         }
     }
     pub async fn inspect(c: &Config) -> Result<Head> {
@@ -1024,6 +1071,32 @@ mod tests {
         let e = Engine::open(other).await?;
         assert_eq!(e.read(0, PAGE * 2).await?, expected);
         assert!(Engine::open(c).await.is_err());
+        Ok(())
+    }
+    #[tokio::test]
+    async fn queued_barrier_rejects_acknowledgement_after_volume_failure() -> Result<()> {
+        let t = tempfile::tempdir()?;
+        let c = config(&t);
+        Engine::init(&c, 1024 * 1024).await?;
+        let e = Engine::open(c).await?;
+        e.write(0, &vec![7; PAGE]).await?;
+        let guard = e.flush_lock.lock().await;
+        let queued = e.clone();
+        let task = tokio::spawn(async move { queued.flush().await });
+        tokio::time::timeout(std::time::Duration::from_secs(1), async {
+            while e.flush_metrics.calls.load(Ordering::Relaxed) == 0 {
+                tokio::task::yield_now().await;
+            }
+        })
+        .await?;
+        // Models failure of an earlier barrier while another client is queued.
+        e.fail_closed();
+        drop(guard);
+        ensure!(
+            task.await?.is_err(),
+            "failed volume acknowledged a queued barrier"
+        );
+        assert_eq!(e.status().await.local_durable_sequence, 0);
         Ok(())
     }
     #[tokio::test]

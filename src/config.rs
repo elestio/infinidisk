@@ -24,6 +24,9 @@ pub struct Config {
     pub max_pending_mib: u64,
     pub segment_mib: u64,
     pub max_inflight: usize,
+    /// Persist data and retrieval metadata, without unrelated inode timestamps.
+    /// false retains the original fsync path for measured comparisons.
+    pub sync_data_only: bool,
 }
 impl Default for Config {
     fn default() -> Self {
@@ -42,6 +45,7 @@ impl Default for Config {
             max_pending_mib: 8192,
             segment_mib: 16,
             max_inflight: 128,
+            sync_data_only: true,
         }
     }
 }

@@ -1,0 +1,3 @@
+local_dir = "/root/infinidisk2/test-output/comparison-323bb1097b47/unused"
+store = "file:///root/infinidisk2/test-output/comparison-323bb1097b47/unused-objects"
+listen = "127.0.0.1:11991"

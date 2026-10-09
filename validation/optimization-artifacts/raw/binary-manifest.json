@@ -1,0 +1,8 @@
+{
+  "binary_sha256": {
+    "zerofs": "91651cb1894f77f6892d224bc119ac4a9bccabf1207d739f4ec71ff8c4e99e21",
+    "infinidisk2": "6aa7869222e47b5bd906ef15f86b8cfd5202a57ef765e9569701f176bafc5f57"
+  },
+  "logical_cpus": 4,
+  "additional_capture_utc": "2026-10-09T21:12:19.651715+00:00"
+}
