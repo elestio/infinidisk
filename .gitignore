@@ -1,0 +1,6 @@
+# local test / runtime artifacts (never belong in the repo)
+*.key
+*.env
+temp/
+*.log
+.DS_Store

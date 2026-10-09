@@ -1,0 +1,22 @@
+[Unit]
+Description=infinidisk ZeroFS volume %i
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/infinidisk _daemon %i
+# after the daemon is serving: declare device, attach NBD, mkfs (first time), mount
+ExecStartPost=/usr/local/bin/infinidisk _up %i
+# before the daemon is signalled: unmount + detach so the drain is clean
+ExecStop=/usr/local/bin/infinidisk _down %i
+Restart=on-failure
+RestartSec=2
+# _up does mkfs + mount during start
+TimeoutStartSec=300
+# drain can take a while on large dirty sets; never SIGKILL mid-drain
+TimeoutStopSec=900
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target

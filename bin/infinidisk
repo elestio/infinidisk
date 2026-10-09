@@ -1,0 +1,893 @@
+#!/usr/bin/env bash
+#
+# infinidisk - S3-backed block volumes for Elestio, powered by ZeroFS.
+#
+# Each volume is an ext4 filesystem on an NBD block device
+# served by a per-volume ZeroFS daemon in write-back mode (ignore_fsync).
+#
+# Design decisions (validated 2026-10-09, see bench results):
+#   - ignore_fsync = true  -> fast write-back (~2600 tps pgbench). Durability
+#     window of a few seconds on total VM loss is accepted (no HA). ZeroFS never
+#     corrupts the filesystem, so the worst case is losing the last un-flushed
+#     writes, never a broken volume.
+#   - nbd-client is used WITHOUT -persist: on an abrupt daemon death -persist
+#     wedges the kernel NBD device (D-state, needs reboot). Without it the device
+#     errors out cleanly.
+#   - -nbd-request-timeout left at the ZeroFS default: shortening it turns slow
+#     requests into I/O errors and corrupts ext4.
+#
+set -euo pipefail
+VERSION="0.4.0"
+
+# ------------------------------------------------------------------ config ----
+: "${INFINIDISK_HOME:=/opt/elestio/infinidisk}"   # secrets: <name>.key, <name>.env (0600)
+: "${INFINIDISK_CONF:=/etc/infinidisk}"           # per-volume metadata + <name>.toml
+: "${INFINIDISK_STATE:=/var/lib/infinidisk}"      # zerofs cache dirs + runtime state
+: "${INFINIDISK_MNT:=/mnt/infinidisk}"            # mountpoints
+: "${ZEROFS_BIN:=/usr/local/bin/zerofs}"
+: "${INFINIDISK_ZEROFS_REPO:=Barre/ZeroFS}"       # github repo for auto-install
+: "${INFINIDISK_ZEROFS_VERSION:=latest}"          # pin a tag (e.g. v2.3.5) or "latest"
+: "${INFINIDISK_ZEROFS_URL:=}"                     # override: direct tarball URL
+: "${INFINIDISK_DEFAULT_ENDPOINT:=https://t3.storage.dev}"
+: "${INFINIDISK_DEFAULT_REGION:=auto}"
+: "${INFINIDISK_DEFAULT_CACHE_GB:=4}"
+: "${INFINIDISK_DEFAULT_MEM_GB:=1}"
+
+# port layout per volume index N: NBD=10900+N NFS=12000+N RPC=14000+N METRICS=16000+N
+NBD_PORT_BASE=10900
+NFS_PORT_BASE=12000
+RPC_PORT_BASE=14000
+METRICS_PORT_BASE=16000
+# read-only snapshot mounts use a parallel high range (base+500+N) to avoid clashing with the live daemon
+SNAP_OFFSET=500
+
+# optional site-wide defaults (endpoint/region/bucket/creds/cache) sourced before anything
+[ -f "${INFINIDISK_CONF:-/etc/infinidisk}/infinidisk.conf" ] && . "${INFINIDISK_CONF:-/etc/infinidisk}/infinidisk.conf"
+
+# -------------------------------------------------------------- utilities ----
+die(){ echo "infinidisk: $*" >&2; exit 1; }
+log(){ echo "[infinidisk] $*" >&2; }
+need_root(){ [ "$(id -u)" = 0 ] || die "must run as root"; }
+vconf(){ echo "$INFINIDISK_CONF/$1.conf"; }
+vtoml(){ echo "$INFINIDISK_CONF/$1.toml"; }
+vkey(){  echo "$INFINIDISK_HOME/$1.key"; }
+venv(){  echo "$INFINIDISK_HOME/$1.env"; }
+vstate(){ echo "$INFINIDISK_STATE/$1"; }
+vmount(){ echo "$INFINIDISK_MNT/$1"; }
+unit(){  echo "infinidisk@$1.service"; }
+exists(){ [ -f "$(vconf "$1")" ]; }
+valid_name(){ [[ "$1" =~ ^[a-z0-9][a-z0-9_-]{1,40}$ ]] || die "invalid volume name '$1' (use [a-z0-9_-], 2-41 chars)"; }
+
+# load a volume's metadata into the environment (BUCKET, PREFIX, INDEX, ...)
+load_meta(){ exists "$1" || die "no such volume: $1"; # shellcheck disable=SC1090
+  . "$(vconf "$1")"; }
+
+# lowest free index across existing volumes
+alloc_index(){
+  local used idx; used=$(mktemp)
+  for f in "$INFINIDISK_CONF"/*.conf; do [ -e "$f" ] || continue; ( . "$f"; echo "$INDEX" ); done | sort -n > "$used"
+  idx=0; while grep -qx "$idx" "$used"; do idx=$((idx+1)); done
+  rm -f "$used"; echo "$idx"
+}
+
+# first free /dev/nbdX (no backing pid)
+alloc_nbd_dev(){
+  local d; for d in /dev/nbd*; do
+    [[ "$d" =~ /dev/nbd[0-9]+$ ]] || continue
+    local n=${d#/dev/nbd}
+    [ -r "/sys/block/nbd$n/pid" ] && continue   # in use
+    echo "$d"; return 0
+  done
+  die "no free /dev/nbd device available (load more with: modprobe nbd nbds_max=64)"
+}
+
+daemon_serving(){ # $1=name : true once the NBD port is listening
+  local p; p=$(( NBD_PORT_BASE + $(. "$(vconf "$1")"; echo "$INDEX") ))
+  ss -ltn 2>/dev/null | grep -q "127.0.0.1:$p "
+}
+wait_serving(){ local i; for i in $(seq 1 60); do daemon_serving "$1" && return 0; sleep 1; done; return 1; }
+
+is_mounted(){ mountpoint -q "$(vmount "$1")"; }
+# systemctl is-active/is-enabled print the state to stdout AND exit non-zero for
+# inactive/disabled, so capture stdout only (never append via ||, that doubles it).
+svc_active(){ local s; s=$(systemctl is-active "$1" 2>/dev/null); echo "${s:-inactive}"; }
+svc_enabled(){ local s; s=$(systemctl is-enabled "$1" 2>/dev/null); echo "${s:-disabled}"; }
+
+# --------------------------------------------------------- zerofs install ----
+_fetch(){ # $1=url $2=dest
+  if command -v curl >/dev/null; then curl -fsSL --retry 3 -o "$2" "$1"
+  elif command -v wget >/dev/null; then wget -q -O "$2" "$1"
+  else die "need curl or wget to download zerofs"; fi
+}
+_host_triple(){ # echoes e.g. linux-amd64 matching the ZeroFS asset naming
+  local os arch; os=$(uname -s | tr '[:upper:]' '[:lower:]')
+  case "$(uname -m)" in
+    x86_64|amd64) arch=amd64;;
+    aarch64|arm64) arch=arm64;;
+    *) die "unsupported CPU arch $(uname -m)";;
+  esac
+  echo "${os}-${arch}"
+}
+# resolve the release tarball URL (honors pin / override)
+_zerofs_tarball_url(){
+  [ -n "$INFINIDISK_ZEROFS_URL" ] && { echo "$INFINIDISK_ZEROFS_URL"; return; }
+  local api
+  if [ "$INFINIDISK_ZEROFS_VERSION" = latest ]; then
+    api="https://api.github.com/repos/$INFINIDISK_ZEROFS_REPO/releases/latest"
+  else
+    api="https://api.github.com/repos/$INFINIDISK_ZEROFS_REPO/releases/tags/$INFINIDISK_ZEROFS_VERSION"
+  fi
+  local url; url=$(_fetch "$api" /dev/stdout | grep -oE '"browser_download_url": *"[^"]*zerofs-pgo-multiplatform\.tar\.gz"' | head -1 | sed -E 's/.*"(https[^"]+)"/\1/')
+  [ -n "$url" ] || die "could not resolve ZeroFS release tarball from GitHub ($INFINIDISK_ZEROFS_REPO $INFINIDISK_ZEROFS_VERSION)"
+  echo "$url"
+}
+auto_install_zerofs(){
+  local triple tmp url bin
+  triple=$(_host_triple)
+  tmp=$(mktemp -d); trap "rm -rf '$tmp'" RETURN
+  url=$(_zerofs_tarball_url)
+  log "downloading ZeroFS ($triple) from $url"
+  _fetch "$url" "$tmp/z.tgz"
+  # verify checksum when available (non-fatal if the .sha256 is missing)
+  if _fetch "$url.sha256" "$tmp/z.sha" 2>/dev/null && [ -s "$tmp/z.sha" ]; then
+    local want have; want=$(awk '{print $1}' "$tmp/z.sha"); have=$(sha256sum "$tmp/z.tgz" | awk '{print $1}')
+    [ "$want" = "$have" ] || die "ZeroFS tarball checksum mismatch (want $want got $have)"
+    log "checksum OK"
+  else
+    log "WARNING: no .sha256 published, skipping checksum verification"
+  fi
+  tar -xzf "$tmp/z.tgz" -C "$tmp"
+  # the tarball ships per-platform binaries named zerofs-<os>-<arch>-pgo
+  bin=$(find "$tmp" -type f -name "zerofs-${triple}-pgo" | head -1)
+  [ -n "$bin" ] || bin=$(find "$tmp" -type f -name "zerofs-${triple}" | head -1)
+  [ -n "$bin" ] || die "no binary for $triple inside the ZeroFS tarball"
+  install -m 0755 "$bin" "$ZEROFS_BIN"
+  "$ZEROFS_BIN" --version >/dev/null 2>&1 || die "installed zerofs not runnable"
+  log "installed $("$ZEROFS_BIN" --version 2>&1 | head -1) -> $ZEROFS_BIN"
+}
+# make sure a usable zerofs exists; auto-install if missing
+ensure_zerofs(){ "$ZEROFS_BIN" --version >/dev/null 2>&1 || { log "zerofs not installed, installing automatically"; auto_install_zerofs; }; }
+
+# ---------------------------------------------------------------- install ----
+cmd_install(){
+  need_root
+  local src=""
+  while [ $# -gt 0 ]; do case "$1" in
+    --binary) src="$2"; shift 2;;
+    *) die "install: unknown arg $1";;
+  esac; done
+
+  log "ensuring nbd kernel module"
+  modprobe nbd nbds_max=64 2>/dev/null || modprobe nbd 2>/dev/null || die "cannot load nbd module"
+  grep -q nbd /proc/modules || die "nbd module not present after modprobe"
+
+  if ! command -v nbd-client >/dev/null; then
+    log "installing nbd-client"
+    if command -v apt-get >/dev/null; then DEBIAN_FRONTEND=noninteractive apt-get install -y nbd-client >/dev/null
+    elif command -v dnf >/dev/null; then dnf install -y nbd >/dev/null
+    elif command -v yum >/dev/null; then yum install -y nbd >/dev/null
+    else die "no supported package manager to install nbd-client"; fi
+  fi
+  command -v mkfs.ext4 >/dev/null || die "mkfs.ext4 missing (install e2fsprogs)"
+  if ! command -v rsync >/dev/null; then
+    log "installing rsync (used by clone/rollback)"
+    if command -v apt-get >/dev/null; then DEBIAN_FRONTEND=noninteractive apt-get install -y rsync >/dev/null 2>&1 || true
+    elif command -v dnf >/dev/null; then dnf install -y rsync >/dev/null 2>&1 || true; fi
+  fi
+
+  if [ -n "$src" ]; then
+    log "installing zerofs binary from $src"
+    install -m 0755 "$src" "$ZEROFS_BIN"
+    "$ZEROFS_BIN" --version >/dev/null 2>&1 || die "zerofs binary at $src not runnable"
+  else
+    auto_install_zerofs   # download+verify+install the latest release automatically
+  fi
+
+  install -d -m 0755 "$INFINIDISK_CONF" "$INFINIDISK_STATE" "$INFINIDISK_MNT"
+  install -d -m 0700 "$INFINIDISK_HOME"
+
+  # systemd template unit: runs the per-volume zerofs daemon and brings the
+  # volume fully up/down (attach + mount in ExecStartPost, unmount in ExecStop).
+  local SELF; SELF=$(command -v "$0" 2>/dev/null || echo /usr/local/bin/infinidisk)
+  cat > /etc/systemd/system/infinidisk@.service <<UNIT
+[Unit]
+Description=infinidisk ZeroFS daemon for volume %i
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=$SELF _daemon %i
+# after the daemon is serving: declare device, attach NBD, mkfs (first time), mount
+ExecStartPost=$SELF _up %i
+# before the daemon is signalled: unmount + detach so the drain is clean
+ExecStop=$SELF _down %i
+Restart=on-failure
+RestartSec=2
+# _up does mkfs + mount during start
+TimeoutStartSec=300
+# drain can take a while on large dirty sets; never SIGKILL mid-drain
+TimeoutStopSec=900
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+  systemctl daemon-reload
+  log "install complete: $("$ZEROFS_BIN" --version 2>&1 | head -1) + nbd tooling + systemd template"
+}
+
+# internal: exec the zerofs daemon for a volume (invoked by systemd template ExecStart)
+cmd__daemon(){
+  local name="$1"; load_meta "$name"
+  set -a; . "$(venv "$name")"; set +a    # AWS_* + INFINIDISK_PASSWORD
+  exec "$ZEROFS_BIN" run -c "$(vtoml "$name")"
+}
+
+# true if the recorded device file still points at a live (backed) nbd device
+_device_live(){ # $1=name
+  local f="$(vstate "$1")/device" d n
+  [ -f "$f" ] || return 1; d=$(cat "$f"); n=${d#/dev/nbd}
+  [ -r "/sys/block/nbd$n/pid" ]
+}
+
+# best-effort single-mount guard: a lease marker in the bucket (via NFS) records
+# host + timestamp. Refuses to mount if a DIFFERENT host holds a fresh (<15min)
+# lease — double RW mount = corruption. Fail-open on any NFS/read error so the
+# guard never blocks a legitimate mount. Override with INFINIDISK_FORCE=1.
+# NOTE: best-effort — there is no periodic refresh, so it protects the mount
+# moment, not the whole lifetime. The Elestio model is one volume per VM anyway.
+LEASE_TTL=900
+_lease(){ # $1=name $2=claim|release
+  local name="$1" act="$2"; load_meta "$name"
+  local nfs=$(( NFS_PORT_BASE + INDEX )) tmp lf host now who ts
+  tmp=$(mktemp -d)
+  mount -t nfs -o "nolock,vers=3,tcp,port=$nfs,mountport=$nfs" 127.0.0.1:/ "$tmp" 2>/dev/null || { rmdir "$tmp"; return 0; }
+  lf="$tmp/.infinidisk-lease"; host=$(hostname); now=$(date +%s)
+  if [ "$act" = claim ]; then
+    if [ -f "$lf" ]; then who=$(cut -d'|' -f1 "$lf" 2>/dev/null); ts=$(cut -d'|' -f2 "$lf" 2>/dev/null)
+      if [ -n "$who" ] && [ "$who" != "$host" ] && [ "${ts:-0}" -gt 0 ] && [ $((now-ts)) -lt "$LEASE_TTL" ] && [ "${INFINIDISK_FORCE:-0}" != 1 ]; then
+        umount "$tmp" 2>/dev/null; rmdir "$tmp" 2>/dev/null
+        die "volume '$name' looks mounted on host '$who' ($(( (now-ts)/60 ))m ago) — refusing double-mount (corruption risk). INFINIDISK_FORCE=1 to override."
+      fi
+    fi
+    echo "$host|$now|$(cat /proc/sys/kernel/random/boot_id 2>/dev/null)" > "$lf" 2>/dev/null || true
+  else
+    [ -f "$lf" ] && who=$(cut -d'|' -f1 "$lf" 2>/dev/null) && [ "$who" = "$host" ] && rm -f "$lf" 2>/dev/null || true
+  fi
+  umount "$tmp" 2>/dev/null; rmdir "$tmp" 2>/dev/null; return 0
+}
+
+# internal: bring the volume up (ExecStartPost). Idempotent: declare device,
+# attach NBD, mkfs once, mount. Safe to re-run on restart / boot.
+cmd__up(){
+  local name="$1"; load_meta "$name"
+  wait_serving "$name" || { log "_up: daemon not serving"; return 1; }
+  _make_device "$name" "$SIZE"                 # idempotent (truncates only if missing)
+  _lease "$name" claim                         # single-mount guard (fail-open, INFINIDISK_FORCE=1 to override)
+  _device_live "$name" || { rm -f "$(vstate "$name")/device"; _attach "$name"; }
+  local dev; dev=$(cat "$(vstate "$name")/device")
+  if [ ! -f "$(vstate "$name")/formatted" ]; then
+    log "_up: first format of $dev"; mkfs.ext4 -F -q -L "id_$name" "$dev"; : > "$(vstate "$name")/formatted"
+  fi
+  is_mounted "$name" || _mount "$name"
+  log "_up: '$name' ready on $dev at $(vmount "$name")"
+}
+
+# internal: take the volume down (ExecStop). Unmount + detach; the daemon is
+# then SIGTERM'd by systemd and drains the remaining WAL.
+cmd__down(){
+  local name="$1"; load_meta "$name" 2>/dev/null || return 0
+  _lease "$name" release                       # release single-mount guard (daemon still up here)
+  is_mounted "$name" && { sync; umount "$(vmount "$name")" 2>/dev/null || umount -l "$(vmount "$name")" 2>/dev/null || true; }
+  [ -f "$(vstate "$name")/device" ] && { nbd-client -d "$(cat "$(vstate "$name")/device")" >/dev/null 2>&1 || true; rm -f "$(vstate "$name")/device"; }
+  return 0
+}
+
+# -------------------------------------------------------- config generation ----
+write_configs(){ # $1=name ; expects meta vars already in scope
+  local name="$1" idx="$INDEX"
+  local nbd=$(( NBD_PORT_BASE + idx )) nfs=$(( NFS_PORT_BASE + idx )) rpc=$(( RPC_PORT_BASE + idx )) met=$(( METRICS_PORT_BASE + idx ))
+  install -d -m 0755 "$(vstate "$name")/cache"
+  umask 077
+  cat > "$(vtoml "$name")" <<TOML
+# infinidisk volume: $name (generated $(date -u +%FT%TZ))
+[cache]
+dir = "$(vstate "$name")/cache"
+disk_size_gb = $CACHE_GB
+memory_size_gb = $MEM_GB
+
+[storage]
+url = "s3://$BUCKET/$PREFIX"
+encryption_password = "\${INFINIDISK_PASSWORD}"
+
+[servers.nfs]
+addresses = ["127.0.0.1:$nfs"]
+[servers.nbd]
+addresses = ["127.0.0.1:$nbd"]
+[servers.rpc]
+addresses = ["127.0.0.1:$rpc"]
+
+[aws]
+access_key_id = "\${AWS_ACCESS_KEY_ID}"
+secret_access_key = "\${AWS_SECRET_ACCESS_KEY}"
+endpoint = "$ENDPOINT"
+default_region = "$REGION"
+
+[filesystem]
+ignore_fsync = true
+compression = "lz4"
+
+[prometheus]
+addresses = ["127.0.0.1:$met"]
+TOML
+  chmod 0644 "$(vtoml "$name")"
+}
+
+# source a volume's AWS creds + encryption password into the environment
+load_secrets(){ set -a; . "$(venv "$1")"; set +a; }
+
+# derive a stable per-volume encryption password from the per-VM secret
+# (/opt/server_token.secret). Reproducible on the SAME VM -> no random key to
+# lose for the common case. Returns non-zero if the VM secret is absent (dev).
+SERVER_SECRET="${INFINIDISK_SERVER_SECRET:-/opt/server_token.secret}"
+_derive_key(){ local sec; [ -r "$SERVER_SECRET" ] || return 1; sec=$(cat "$SERVER_SECRET"); printf '%s' "${sec}|infinidisk|$1" | sha256sum | cut -d' ' -f1; }
+# write the encryption password to <name>.key and sync it into <name>.env
+_set_key(){ local name="$1" k="$2"; umask 077; printf '%s\n' "$k" > "$(vkey "$name")"; chmod 0600 "$(vkey "$name")"
+  [ -f "$(venv "$name")" ] && sed -i "s|^INFINIDISK_PASSWORD=.*|INFINIDISK_PASSWORD=$k|" "$(venv "$name")"; }
+# path to the scrapeable metrics endpoint for a volume
+metrics_url(){ echo "http://127.0.0.1:$(( METRICS_PORT_BASE + $(. "$(vconf "$1")"; echo "$INDEX") ))/metrics"; }
+
+# ------------------------------------------------------------------ create ----
+cmd_create(){
+  need_root
+  local name="" size="" bucket="" prefix="" endpoint="$INFINIDISK_DEFAULT_ENDPOINT"
+  local region="$INFINIDISK_DEFAULT_REGION" cache="$INFINIDISK_DEFAULT_CACHE_GB" mem="$INFINIDISK_DEFAULT_MEM_GB"
+  local ak="${AWS_ACCESS_KEY_ID:-}" sk="${AWS_SECRET_ACCESS_KEY:-}" keyarg=""
+  while [ $# -gt 0 ]; do case "$1" in
+    --size) size="$2"; shift 2;;
+    --key) keyarg="$2"; shift 2;;
+    --bucket) bucket="$2"; shift 2;;
+    --prefix) prefix="$2"; shift 2;;
+    --endpoint) endpoint="$2"; shift 2;;
+    --region) region="$2"; shift 2;;
+    --cache-gb) cache="$2"; shift 2;;
+    --mem-gb) mem="$2"; shift 2;;
+    --access-key) ak="$2"; shift 2;;
+    --secret-key) sk="$2"; shift 2;;
+    -*) die "create: unknown flag $1";;
+    *) [ -z "$name" ] && name="$1" && shift || die "create: unexpected arg $1";;
+  esac; done
+  [ -n "$name" ] || die "usage: infinidisk create <name> --size 20G --bucket <b> [--prefix <p>] [--access-key .. --secret-key ..]"
+  valid_name "$name"; exists "$name" && die "volume '$name' already exists"
+  [ -n "$size" ] || die "--size required (e.g. 20G)"
+  [ -n "$bucket" ] || die "--bucket required"
+  [ -n "$ak" ] && [ -n "$sk" ] || die "S3 credentials required (--access-key/--secret-key or AWS_* env)"
+  ensure_zerofs   # auto-install zerofs if missing
+  [ -z "$prefix" ] && prefix="infinidisk/$name"
+
+  local idx; idx=$(alloc_index)
+  local INDEX="$idx" BUCKET="$bucket" PREFIX="$prefix" ENDPOINT="$endpoint" REGION="$region"
+  local SIZE="$size" CACHE_GB="$cache" MEM_GB="$mem"
+
+  log "create '$name' index=$idx size=$size bucket=$bucket prefix=$prefix"
+  # secrets: --key > derived-from-VM-secret > random
+  umask 077; install -d -m 0700 "$INFINIDISK_HOME"
+  local key
+  if [ -n "$keyarg" ]; then key="$keyarg"; log "using provided encryption key"
+  elif key=$(_derive_key "$name"); then log "encryption key derived from $SERVER_SECRET (reproducible on this VM)"
+  else key=$(openssl rand -base64 32); log "WARNING: $SERVER_SECRET absent -> RANDOM key. Back it up now: infinidisk key export $name"; fi
+  printf '%s\n' "$key" > "$(vkey "$name")"; chmod 0600 "$(vkey "$name")"
+  { echo "AWS_ACCESS_KEY_ID=$ak"; echo "AWS_SECRET_ACCESS_KEY=$sk"; echo "INFINIDISK_PASSWORD=$key"; } > "$(venv "$name")"
+  chmod 0600 "$(venv "$name")"
+  # metadata
+  cat > "$(vconf "$name")" <<META
+NAME=$name
+INDEX=$idx
+BUCKET=$bucket
+PREFIX=$prefix
+ENDPOINT=$endpoint
+REGION=$region
+SIZE=$size
+CACHE_GB=$cache
+MEM_GB=$mem
+EXPORT=$name
+CREATED=$(date -u +%FT%TZ)
+META
+  write_configs "$name"
+
+  # systemd brings it fully up (daemon -> _up: declare device, attach, mkfs, mount)
+  systemctl start "$(unit "$name")" \
+    || { journalctl -u "$(unit "$name")" --no-pager | tail -8 >&2; die "volume '$name' failed to start"; }
+  log "volume '$name' created and mounted at $(vmount "$name")"
+  cmd_status "$name"
+}
+
+# create the ZeroFS NBD export (.nbd/<export> sized file) via a transient NFS mount
+_make_device(){
+  local name="$1" size="$2"; load_meta "$name"
+  local nfs=$(( NFS_PORT_BASE + INDEX )) tmp; tmp=$(mktemp -d)
+  mount -t nfs -o "nolock,vers=3,tcp,port=$nfs,mountport=$nfs" 127.0.0.1:/ "$tmp" \
+    || { rmdir "$tmp"; die "could not mount ZeroFS NFS to declare device"; }
+  mkdir -p "$tmp/.nbd"
+  if [ ! -e "$tmp/.nbd/$EXPORT" ]; then truncate -s "$size" "$tmp/.nbd/$EXPORT"; log "declared NBD export '$EXPORT' size=$size"; fi
+  umount "$tmp"; rmdir "$tmp"
+}
+
+_attach(){ # bind the ZeroFS export to a free /dev/nbdX (NO -persist)
+  local name="$1"; load_meta "$name"
+  local port=$(( NBD_PORT_BASE + INDEX )) dev; dev=$(alloc_nbd_dev)
+  nbd-client 127.0.0.1 "$port" "$dev" -N "$EXPORT" >/dev/null 2>&1 \
+    || die "nbd-client attach failed ($dev <- 127.0.0.1:$port/$EXPORT)"
+  echo "$dev" > "$(vstate "$name")/device"
+  log "attached $EXPORT -> $dev"
+}
+
+_mount(){ local name="$1"; local dev; dev=$(cat "$(vstate "$name")/device")
+  install -d -m 0755 "$(vmount "$name")"; mount "$dev" "$(vmount "$name")"; }
+
+# ------------------------------------------------------------------- mount ----
+cmd_mount(){
+  need_root; local name="${1:-}"; [ -n "$name" ] || die "usage: infinidisk mount <name>"; load_meta "$name"
+  is_mounted "$name" && { log "'$name' already mounted at $(vmount "$name")"; return 0; }
+  systemctl start "$(unit "$name")" \
+    || { journalctl -u "$(unit "$name")" --no-pager | tail -8 >&2; die "mount failed"; }
+  log "'$name' mounted at $(vmount "$name")"
+}
+
+# ------------------------------------------------------------------ umount ----
+cmd_umount(){
+  need_root; local name="${1:-}"; [ -n "$name" ] || die "usage: infinidisk umount <name>"; load_meta "$name"
+  systemctl stop "$(unit "$name")" || true   # ExecStop unmounts+detaches, then daemon drains WAL
+  log "'$name' unmounted and daemon stopped"
+}
+
+# ----------------------------------------------------------- enable/disable ----
+cmd_enable(){
+  need_root; local name="${1:-}"; [ -n "$name" ] || die "usage: infinidisk enable <name>"; load_meta "$name"
+  systemctl enable "$(unit "$name")" >/dev/null 2>&1 || die "enable failed"
+  log "'$name' will auto-mount at boot"
+}
+cmd_disable(){
+  need_root; local name="${1:-}"; [ -n "$name" ] || die "usage: infinidisk disable <name>"; load_meta "$name"
+  systemctl disable "$(unit "$name")" >/dev/null 2>&1 || true
+  log "'$name' will no longer auto-mount at boot"
+}
+
+# bytes still buffered locally and not yet flushed to S3 (= the ignore_fsync loss
+# window). Best-effort scrape of the Prometheus endpoint; "-" if unavailable.
+pending_bytes(){ # $1=name
+  command -v curl >/dev/null || { echo "-"; return; }
+  local out; out=$(curl -fsS --max-time 3 "$(metrics_url "$1")" 2>/dev/null) || { echo "-"; return; }
+  echo "$out" | awk '
+    /^zerofs_(staging|wal|dirty|pending|unflushed)[a-z_]*_bytes[ {]/ {v=$NF; s+=v}
+    END { if (s>0) printf "%.0f", s; else print "0" }'
+}
+
+# ------------------------------------------------------------------ status ----
+cmd_status(){
+  local name="" json=0
+  while [ $# -gt 0 ]; do case "$1" in --json) json=1; shift;; *) name="$1"; shift;; esac; done
+  if [ -z "$name" ]; then [ "$json" = 1 ] && cmd_list --json || cmd_list; return; fi
+  load_meta "$name"
+  local active mounted dev pend enabled usep
+  active=$(svc_active "$(unit "$name")")
+  enabled=$(svc_enabled "$(unit "$name")")
+  mounted=$(is_mounted "$name" && echo yes || echo no)
+  dev=$( [ -f "$(vstate "$name")/device" ] && cat "$(vstate "$name")/device" || echo "-")
+  pend=$([ "$mounted" = yes ] && pending_bytes "$name" || echo "-")
+  usep=$([ "$mounted" = yes ] && df -h --output=used,avail,pcent "$(vmount "$name")" | tail -1 | tr -s ' ' || echo "-")
+  if [ "$json" = 1 ]; then
+    printf '{"name":"%s","daemon":"%s","enabled":"%s","mounted":"%s","device":"%s","mountpoint":"%s","bucket":"%s","prefix":"%s","endpoint":"%s","size":"%s","cache_gb":%s,"mem_gb":%s,"mode":"ignore_fsync","pending_to_s3_bytes":"%s"}\n' \
+      "$name" "$active" "$enabled" "$mounted" "$dev" "$(vmount "$name")" "$BUCKET" "$PREFIX" "$ENDPOINT" "$SIZE" "$CACHE_GB" "$MEM_GB" "$pend"
+    return
+  fi
+  echo "volume : $name"
+  echo "state  : daemon=$active enabled=$enabled mounted=$mounted"
+  echo "device : $dev   mountpoint=$(vmount "$name")"
+  echo "backend: s3://$BUCKET/$PREFIX  ($ENDPOINT)"
+  echo "size   : $SIZE   cache=${CACHE_GB}G ram=${MEM_GB}G  mode=ignore_fsync"
+  [ "$mounted" = yes ] && echo "usage  : $usep"
+  [ "$mounted" = yes ] && echo "pending-to-S3 : ${pend} bytes (ignore_fsync loss window)"
+}
+
+# -------------------------------------------------------------------- list ----
+cmd_list(){
+  local json=0; [ "${1:-}" = --json ] && json=1
+  if [ "$json" = 1 ]; then
+    local first=1; printf '['
+    for f in "$INFINIDISK_CONF"/*.conf; do [ -e "$f" ] || continue
+      ( . "$f"; a=$(svc_active "infinidisk@$NAME.service")
+        m=$(mountpoint -q "$INFINIDISK_MNT/$NAME" && echo true || echo false)
+        printf '{"name":"%s","daemon":"%s","mounted":%s,"size":"%s","bucket":"%s","prefix":"%s"}' "$NAME" "$a" "$m" "$SIZE" "$BUCKET" "$PREFIX" )
+      first=0; printf ','
+    done | sed 's/,$//'
+    printf ']\n'; return
+  fi
+  local any=0
+  printf '%-20s %-9s %-8s %-9s %s\n' NAME DAEMON MOUNTED SIZE BACKEND
+  for f in "$INFINIDISK_CONF"/*.conf; do [ -e "$f" ] || continue; any=1
+    ( . "$f"
+      a=$(svc_active "infinidisk@$NAME.service")
+      m=$(mountpoint -q "$INFINIDISK_MNT/$NAME" && echo yes || echo no)
+      printf '%-20s %-9s %-8s %-9s %s\n' "$NAME" "$a" "$m" "$SIZE" "s3://$BUCKET/$PREFIX" )
+  done
+  [ "$any" = 0 ] && echo "(no volumes)"
+}
+
+# ----------------------------------------------------------------- destroy ----
+cmd_destroy(){
+  need_root; local name="" yes=0
+  while [ $# -gt 0 ]; do case "$1" in
+    --yes|-y) yes=1; shift;;
+    -*) die "destroy: unknown flag $1";; *) name="$1"; shift;;
+  esac; done
+  [ -n "$name" ] || die "usage: infinidisk destroy <name> [--yes]"; load_meta "$name"
+  [ "$yes" = 1 ] || { read -r -p "destroy volume '$name'? (S3 data is kept) [y/N] " a; [ "$a" = y ] || die "aborted"; }
+  cmd_umount "$name" 2>/dev/null || true
+  systemctl disable "$(unit "$name")" 2>/dev/null || true
+  rm -f "$(vconf "$name")" "$(vtoml "$name")" "$(vkey "$name")" "$(venv "$name")"
+  rm -rf "$(vstate "$name")"
+  rmdir "$(vmount "$name")" 2>/dev/null || true
+  log "volume '$name' destroyed (local config removed; S3 data KEPT)"
+}
+
+# ---------------------------------------------------------------- snapshot ----
+# infinidisk snapshot create|list|delete|info|mount|umount <vol> [<snap>]
+cmd_snapshot(){
+  need_root; local sub="${1:-}"; shift || true
+  local name="${1:-}"; [ -n "$name" ] || die "usage: infinidisk snapshot <create|list|delete|info|mount|umount> <volume> [snap]"
+  load_meta "$name"; load_secrets "$name"
+  local toml; toml="$(vtoml "$name")"
+  case "$sub" in
+    create) local snap="${2:-infinidisk-$(date -u +%Y%m%d-%H%M%S)}"
+      sync 2>/dev/null || true
+      "$ZEROFS_BIN" checkpoint create -c "$toml" "$snap" 2>&1 | sed 's/^/[zerofs] /'
+      log "snapshot '$snap' created for volume '$name'";;
+    list)   "$ZEROFS_BIN" checkpoint list -c "$toml";;
+    info)   local snap="${2:?snapshot name required}"; "$ZEROFS_BIN" checkpoint info -c "$toml" "$snap";;
+    delete) local snap="${2:?snapshot name required}"; "$ZEROFS_BIN" checkpoint delete -c "$toml" "$snap" 2>&1 | sed 's/^/[zerofs] /'; log "snapshot '$snap' deleted";;
+    mount)  local snap="${2:?snapshot name required}"; _snap_mount "$name" "$snap";;
+    umount|unmount) local snap="${2:?snapshot name required}"; _snap_umount "$name" "$snap";;
+    schedule) _snap_schedule "$name" "${@:2}";;
+    unschedule) _snap_unschedule "$name";;
+    *) die "snapshot: unknown subcommand '$sub' (create|list|delete|info|mount|umount|schedule|unschedule)";;
+  esac
+}
+
+_snap_unit(){ echo "infinidisk-snap-$1-$2"; }         # $1=vol $2=snap
+_snap_mp(){ echo "$INFINIDISK_MNT/$1@$2"; }
+_snap_toml(){ echo "$INFINIDISK_CONF/$1@$2.toml"; }
+
+# read-only mount of a checkpoint: a second daemon on parallel ports, opened
+# --read-only --checkpoint, ext4 mounted ro,norecovery.
+_snap_mount(){
+  local name="$1" snap="$2"; load_meta "$name"
+  local idx="$INDEX"
+  local nbd=$(( NBD_PORT_BASE + SNAP_OFFSET + idx )) nfs=$(( NFS_PORT_BASE + SNAP_OFFSET + idx )) rpc=$(( RPC_PORT_BASE + SNAP_OFFSET + idx ))
+  local st="$(vstate "$name")/snap-$snap"; install -d -m 0755 "$st/cache"
+  umask 077
+  cat > "$(_snap_toml "$name" "$snap")" <<TOML
+[cache]
+dir = "$st/cache"
+disk_size_gb = 1
+memory_size_gb = 1
+[storage]
+url = "s3://$BUCKET/$PREFIX"
+encryption_password = "\${INFINIDISK_PASSWORD}"
+[servers.nfs]
+addresses = ["127.0.0.1:$nfs"]
+[servers.nbd]
+addresses = ["127.0.0.1:$nbd"]
+[servers.rpc]
+addresses = ["127.0.0.1:$rpc"]
+[aws]
+access_key_id = "\${AWS_ACCESS_KEY_ID}"
+secret_access_key = "\${AWS_SECRET_ACCESS_KEY}"
+endpoint = "$ENDPOINT"
+default_region = "$REGION"
+[filesystem]
+ignore_fsync = true
+TOML
+  chmod 0644 "$(_snap_toml "$name" "$snap")"
+  local unit; unit="$(_snap_unit "$name" "$snap")"
+  local self; self=$(command -v "$0" 2>/dev/null || echo /usr/local/bin/infinidisk)
+  systemctl reset-failed "$unit" 2>/dev/null || true
+  systemd-run --unit="$unit" --collect \
+    -p "Environment=INFINIDISK_SNAP_TOML=$(_snap_toml "$name" "$snap")" \
+    -p "Environment=INFINIDISK_SNAP_CP=$snap" \
+    -p "EnvironmentFile=$(venv "$name")" \
+    "$self" _snap_daemon "$name" "$snap" >/dev/null
+  # wait serving
+  local i; for i in $(seq 1 60); do ss -ltn 2>/dev/null | grep -q "127.0.0.1:$nbd " && break; sleep 1; done
+  ss -ltn 2>/dev/null | grep -q "127.0.0.1:$nbd " || { journalctl -u "$unit" --no-pager|tail -5 >&2; die "snapshot daemon not serving"; }
+  local dev; dev=$(alloc_nbd_dev)
+  nbd-client 127.0.0.1 "$nbd" "$dev" -N "$EXPORT" >/dev/null 2>&1 || die "snapshot nbd attach failed"
+  echo "$dev" > "$st/device"
+  install -d -m 0755 "$(_snap_mp "$name" "$snap")"
+  mount -o ro,norecovery "$dev" "$(_snap_mp "$name" "$snap")" || { nbd-client -d "$dev" >/dev/null 2>&1; die "snapshot ext4 mount failed"; }
+  log "snapshot '$snap' of '$name' mounted READ-ONLY at $(_snap_mp "$name" "$snap")"
+}
+
+cmd__snap_daemon(){ local name="$1" snap="$2"; exec "$ZEROFS_BIN" run -c "$INFINIDISK_SNAP_TOML" --checkpoint "$INFINIDISK_SNAP_CP"; }  # --checkpoint implies read-only
+
+_snap_umount(){
+  local name="$1" snap="$2"; load_meta "$name"
+  local st="$(vstate "$name")/snap-$snap" unit; unit="$(_snap_unit "$name" "$snap")"
+  mountpoint -q "$(_snap_mp "$name" "$snap")" && { umount "$(_snap_mp "$name" "$snap")" 2>/dev/null || umount -l "$(_snap_mp "$name" "$snap")" 2>/dev/null || true; }
+  [ -f "$st/device" ] && { nbd-client -d "$(cat "$st/device")" >/dev/null 2>&1 || true; rm -f "$st/device"; }
+  systemctl stop "$unit" 2>/dev/null || true; systemctl reset-failed "$unit" 2>/dev/null || true
+  rmdir "$(_snap_mp "$name" "$snap")" 2>/dev/null || true
+  rm -f "$(_snap_toml "$name" "$snap")"; rm -rf "$st"
+  log "snapshot '$snap' of '$name' unmounted"
+}
+
+# ------------------------------------------------------------------ resize ----
+# grow a volume: truncate the NBD export larger, re-attach, resize2fs online. No shrink.
+cmd_resize(){
+  need_root; local name="${1:-}" newsize="${2:-}"
+  [ -n "$name" ] && [ -n "$newsize" ] || die "usage: infinidisk resize <name> <newsize e.g. 40G>"
+  load_meta "$name"
+  systemctl is-active "$(unit "$name")" >/dev/null 2>&1 || die "volume '$name' must be mounted to resize"
+  local cur_b new_b; cur_b=$(numfmt --from=iec "${SIZE/G/G}" 2>/dev/null || echo 0); new_b=$(numfmt --from=iec "$newsize" 2>/dev/null || die "bad size '$newsize'")
+  [ "$new_b" -gt "$cur_b" ] || die "resize only grows (current $SIZE, requested $newsize)"
+  log "resizing '$name' $SIZE -> $newsize"
+  _grow_device "$name" "$newsize"
+  # re-attach so the kernel NBD device picks up the new size
+  is_mounted "$name" && umount "$(vmount "$name")"
+  [ -f "$(vstate "$name")/device" ] && { nbd-client -d "$(cat "$(vstate "$name")/device")" >/dev/null 2>&1 || true; rm -f "$(vstate "$name")/device"; }
+  _attach "$name"; _mount "$name"
+  local dev; dev=$(cat "$(vstate "$name")/device")
+  resize2fs "$dev" >/dev/null 2>&1 || { e2fsck -f -y "$dev" >/dev/null 2>&1; resize2fs "$dev" >/dev/null 2>&1 || die "resize2fs failed"; }
+  sed -i "s/^SIZE=.*/SIZE=$newsize/" "$(vconf "$name")"
+  log "volume '$name' resized to $newsize"; cmd_status "$name"
+}
+_grow_device(){ # $1=name $2=newsize ; truncate the .nbd export via transient NFS
+  local name="$1" newsize="$2"; load_meta "$name"
+  local nfs=$(( NFS_PORT_BASE + INDEX )) tmp; tmp=$(mktemp -d)
+  mount -t nfs -o "nolock,vers=3,tcp,port=$nfs,mountport=$nfs" 127.0.0.1:/ "$tmp" || { rmdir "$tmp"; die "NFS mount failed for resize"; }
+  truncate -s "$newsize" "$tmp/.nbd/$EXPORT"
+  umount "$tmp"; rmdir "$tmp"
+}
+
+# ----------------------------------------------------------------- metrics ----
+cmd_metrics(){
+  local name="${1:-}"; [ -n "$name" ] || die "usage: infinidisk metrics <name>"; load_meta "$name"
+  command -v curl >/dev/null || die "curl required"
+  curl -fsS --max-time 5 "$(metrics_url "$name")" 2>/dev/null || die "metrics endpoint not reachable (is '$name' mounted?)"
+}
+
+# ------------------------------------------------------------------ doctor ----
+cmd_doctor(){
+  local ok=0 warn=0
+  chk(){ if eval "$2" >/dev/null 2>&1; then printf '  OK   %s\n' "$1"; ok=$((ok+1)); else printf '  FAIL %s\n' "$1"; warn=$((warn+1)); fi; }
+  echo "infinidisk doctor:"
+  chk "nbd kernel module loaded" 'grep -qw nbd /proc/modules'
+  chk "nbd-client present" 'command -v nbd-client'
+  chk "mkfs.ext4 present" 'command -v mkfs.ext4'
+  chk "zerofs installed" '"$ZEROFS_BIN" --version'
+  local free; free=$(for d in /dev/nbd*; do [[ "$d" =~ /dev/nbd[0-9]+$ ]] || continue; [ -r "/sys/block/${d#/dev/}/pid" ] || echo x; done | wc -l)
+  printf '  INFO free NBD devices: %s\n' "$free"
+  chk "default S3 endpoint reachable ($INFINIDISK_DEFAULT_ENDPOINT)" 'command -v curl >/dev/null && curl -fsS --max-time 5 -o /dev/null "$INFINIDISK_DEFAULT_ENDPOINT"'
+  chk "config dir writable" '[ -w "$INFINIDISK_CONF" ] || [ ! -e "$INFINIDISK_CONF" ]'
+  echo "  -> $ok ok, $warn issue(s)"
+  [ "$warn" = 0 ]
+}
+
+# -------------------------------------------------------------------- main ----
+# -------------------------------------------------------------------- key ----
+# key export <vol>  -> print the encryption password (for the backend to escrow)
+# key import <vol> <value> -> set it (for DR with an escrowed key)
+# key derive <vol>  -> show what the per-VM secret would derive
+cmd_key(){
+  need_root; local sub="${1:-}" name="${2:-}"
+  case "$sub" in
+    export|show) [ -n "$name" ] || die "usage: infinidisk key export <volume>"; load_meta "$name"; cat "$(vkey "$name")";;
+    import) name="${2:-}"; local k="${3:-}"; [ -n "$name" ] && [ -n "$k" ] || die "usage: infinidisk key import <volume> <keyvalue>"; load_meta "$name"; _set_key "$name" "$k"; log "key updated for '$name' — remount (umount+mount) to apply";;
+    derive) [ -n "$name" ] || die "usage: infinidisk key derive <volume>"; _derive_key "$name" || die "no $SERVER_SECRET on this VM";;
+    *) die "usage: infinidisk key <export|import|derive> <volume> [keyvalue]";;
+  esac
+}
+
+# ------------------------------------------------------------------- adopt ----
+# Re-attach an EXISTING ZeroFS bucket as a volume on this (possibly fresh) VM.
+# Does NOT format — the filesystem already lives in the bucket. The encryption
+# key must match the original: --key (from escrow) or derived from this VM's
+# secret (only works if it is the same VM / same secret).
+cmd_adopt(){
+  need_root; local name="" bucket="" prefix="" endpoint="$INFINIDISK_DEFAULT_ENDPOINT"
+  local region="$INFINIDISK_DEFAULT_REGION" cache="$INFINIDISK_DEFAULT_CACHE_GB" mem="$INFINIDISK_DEFAULT_MEM_GB"
+  local ak="${AWS_ACCESS_KEY_ID:-}" sk="${AWS_SECRET_ACCESS_KEY:-}" keyarg=""
+  while [ $# -gt 0 ]; do case "$1" in
+    --bucket) bucket="$2"; shift 2;; --prefix) prefix="$2"; shift 2;; --endpoint) endpoint="$2"; shift 2;;
+    --region) region="$2"; shift 2;; --cache-gb) cache="$2"; shift 2;; --mem-gb) mem="$2"; shift 2;;
+    --key) keyarg="$2"; shift 2;; --access-key) ak="$2"; shift 2;; --secret-key) sk="$2"; shift 2;;
+    -*) die "adopt: unknown flag $1";; *) [ -z "$name" ] && name="$1" && shift || die "adopt: unexpected $1";;
+  esac; done
+  [ -n "$name" ] || die "usage: infinidisk adopt <name> --bucket <b> [--prefix p] [--key k] [--access-key.. --secret-key..]"
+  valid_name "$name"; exists "$name" && die "volume '$name' already exists"
+  [ -n "$bucket" ] || die "--bucket required"
+  [ -n "$ak" ] && [ -n "$sk" ] || die "S3 credentials required"
+  ensure_zerofs
+  [ -z "$prefix" ] && prefix="infinidisk/$name"
+  local idx; idx=$(alloc_index)
+  local INDEX="$idx" BUCKET="$bucket" PREFIX="$prefix" ENDPOINT="$endpoint" REGION="$region" SIZE="0" CACHE_GB="$cache" MEM_GB="$mem"
+  local key
+  if [ -n "$keyarg" ]; then key="$keyarg"; log "adopt: using provided key"
+  elif key=$(_derive_key "$name"); then log "adopt: key derived from $SERVER_SECRET (assumes same VM as origin)"
+  else die "adopt needs the original encryption key: pass --key <value> (from escrow)"; fi
+  umask 077; install -d -m 0700 "$INFINIDISK_HOME"
+  printf '%s\n' "$key" > "$(vkey "$name")"; chmod 0600 "$(vkey "$name")"
+  { echo "AWS_ACCESS_KEY_ID=$ak"; echo "AWS_SECRET_ACCESS_KEY=$sk"; echo "INFINIDISK_PASSWORD=$key"; } > "$(venv "$name")"; chmod 0600 "$(venv "$name")"
+  cat > "$(vconf "$name")" <<META
+NAME=$name
+INDEX=$idx
+BUCKET=$bucket
+PREFIX=$prefix
+ENDPOINT=$endpoint
+REGION=$region
+SIZE=0
+CACHE_GB=$cache
+MEM_GB=$mem
+EXPORT=$name
+CREATED=$(date -u +%FT%TZ)
+META
+  write_configs "$name"
+  install -d -m 0755 "$(vstate "$name")"; : > "$(vstate "$name")/formatted"   # DO NOT mkfs an adopted volume
+  log "adopting '$name' from s3://$bucket/$prefix (no format)"
+  systemctl start "$(unit "$name")" || { journalctl -u "$(unit "$name")" --no-pager | tail -8 >&2; die "adopt failed — wrong key/prefix?"; }
+  # record the real size from the attached device
+  local dev; dev=$(cat "$(vstate "$name")/device" 2>/dev/null)
+  if [ -n "$dev" ]; then local b; b=$(blockdev --getsize64 "$dev" 2>/dev/null); [ -n "$b" ] && sed -i "s/^SIZE=.*/SIZE=$(numfmt --to=iec "$b" 2>/dev/null || echo "$b")/" "$(vconf "$name")"; fi
+  log "volume '$name' adopted and mounted at $(vmount "$name")"; cmd_status "$name"
+}
+
+# ------------------------------------------------------------------- clone ----
+# Promote a snapshot into a NEW independent writable volume (full copy).
+cmd_clone(){
+  need_root; local src="${1:-}" snap="${2:-}" newvol="${3:-}"
+  [ -n "$src" ] && [ -n "$snap" ] && [ -n "$newvol" ] || die "usage: infinidisk clone <srcvol> <snap> <newvol>"
+  load_meta "$src"; load_secrets "$src"
+  local sbucket="$BUCKET" sendpoint="$ENDPOINT" sregion="$REGION" ssize="$SIZE" scache="$CACHE_GB" smem="$MEM_GB"
+  local sak ssk; sak=$(grep -E '^AWS_ACCESS_KEY_ID=' "$(venv "$src")"|cut -d= -f2-); ssk=$(grep -E '^AWS_SECRET_ACCESS_KEY=' "$(venv "$src")"|cut -d= -f2-)
+  command -v rsync >/dev/null || die "rsync required for clone (apt-get install rsync)"
+  log "clone: mounting snapshot '$snap' of '$src' (read-only)"
+  _snap_mount "$src" "$snap"
+  log "clone: creating new volume '$newvol' ($ssize)"
+  cmd_create "$newvol" --size "$ssize" --bucket "$sbucket" --prefix "infinidisk/$newvol" --endpoint "$sendpoint" --region "$sregion" --cache-gb "$scache" --mem-gb "$smem" --access-key "$sak" --secret-key "$ssk" >&2
+  log "clone: copying data (full copy, may take a while)"
+  rsync -aH --delete --exclude 'lost+found' "$(_snap_mp "$src" "$snap")/" "$(vmount "$newvol")/"
+  sync; _snap_umount "$src" "$snap"
+  log "clone complete: '$newvol' is an independent writable copy of '$src@$snap'"; cmd_status "$newvol"
+}
+
+# ---------------------------------------------------------------- rollback ----
+# Destructively revert a volume's CONTENT to a snapshot (file-level).
+cmd_rollback(){
+  need_root; local name="" snap="" yes=0
+  while [ $# -gt 0 ]; do case "$1" in --yes|-y) yes=1; shift;; -*) die "rollback: unknown $1";; *) [ -z "$name" ] && name="$1" && shift || { snap="$1"; shift; };; esac; done
+  [ -n "$name" ] && [ -n "$snap" ] || die "usage: infinidisk rollback <vol> <snap> [--yes]"
+  load_meta "$name"; is_mounted "$name" || die "volume '$name' must be mounted"
+  command -v rsync >/dev/null || die "rsync required for rollback"
+  [ "$yes" = 1 ] || { read -r -p "DESTRUCTIVE: overwrite '$name' with snapshot '$snap'? [y/N] " a; [ "$a" = y ] || die "aborted"; }
+  log "rollback: mounting snapshot '$snap' (read-only)"; _snap_mount "$name" "$snap"
+  log "rollback: restoring content of '$name' from '$snap'"
+  rsync -aH --delete --exclude 'lost+found' "$(_snap_mp "$name" "$snap")/" "$(vmount "$name")/"
+  sync; _snap_umount "$name" "$snap"
+  log "rollback complete: '$name' now matches snapshot '$snap'"
+}
+
+# ----------------------------------------------- scheduled snapshots ----
+_snap_schedule(){
+  local name="$1"; shift; local every="1h" keep="24"
+  while [ $# -gt 0 ]; do case "$1" in --every) every="$2"; shift 2;; --keep) keep="$2"; shift 2;; *) die "schedule: unknown $1";; esac; done
+  local self; self=$(command -v "$0" 2>/dev/null || echo /usr/local/bin/infinidisk)
+  cat > "/etc/systemd/system/infinidisk-snap-$name.service" <<U
+[Unit]
+Description=infinidisk scheduled snapshot for $name
+[Service]
+Type=oneshot
+ExecStart=$self _snaptick $name $keep
+U
+  cat > "/etc/systemd/system/infinidisk-snap-$name.timer" <<U
+[Unit]
+Description=infinidisk snapshot schedule for $name
+[Timer]
+OnBootSec=$every
+OnUnitActiveSec=$every
+Persistent=true
+[Install]
+WantedBy=timers.target
+U
+  systemctl daemon-reload
+  systemctl enable --now "infinidisk-snap-$name.timer" >/dev/null 2>&1 || die "could not enable timer"
+  log "scheduled snapshots for '$name': every $every, keep $keep newest (auto-*)"
+}
+_snap_unschedule(){
+  local name="$1"
+  systemctl disable --now "infinidisk-snap-$name.timer" >/dev/null 2>&1 || true
+  rm -f "/etc/systemd/system/infinidisk-snap-$name.service" "/etc/systemd/system/infinidisk-snap-$name.timer"
+  systemctl daemon-reload
+  log "snapshot schedule removed for '$name' (existing snapshots kept)"
+}
+# internal (timer): take a snapshot + prune auto-* to the newest N
+cmd__snaptick(){
+  local name="$1" keep="${2:-24}"; load_meta "$name"; load_secrets "$name"
+  local toml; toml="$(vtoml "$name")"
+  local snap="auto-$(date -u +%Y%m%d-%H%M%S)"
+  "$ZEROFS_BIN" checkpoint create -c "$toml" "$snap" >/dev/null 2>&1 || { log "_snaptick: checkpoint create failed"; return 1; }
+  local autos; mapfile -t autos < <("$ZEROFS_BIN" checkpoint list -c "$toml" 2>/dev/null | grep -oE 'auto-[0-9]{8}-[0-9]{6}' | sort -u)
+  local n=${#autos[@]}
+  if [ "$n" -gt "$keep" ]; then
+    local del=$((n-keep)) i
+    for ((i=0;i<del;i++)); do "$ZEROFS_BIN" checkpoint delete -c "$toml" "${autos[$i]}" >/dev/null 2>&1 || true; done
+    log "_snaptick: $name snapshot $snap; pruned $del old (kept $keep)"
+  else log "_snaptick: $name snapshot $snap ($n total)"; fi
+}
+
+usage(){ cat <<USAGE
+infinidisk $VERSION - S3-backed block volumes via ZeroFS (ignore_fsync, no HA)
+
+  infinidisk install [--binary <path-to-zerofs>]
+  infinidisk create  <name> --size 20G --bucket <b> [--prefix p] [--endpoint u]
+                            [--region r] [--cache-gb 4] [--mem-gb 1] [--key k]
+                            [--access-key .. --secret-key ..]   (or AWS_* env)
+  infinidisk adopt   <name> --bucket <b> [--prefix p] [--key k] ...  # re-attach existing (DR)
+  infinidisk mount    <name>
+  infinidisk umount   <name>
+  infinidisk enable   <name>                  # auto-mount at boot
+  infinidisk disable  <name>
+  infinidisk resize   <name> <newsize>        # grow only (e.g. 40G)
+  infinidisk snapshot create <name> [snap]    # point-in-time (ZeroFS checkpoint)
+  infinidisk snapshot list   <name>
+  infinidisk snapshot info   <name> <snap>
+  infinidisk snapshot delete <name> <snap>
+  infinidisk snapshot mount  <name> <snap>    # read-only clone at <mnt>/<name>@<snap>
+  infinidisk snapshot umount <name> <snap>
+  infinidisk snapshot schedule <name> [--every 1h] [--keep 24]   # auto snapshots + retention
+  infinidisk snapshot unschedule <name>
+  infinidisk clone    <srcvol> <snap> <newvol> # promote a snapshot to a new writable volume
+  infinidisk rollback <name> <snap> [--yes]    # DESTRUCTIVE: revert content to a snapshot
+  infinidisk key      <export|import|derive> <name> [keyvalue]
+  infinidisk status   [name] [--json]
+  infinidisk list     [--json]
+  infinidisk metrics  <name>                  # raw Prometheus metrics
+  infinidisk doctor                           # preflight checks
+  infinidisk destroy  <name> [--yes]          # removes the volume locally; S3 data is kept
+
+Site defaults can be set in $INFINIDISK_CONF/infinidisk.conf (endpoint, region,
+bucket, AWS_* creds, cache/mem defaults).
+USAGE
+}
+
+main(){
+  local cmd="${1:-}"; shift || true
+  case "$cmd" in
+    install) cmd_install "$@";;
+    create)  cmd_create "$@";;
+    mount)   cmd_mount "$@";;
+    umount|unmount) cmd_umount "$@";;
+    enable)  cmd_enable "$@";;
+    disable) cmd_disable "$@";;
+    resize)  cmd_resize "$@";;
+    snapshot|snap) cmd_snapshot "$@";;
+    clone)   cmd_clone "$@";;
+    rollback) cmd_rollback "$@";;
+    adopt)   cmd_adopt "$@";;
+    key)     cmd_key "$@";;
+    metrics) cmd_metrics "$@";;
+    doctor)  cmd_doctor "$@";;
+    status)  cmd_status "$@";;
+    list)    cmd_list "$@";;
+    destroy) cmd_destroy "$@";;
+    _daemon) cmd__daemon "$@";;        # internal (systemd ExecStart)
+    _up)     cmd__up "$@";;            # internal (systemd ExecStartPost)
+    _down)   cmd__down "$@";;          # internal (systemd ExecStop)
+    _snap_daemon) cmd__snap_daemon "$@";;  # internal (snapshot read-only daemon)
+    _snaptick) cmd__snaptick "$@";;        # internal (scheduled snapshot timer)
+    version|-v|--version) echo "infinidisk $VERSION";;
+    ""|help|-h|--help) usage;;
+    *) die "unknown command '$cmd' (try: infinidisk help)";;
+  esac
+}
+main "$@"
