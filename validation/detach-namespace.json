@@ -1,0 +1,4 @@
+{
+  "namespace_mount_detach_refused": true,
+  "detach_after_unmount": true
+}

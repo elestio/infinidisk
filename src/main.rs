@@ -1,0 +1,164 @@
+use anyhow::{Context, Result};
+use clap::{Parser, Subcommand};
+use infinidisk2::{config::Config, engine::Engine, linux, nbd};
+use std::{path::PathBuf, time::Duration};
+use tokio::sync::watch;
+
+#[derive(Parser)]
+#[command(version, about)]
+struct Cli {
+    #[arg(short, long, default_value = "infinidisk2.toml")]
+    config: PathBuf,
+    #[command(subcommand)]
+    command: Command,
+}
+#[derive(Subcommand)]
+enum Command {
+    /// Write an example configuration (refuses to overwrite).
+    Config,
+    /// Create a brand-new unformatted block volume; never replaces remote data.
+    Init {
+        #[arg(long,value_parser=parse_size)]
+        size: u64,
+    },
+    /// Restore the last remote checkpoint into a new local directory.
+    Adopt {
+        /// The previous writer must already be stopped/fenced.
+        #[arg(long)]
+        takeover: bool,
+    },
+    /// Serve the block device over loopback NBD.
+    Serve,
+    /// Inspect the committed remote HEAD without opening the volume for writing.
+    Status,
+    /// Verify every referenced remote page and all metadata checksums.
+    Scrub,
+    /// Offline orphan collection; default is a dry run. Stop the server first.
+    Gc {
+        #[arg(long)]
+        apply: bool,
+        #[arg(long, default_value_t = 86400)]
+        min_age_seconds: u64,
+    },
+    /// Attach natively with multiple sockets; runs in foreground until detached.
+    Attach {
+        #[arg(long)]
+        device: PathBuf,
+        #[arg(long, default_value_t = 8)]
+        connections: u8,
+    },
+    /// Detach a Linux NBD device (unmount the filesystem first).
+    Detach {
+        #[arg(long)]
+        device: PathBuf,
+    },
+}
+fn parse_size(s: &str) -> std::result::Result<u64, String> {
+    let (n, m) = if let Some(n) = s.strip_suffix("GiB") {
+        (n, 1024u64.pow(3))
+    } else if let Some(n) = s.strip_suffix("MiB") {
+        (n, 1024u64.pow(2))
+    } else {
+        (s, 1)
+    };
+    n.parse::<u64>()
+        .map_err(|e| e.to_string())?
+        .checked_mul(m)
+        .ok_or_else(|| "size overflow".into())
+}
+#[tokio::main(worker_threads = 4)]
+async fn main() -> Result<()> {
+    tracing_subscriber::fmt()
+        .with_env_filter(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "infinidisk2=info".into()),
+        )
+        .init();
+    let cli = Cli::parse();
+    if matches!(cli.command, Command::Config) {
+        use std::io::Write;
+        let mut f = std::fs::OpenOptions::new()
+            .create_new(true)
+            .write(true)
+            .open(&cli.config)?;
+        f.write_all(toml::to_string_pretty(&Config::default())?.as_bytes())?;
+        f.sync_all()?;
+        println!("Configuration: {}", cli.config.display());
+        return Ok(());
+    }
+    let c = Config::load(&cli.config)?;
+    match cli.command {
+        Command::Init { size } => println!(
+            "{}",
+            serde_json::to_string_pretty(&Engine::init(&c, size).await?)?
+        ),
+        Command::Adopt { takeover } => println!(
+            "{}",
+            serde_json::to_string_pretty(&Engine::adopt(&c, takeover).await?)?
+        ),
+        Command::Status => println!(
+            "{}",
+            serde_json::to_string_pretty(&Engine::inspect(&c).await?)?
+        ),
+        Command::Scrub => {
+            let (seq, pages) = Engine::verify_remote(&c).await?;
+            println!("Verified remote sequence {seq}: {pages} allocated 4 KiB pages");
+        }
+        Command::Gc {
+            apply,
+            min_age_seconds,
+        } => println!(
+            "{}",
+            serde_json::to_string_pretty(&Engine::gc(&c, apply, min_age_seconds).await?)?
+        ),
+        Command::Attach {
+            device,
+            connections,
+        } => {
+            tokio::task::spawn_blocking(move || linux::attach(&c, &device, connections)).await??;
+        }
+        Command::Detach { device } => {
+            tokio::task::spawn_blocking(move || linux::detach(&device)).await??;
+        }
+        Command::Serve => {
+            let e = Engine::open(c).await?;
+            let (tx, rx) = watch::channel(false);
+            let engine = e.clone();
+            let mut bg_shutdown = rx.clone();
+            let background = tokio::spawn(async move {
+                let mut interval =
+                    tokio::time::interval(Duration::from_secs(engine.config.checkpoint_seconds));
+                interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+                loop {
+                    tokio::select! {
+                        _=bg_shutdown.changed()=>break,
+                        _=interval.tick()=>{
+                            if let Err(err)=engine.checkpoint().await {tracing::error!(error=%err,"S3 checkpoint failed; local WAL retained");}
+                            let status=serde_json::to_string(&engine.status().await).unwrap();
+                            tracing::info!(%status,"volume status");
+                        }
+                    }
+                }
+            });
+            let mut term =
+                tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())?;
+            let server = nbd::serve(e.clone(), rx);
+            tokio::pin!(server);
+            let result = tokio::select! {
+                r=&mut server=>r,
+                _=tokio::signal::ctrl_c()=>{let _=tx.send(true);server.await},
+                _=term.recv()=>{let _=tx.send(true);server.await},
+            };
+            let _ = tx.send(true);
+            // Do not silently abandon an in-progress checkpoint on orderly shutdown.
+            let _ = tokio::time::timeout(Duration::from_secs(60), background).await;
+            e.flush().await?;
+            tokio::time::timeout(Duration::from_secs(60), e.checkpoint())
+                .await
+                .context("shutdown checkpoint timed out; local WAL retained")??;
+            result?;
+        }
+        Command::Config => unreachable!(),
+    }
+    Ok(())
+}
