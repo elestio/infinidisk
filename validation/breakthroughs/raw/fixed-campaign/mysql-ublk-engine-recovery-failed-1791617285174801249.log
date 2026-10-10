@@ -1,0 +1,40 @@
+host
+fio-version
+zerofs-version
+id2-version
+infinidisk2-storage-recovery-mount
+infinidisk2-storage-recovery-mysql-start
+infinidisk2-storage-recovery-mysql-settings
+infinidisk2-storage-recovery-mysql-crash
+infinidisk2-storage-recovery-mysql-restart
+infinidisk2-storage-recovery-storage-crash-db-kill
+infinidisk2-storage-recovery-storage-crash-db-remove
+infinidisk2-storage-recovery-storage-crash-unmount
+infinidisk2-storage-recovery-storage-crash-ublk-delete
+cleanup-mysql-1791616998197426359
+ublk-delete-1791616998209570573
+Traceback (most recent call last):
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 433, in <module>
+    mysql('infinidisk2-storage-recovery',existing=True,measure=False,storage_crash=True);stop();continue
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 361, in mysql
+    run([BIN,'-c',cfg,'ublk-delete','--id','31'],label+'-storage-crash-ublk-delete');ublk_started=False
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 98, in run
+    if check and p.returncode:raise RuntimeError(label+' failed: '+str(p.returncode))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: infinidisk2-storage-recovery-storage-crash-ublk-delete failed: 1
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 518, in <module>
+    stop();save()
+    ~~~~^^
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 171, in stop
+    run([BIN,'-c',cfg,'ublk-delete','--id','31'],'ublk-delete-'+str(time.time_ns()))
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 98, in run
+    if check and p.returncode:raise RuntimeError(label+' failed: '+str(p.returncode))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: ublk-delete-1791616998209570573 failed: 1

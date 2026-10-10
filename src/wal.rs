@@ -28,6 +28,8 @@ pub struct Segment {
     pub file: File,
     pub len: u64,
     pub last_seq: u64,
+    pub commit_seq: u64,
+    pub capacity: u64,
     vectored: bool,
 }
 pub struct Recovered {
@@ -55,20 +57,33 @@ pub fn validate_upload(
         "invalid sealed WAL identity/header"
     );
     let mut pos = HEADER;
-    let mut previous = 0;
+    let mut previous = u64::from_le_bytes(h[40..48].try_into()?).saturating_sub(1);
     while pos < data.len() {
         let r = data
             .get(pos..pos + RECORD)
             .context("truncated sealed WAL record")?;
+        let commit = &r[..4] == b"CMT1";
         let zero = &r[..4] == b"ZER1";
         ensure!(
-            zero || &r[..4] == b"WRT1",
+            commit || zero || &r[..4] == b"WRT1",
             "invalid sealed WAL record magic"
         );
         let len = u32::from_le_bytes(r[4..8].try_into()?) as usize;
         let seq = u64::from_le_bytes(r[8..16].try_into()?);
         let first = u64::from_le_bytes(r[16..24].try_into()?);
         let count = u32::from_le_bytes(r[24..28].try_into()?) as usize;
+        if commit {
+            ensure!(
+                len == 0 && count == 0 && first == 0 && seq == previous,
+                "invalid sealed commit marker"
+            );
+            ensure!(
+                crc32fast::hash(&r[..28]) == u32::from_le_bytes(r[28..32].try_into()?),
+                "sealed commit CRC mismatch"
+            );
+            pos += RECORD;
+            continue;
+        }
         ensure!(
             count > 0
                 && ((zero && len == 0)
@@ -170,6 +185,7 @@ impl Segment {
         h[..8].copy_from_slice(b"IDWAL001");
         h[8..24].copy_from_slice(id.as_bytes());
         h[24..40].copy_from_slice(volume.as_bytes());
+        h[40..48].copy_from_slice(&next.to_le_bytes());
         let crc = crc32fast::hash(&h[..60]);
         h[60..].copy_from_slice(&crc.to_le_bytes());
         file.write_all(&h)?;
@@ -181,6 +197,8 @@ impl Segment {
             file,
             len: HEADER as u64,
             last_seq: next - 1,
+            commit_seq: 0,
+            capacity: 0,
             vectored,
         })
     }
@@ -210,9 +228,16 @@ impl Segment {
             "WAL filename identity mismatch"
         );
         let end = file.metadata()?.len();
+        let capacity = u64::from_le_bytes(h[48..56].try_into()?);
+        ensure!(
+            capacity == 0
+                || (capacity >= HEADER as u64 && capacity <= 80 * 1024 * 1024 && end <= capacity),
+            "invalid fixed WAL capacity"
+        );
         let mut pos = HEADER as u64;
         let mut rows = Vec::new();
-        let mut last = 0;
+        let mut last = u64::from_le_bytes(h[40..48].try_into()?).saturating_sub(1);
+        let mut commit_seq = 0;
         while pos < end {
             if end - pos < RECORD as u64 {
                 ensure!(allow_tail, "truncated nonfinal WAL record");
@@ -220,15 +245,45 @@ impl Segment {
             }
             let mut r = [0u8; RECORD];
             file.read_exact(&mut r)?;
+            if capacity > 0 && r.iter().all(|b| *b == 0) {
+                // Zero padding is allowed only when all remaining bytes are zero.
+                // A hole in front of a later record/commit is corruption.
+                let mut remaining = end - pos - RECORD as u64;
+                let mut b = [0; 65536];
+                while remaining > 0 {
+                    let n = (remaining as usize).min(b.len());
+                    file.read_exact(&mut b[..n])?;
+                    ensure!(
+                        b[..n].iter().all(|v| *v == 0),
+                        "nonzero data after fixed WAL padding"
+                    );
+                    remaining -= n as u64;
+                }
+                break;
+            }
+            let commit = &r[..4] == b"CMT1";
             let zero = &r[..4] == b"ZER1";
             ensure!(
-                zero || &r[..4] == b"WRT1",
+                commit || zero || &r[..4] == b"WRT1",
                 "invalid WAL record magic at {pos}"
             );
             let len = u32::from_le_bytes(r[4..8].try_into()?) as usize;
             let seq = u64::from_le_bytes(r[8..16].try_into()?);
             let first = u64::from_le_bytes(r[16..24].try_into()?);
             let count = u32::from_le_bytes(r[24..28].try_into()?) as usize;
+            if commit {
+                ensure!(
+                    len == 0 && count == 0 && first == 0 && seq == last,
+                    "invalid WAL commit marker"
+                );
+                ensure!(
+                    crc32fast::hash(&r[..28]) == u32::from_le_bytes(r[28..32].try_into()?),
+                    "WAL commit CRC mismatch"
+                );
+                commit_seq = seq;
+                pos += RECORD as u64;
+                continue;
+            }
             ensure!(
                 count > 0
                     && ((zero && len == 0)
@@ -281,11 +336,18 @@ impl Segment {
             last = seq;
             pos += (RECORD + len) as u64;
         }
-        if pos != end {
+        if capacity == 0 && pos != end {
             file.set_len(pos)?;
             file.sync_all()?;
         }
-        file.seek(SeekFrom::End(0))?;
+        if capacity > 0 && end != capacity {
+            // Only creation interrupted before the first record may have a short file.
+            // A truncated file containing records is not a recoverable cache tail.
+            ensure!(rows.is_empty(), "truncated fixed WAL containing records");
+            file.set_len(capacity)?;
+            file.sync_data()?;
+        }
+        file.seek(SeekFrom::Start(pos))?;
         Ok((
             Self {
                 id,
@@ -293,15 +355,63 @@ impl Segment {
                 file,
                 len: pos,
                 last_seq: last,
+                commit_seq,
+                capacity,
                 vectored: true,
             },
             rows,
         ))
     }
+    pub fn storage_bytes(&self) -> u64 {
+        self.len.max(self.capacity)
+    }
+    pub fn initialize_capacity(&mut self, capacity: u64) -> Result<()> {
+        ensure!(
+            self.len == HEADER as u64 && capacity >= self.len && capacity <= 80 * 1024 * 1024,
+            "invalid WAL initialization"
+        );
+        let mut h = [0; HEADER];
+        self.file.read_exact_at(&mut h, 0)?;
+        h[48..56].copy_from_slice(&capacity.to_le_bytes());
+        let crc = crc32fast::hash(&h[..60]);
+        h[60..64].copy_from_slice(&crc.to_le_bytes());
+        self.file.write_all_at(&h, 0)?;
+        let zeros = [0; 65536];
+        let mut off = HEADER as u64;
+        while off < capacity {
+            let n = ((capacity - off) as usize).min(zeros.len());
+            self.file.write_all_at(&zeros[..n], off)?;
+            off += n as u64;
+        }
+        self.file.sync_data()?;
+        self.file.seek(SeekFrom::Start(HEADER as u64))?;
+        self.capacity = capacity;
+        Ok(())
+    }
+    pub fn commit(&mut self, seq: u64) -> Result<()> {
+        ensure!(
+            self.capacity == 0 || self.len + RECORD as u64 <= self.capacity,
+            "fixed WAL commit exceeds capacity"
+        );
+        ensure!(seq == self.last_seq, "commit does not match the WAL tail");
+        let mut h = [0; RECORD];
+        h[..4].copy_from_slice(b"CMT1");
+        h[8..16].copy_from_slice(&seq.to_le_bytes());
+        let crc = crc32fast::hash(&h[..28]);
+        h[28..32].copy_from_slice(&crc.to_le_bytes());
+        self.file.write_all(&h)?;
+        self.len += RECORD as u64;
+        self.commit_seq = seq;
+        Ok(())
+    }
     pub fn append(&mut self, seq: u64, first: u64, data: &[u8]) -> Result<Vec<(Ref, bool)>> {
         ensure!(
             !data.is_empty() && data.len().is_multiple_of(PAGE) && data.len() <= MAX_IO + PAGE,
             "invalid append size"
+        );
+        ensure!(
+            self.capacity == 0 || self.len + (RECORD + data.len()) as u64 <= self.capacity,
+            "fixed WAL append exceeds capacity"
         );
         let mut h = [0u8; RECORD];
         h[..4].copy_from_slice(b"WRT1");
@@ -365,6 +475,10 @@ impl Segment {
         ensure!(
             count > 0 && count <= u32::MAX as u64,
             "zero range too large"
+        );
+        ensure!(
+            self.capacity == 0 || self.len + RECORD as u64 <= self.capacity,
+            "fixed WAL zero exceeds capacity"
         );
         let mut h = [0; RECORD];
         h[..4].copy_from_slice(b"ZER1");
@@ -459,6 +573,35 @@ impl Watermark {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn initialized_wal_keeps_physical_eof_and_rejects_a_hole_before_commit() -> Result<()> {
+        let t = tempfile::tempdir()?;
+        let v = Uuid::new_v4();
+        let mut s = Segment::create(t.path(), v, 1)?;
+        s.initialize_capacity(1024 * 1024)?;
+        s.append(1, 0, &vec![7; PAGE])?;
+        s.commit(1)?;
+        s.append(2, 1, &vec![8; PAGE])?;
+        s.commit(2)?;
+        s.file.sync_data()?;
+        assert_eq!(s.file.metadata()?.len(), 1024 * 1024);
+        let logical = s.len;
+        let path = s.path.clone();
+        let bytes = std::fs::read(&path)?;
+        validate_upload(&bytes[..logical as usize], v, s.id, 2, PAGE as u64 * 4)?;
+        drop(s);
+        let (mut s, rows) = Segment::open(path.clone(), v, PAGE as u64 * 4, true)?;
+        assert_eq!(rows.len(), 2);
+        assert_eq!(s.commit_seq, 2);
+        assert_eq!(s.len, logical);
+        s.append(3, 2, &vec![9; PAGE])?;
+        s.commit(3)?;
+        assert_eq!(s.file.metadata()?.len(), 1024 * 1024);
+        s.file
+            .write_all_at(&[0; RECORD], HEADER as u64 + (RECORD + PAGE) as u64)?;
+        assert!(Segment::open(path, v, PAGE as u64 * 4, true).is_err());
+        Ok(())
+    }
     #[test]
     fn tail_is_recovered_but_complete_corruption_is_rejected() -> Result<()> {
         let t = tempfile::tempdir()?;

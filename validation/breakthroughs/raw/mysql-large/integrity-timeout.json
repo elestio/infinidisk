@@ -1,0 +1,9 @@
+{
+  "kind": "agent-recorded observation",
+  "stage": "original 128 MiB SSD verification",
+  "exception": "subprocess.TimeoutExpired",
+  "timeout_seconds": 300,
+  "query": "CHECK TABLE bench.sbtest1,bench.sbtest2,bench.sbtest3,bench.sbtest4 EXTENDED",
+  "counts_before_timeout": "all four equal 1000000",
+  "raw_benchmark_before_resume": "before-resume-report.json"
+}

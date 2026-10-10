@@ -1,0 +1,22 @@
+host
+fio-version
+zerofs-version
+id2-version
+infinidisk2-storage-recovery-mount
+infinidisk2-storage-recovery-mysql-start
+infinidisk2-storage-recovery-mysql-settings
+infinidisk2-storage-recovery-mysql-crash
+infinidisk2-storage-recovery-mysql-restart
+infinidisk2-storage-recovery-storage-crash-db-kill
+infinidisk2-storage-recovery-storage-crash-db-remove
+infinidisk2-storage-recovery-storage-crash-unmount
+infinidisk2-storage-recovery-storage-crash-fsck
+infinidisk2-storage-recovery-storage-crash-remount
+infinidisk2-storage-recovery-storage-crash-mysql-start
+infinidisk2-storage-recovery-mysql-counts
+infinidisk2-storage-recovery-mysql-check
+infinidisk2-storage-recovery-mysql-stop
+infinidisk2-storage-recovery-mysql-remove
+infinidisk2-storage-recovery-mysql-unmount
+detach-1791616147100650862
+REPORT /root/infinidisk2/test-output/comparison-323bb1097b47/optimization-breakthrough-recovery.json

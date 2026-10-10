@@ -1,0 +1,16 @@
+host
+fio-version
+zerofs-version
+id2-version
+infinidisk2-local-active-ublk-mount
+infinidisk2-local-active-ublk-mysql-start
+infinidisk2-local-active-ublk-mysql-settings
+infinidisk2-local-active-ublk-mysql-warm
+infinidisk2-local-active-ublk-mysql-read_only-0
+infinidisk2-local-active-ublk-mysql-read_only-1
+infinidisk2-local-active-ublk-mysql-read_only-2
+infinidisk2-local-active-ublk-mysql-stop
+infinidisk2-local-active-ublk-mysql-remove
+infinidisk2-local-active-ublk-mysql-unmount
+ublk-delete-1791615764615833733
+REPORT /root/infinidisk2/test-output/comparison-be4ba51a4a38/optimization-local-active-ublk.json

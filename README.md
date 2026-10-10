@@ -28,7 +28,7 @@ cargo clippy --locked --all-targets -j 2 -- -D warnings
 cargo fmt --all --check
 ```
 
-Rust 1.99.0, Linux x86_64 et `Cargo.lock` ont été utilisés pour cette livraison. Les dépendances sont téléchargées depuis crates.io. La publication Cargo est désactivée ; aucune licence de distribution du nouveau code n’est imposée par cette livraison interne. Le backend `file://` permet de tester le protocole sans compte S3.
+Rust 1.99.0, Linux x86_64 et `Cargo.lock` ont été utilisés pour cette livraison. Les dépendances proviennent de crates.io ; l’adaptateur ublk optionnel utilise libublk épinglé à un commit Git. La publication Cargo est désactivée ; aucune licence de distribution du nouveau code n’est imposée par cette livraison interne. Le backend `file://` permet de tester le protocole sans compte S3.
 
 ## Créer et utiliser un volume
 
@@ -139,6 +139,26 @@ python3 scripts/validate_vm.py --s3 --credentials /chemin/credentials.env --post
 Le script vérifie que son export nouvellement créé est vierge avant formatage. Il réalise les tests sur un NBD libre, utilise des conteneurs PostgreSQL isolés sans réseau et laisse les résultats sous `test-output/run-<id>`. Il ne vide jamais le cache global de la VM. Les rapports ne certifient pas une panne électrique réelle, une destruction du disque matériel ou une charge longue de plusieurs téraoctets.
 
 Voir [les spécifications et décisions](docs/architecture.md), [la review et les mesures](validation/rapport.html) et [les résultats bruts](validation/s3-report.json).
+
+## Variantes expérimentales de performance
+
+La [spécification des variantes](docs/breakthroughs.md) décrit le cache par page logique, la compaction S3 hors ligne, le journal à marqueurs de commit, les segments entièrement préinitialisés, le préchauffage complet et le transport ublk. Les options `logical_cache`, `wal_commit_records` et `wal_fixed_size` sont désactivées par défaut ; `flush_batch_us` vaut zéro. Les formats de journal expérimentaux ne doivent pas être ouverts ensuite par un ancien binaire. Conserver le binaire et le journal associés jusqu’à une migration qualifiée.
+
+La [campagne complète du 10 octobre](validation/breakthroughs/rapport.html) observe ×1,57 en lecture à cache SSD identique et ×28 à ×32 avec le volume préchauffé dans un budget de 4 Gio, ainsi que +59 à +65 % en écriture sur la petite base avec WAL fixe et marqueurs. Le grand dataset reste derrière le disque natif en mixte/écriture. Les coûts de préparation, le page cache Linux, les erreurs et les reprises après crash figurent dans le rapport ; ces chiffres ne sont pas des garanties universelles.
+
+Les commandes hors ligne prennent le verrou exclusif du volume : arrêter le serveur avant de les exécuter. `warm` exige `logical_cache=true` et un cache SSD assez grand pour toutes les pages allouées. `compact` réécrit les pages vers de nouveaux objets ; les anciens objets restent présents jusqu’à une collecte ultérieure.
+
+```sh
+./target/release/infinidisk2 -c volume.toml warm
+./target/release/infinidisk2 -c volume.toml compact
+# Linux avec ublk_drv et io_uring, compilateur C/Clang pour libublk :
+cargo build --release --features ublk --locked -j 2
+modprobe ublk_drv
+# Choisir un identifiant libre ; le serveur reste au premier plan.
+./target/release/infinidisk2 -c volume.toml ublk --id 31 --queues 4
+```
+
+ublk expose `/dev/ublkb31`. Après arrêt de la base et démontage du système de fichiers, `ublk-delete --id 31` supprime uniquement un périphérique identifié comme cible expérimentale InfiniDisk2 et refuse un périphérique encore utilisé. Les commandes de formatage restent des opérations explicites de l’administrateur, limitées à un volume neuf.
 
 ## Comparaison avec ZeroFS
 

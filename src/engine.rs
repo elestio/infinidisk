@@ -82,6 +82,9 @@ pub struct Status {
     pub flush_wait_ns: u64,
     pub wal_sync_ns: u64,
     pub watermark_sync_ns: u64,
+    pub logical_cache_hits: u64,
+    pub remote_gets: u64,
+    pub remote_bytes: u64,
 }
 #[derive(Default)]
 struct FlushMetrics {
@@ -90,6 +93,9 @@ struct FlushMetrics {
     wait_ns: AtomicU64,
     wal_ns: AtomicU64,
     watermark_ns: AtomicU64,
+    page_hits: AtomicU64,
+    remote_gets: AtomicU64,
+    remote_bytes: AtomicU64,
 }
 pub struct Engine {
     pub config: Config,
@@ -103,6 +109,7 @@ pub struct Engine {
     cache: std::sync::Mutex<LruCache<(Uuid, u64), Bytes>>,
     fetch_locks: Vec<Mutex<()>>,
     disk_cache: DiskCache,
+    page_cache: Option<Arc<crate::page_cache::PageCache>>,
     space_available: Notify,
     poisoned: AtomicBool,
     _lock: File,
@@ -290,6 +297,7 @@ impl Engine {
         );
         paths.sort();
         let mut seq = head.seq;
+        let mut committed = head.seq.max(wm.seq);
         let mut sealed = Vec::new();
         let mut local = HashMap::new();
         let mut dirty = BTreeSet::new();
@@ -324,6 +332,7 @@ impl Engine {
             if c.wal_preallocate {
                 s.release_reservation(c.segment_mib * 1024 * 1024)?;
             }
+            committed = committed.max(s.commit_seq);
             for row in records {
                 if row.seq <= head.seq {
                     continue;
@@ -361,18 +370,18 @@ impl Engine {
             }
             local.insert(s.id, Arc::new(s.file.try_clone()?));
             if s.last_seq <= head.seq {
-                resident_bytes += s.len;
+                resident_bytes += s.storage_bytes();
                 resident.push_back(s);
             } else {
-                pending += s.len;
+                pending += s.storage_bytes();
                 sealed.push(s);
             }
         }
         ensure!(
-            seq >= wm.seq,
+            seq >= committed,
             "acknowledged durable writes are missing: WAL {}, watermark {}",
             seq,
-            wm.seq
+            committed
         );
         while resident_bytes > c.hot_wal_mib * 1024 * 1024 {
             let Some(segment) = resident.pop_front() else {
@@ -380,7 +389,7 @@ impl Engine {
             };
             match std::fs::remove_file(&segment.path) {
                 Ok(()) => {
-                    resident_bytes -= segment.len;
+                    resident_bytes -= segment.storage_bytes();
                     local.remove(&segment.id);
                 }
                 Err(err) => {
@@ -390,7 +399,7 @@ impl Engine {
                 }
             }
         }
-        let active = Segment::create_with_options(
+        let mut active = Segment::create_with_options(
             &c.local_dir.join("wal"),
             identity.volume,
             seq + 1,
@@ -401,6 +410,11 @@ impl Engine {
             },
             c.wal_writev,
         )?;
+        if c.wal_fixed_size {
+            active.initialize_capacity(
+                c.segment_mib * 1024 * 1024 + MAX_IO as u64 + PAGE as u64 + 128,
+            )?;
+        }
         local.insert(active.id, Arc::new(active.file.try_clone()?));
         let cache = LruCache::new(
             NonZeroUsize::new(
@@ -411,16 +425,29 @@ impl Engine {
         );
         let disk_cache = DiskCache::open(
             c.local_dir.join("cache"),
-            c.disk_cache_mib * 1024 * 1024,
+            if c.logical_cache {
+                0
+            } else {
+                c.disk_cache_mib * 1024 * 1024
+            },
             c.read_extent_kib * 1024,
         )?;
+        let page_cache = if c.logical_cache {
+            Some(Arc::new(crate::page_cache::PageCache::open(
+                &c.local_dir.join("logical-cache"),
+                identity.volume,
+                c.disk_cache_mib * 1024 * 1024,
+            )?))
+        } else {
+            None
+        };
         Ok(Arc::new(Self {
             config: c,
             identity,
             store,
             state: Mutex::new(State {
                 seq,
-                durable: wm.seq,
+                durable: committed,
                 index,
                 dirty,
                 active,
@@ -437,6 +464,7 @@ impl Engine {
             cache: std::sync::Mutex::new(cache),
             fetch_locks: (0..256).map(|_| Mutex::new(())).collect(),
             disk_cache,
+            page_cache,
             space_available: Notify::new(),
             poisoned: AtomicBool::new(false),
             _lock: lock,
@@ -463,7 +491,13 @@ impl Engine {
             notification.as_mut().enable();
             let s = self.state.lock().await;
             self.healthy()?;
-            if s.pending + s.active.len + additional <= self.config.max_pending_mib * 1024 * 1024 {
+            let required = if s.active.capacity > 0 {
+                // Reserve room for a new initialized file during rotation/checkpoint.
+                s.pending + s.active.storage_bytes() + s.active.capacity
+            } else {
+                s.pending + s.active.len + additional
+            };
+            if required <= self.config.max_pending_mib * 1024 * 1024 {
                 return Ok(s);
             }
             drop(s);
@@ -482,7 +516,29 @@ impl Engine {
         );
         Ok(())
     }
-    async fn page(&self, r: Option<Ref>, local: Option<Arc<File>>) -> Result<Bytes> {
+    async fn page(&self, page: u64, r: Option<Ref>, local: Option<Arc<File>>) -> Result<Bytes> {
+        let version = r.clone();
+        if let (Some(cache), Some(version)) = (&self.page_cache, &version) {
+            let cache = cache.clone();
+            let version = version.clone();
+            if let Some(b) = tokio::task::spawn_blocking(move || cache.get(page, &version)).await? {
+                self.flush_metrics.page_hits.fetch_add(1, Ordering::Relaxed);
+                return Ok(b);
+            }
+        }
+        let b = self.extent_page(r, local).await?;
+        if let (Some(cache), Some(version)) = (&self.page_cache, version) {
+            let cache = cache.clone();
+            let data = b.clone();
+            if let Err(err) =
+                tokio::task::spawn_blocking(move || cache.put(page, &version, &data)).await?
+            {
+                tracing::warn!(error=%err,"disposable page cache fill failed");
+            }
+        }
+        Ok(b)
+    }
+    async fn extent_page(&self, r: Option<Ref>, local: Option<Arc<File>>) -> Result<Bytes> {
         let Some(r) = r else {
             return Ok(Bytes::from_static(&[0; PAGE]));
         };
@@ -523,6 +579,12 @@ impl Engine {
             .store
             .range(&format!("segments/{}", r.segment), start..end)
             .await?;
+        self.flush_metrics
+            .remote_gets
+            .fetch_add(1, Ordering::Relaxed);
+        self.flush_metrics
+            .remote_bytes
+            .fetch_add(b.len() as u64, Ordering::Relaxed);
         ensure!(valid(&b), "remote page checksum mismatch");
         self.disk_cache.put(k, &b).await;
         self.cache.lock().unwrap().put(k, b.clone());
@@ -542,11 +604,11 @@ impl Engine {
                 .map(|p| {
                     let r = s.index.get(&p).cloned();
                     let f = r.as_ref().and_then(|r| s.local.get(&r.segment)).cloned();
-                    (r, f)
+                    (p, r, f)
                 })
                 .collect()
         };
-        let pages: Vec<Bytes> = stream::iter(refs.into_iter().map(|(r, f)| self.page(r, f)))
+        let pages: Vec<Bytes> = stream::iter(refs.into_iter().map(|(p, r, f)| self.page(p, r, f)))
             .buffered(32)
             .try_collect()
             .await?;
@@ -574,7 +636,7 @@ impl Engine {
             for p in [first, end - 1] {
                 let r = s.index.get(&p).cloned();
                 let f = r.as_ref().and_then(|r| s.local.get(&r.segment)).cloned();
-                let b = self.page(r, f).await?;
+                let b = self.page(p, r, f).await?;
                 let dest = (p - first) as usize * PAGE;
                 pages[dest..dest + PAGE].copy_from_slice(&b);
             }
@@ -611,13 +673,35 @@ impl Engine {
             s.dirty.insert(p / SHARD_PAGES);
         }
         s.seq = seq;
+        let fills: Vec<_> = if self.page_cache.is_some() {
+            (first..end)
+                .filter_map(|p| s.index.get(&p).cloned().map(|r| (p, r)))
+                .collect()
+        } else {
+            Vec::new()
+        };
         if s.active.len >= self.config.segment_mib * 1024 * 1024 {
             self.rotate(&mut s)?;
+        }
+        drop(s);
+        if let Some(cache) = &self.page_cache {
+            let cache = cache.clone();
+            let result = tokio::task::spawn_blocking(move || {
+                for (p, r) in fills {
+                    let start = (p - first) as usize * PAGE;
+                    cache.put(p, &r, &pages[start..start + PAGE])?;
+                }
+                Ok::<_, anyhow::Error>(())
+            })
+            .await?;
+            if let Err(err) = result {
+                tracing::warn!(error=%err,"disposable write cache fill failed");
+            }
         }
         Ok(())
     }
     fn rotate(&self, s: &mut State) -> Result<()> {
-        let next = Segment::create_with_options(
+        let mut next = Segment::create_with_options(
             &self.config.local_dir.join("wal"),
             self.identity.volume,
             s.seq + 1,
@@ -629,13 +713,19 @@ impl Engine {
             self.config.wal_writev,
         )
         .inspect_err(|_| self.fail_closed())?;
+        if self.config.wal_fixed_size {
+            next.initialize_capacity(
+                self.config.segment_mib * 1024 * 1024 + MAX_IO as u64 + PAGE as u64 + 128,
+            )
+            .inspect_err(|_| self.fail_closed())?;
+        }
         s.local.insert(next.id, Arc::new(next.file.try_clone()?));
         let old = std::mem::replace(&mut s.active, next);
         if self.config.wal_preallocate {
             old.release_reservation(self.config.segment_mib * 1024 * 1024)
                 .inspect_err(|_| self.fail_closed())?;
         }
-        s.pending += old.len;
+        s.pending += old.storage_bytes();
         s.sealed.push(old);
         Ok(())
     }
@@ -681,6 +771,9 @@ impl Engine {
             s.dirty.insert(p / SHARD_PAGES);
         }
         s.seq = seq;
+        if s.active.len >= self.config.segment_mib * 1024 * 1024 {
+            self.rotate(&mut s)?;
+        }
         Ok(())
     }
     pub async fn flush(&self) -> Result<()> {
@@ -698,11 +791,19 @@ impl Engine {
             return Ok(());
         }
         // Concurrent connections share one fsync group and one durability frontier.
-        tokio::task::yield_now().await;
+        if self.config.flush_batch_us > 0 {
+            tokio::time::sleep(std::time::Duration::from_micros(self.config.flush_batch_us)).await;
+        } else {
+            tokio::task::yield_now().await;
+        }
         let (seq, files) = {
-            let s = self.state.lock().await;
+            let mut s = self.state.lock().await;
+            let seq = s.seq;
+            if self.config.wal_commit_records {
+                s.active.commit(seq).inspect_err(|_| self.fail_closed())?;
+            }
             (
-                s.seq,
+                seq,
                 s.sealed
                     .iter()
                     .map(|s| s.file.try_clone())
@@ -712,6 +813,7 @@ impl Engine {
         };
         let wm = self.watermark.clone();
         let data_only = self.config.sync_data_only;
+        let commit_records = self.config.wal_commit_records;
         let r: Result<(u64, u64)> = tokio::task::spawn_blocking(move || {
             let start = Instant::now();
             for f in files {
@@ -724,7 +826,8 @@ impl Engine {
             let wal_ns = start.elapsed().as_nanos() as u64;
             let start = Instant::now();
             let mut wm = wm.lock().unwrap();
-            if data_only {
+            if commit_records { /* the validated commit marker is in the synchronized WAL */
+            } else if data_only {
                 wm.persist_data(seq)?;
             } else {
                 wm.persist(seq)?;
@@ -782,35 +885,50 @@ impl Engine {
                 s.seq,
                 s.sealed
                     .iter()
-                    .map(|s| (s.id, s.path.clone(), s.len, s.last_seq))
+                    .map(|s| (s.id, s.path.clone(), s.len, s.last_seq, s.capacity))
                     .collect::<Vec<_>>(),
                 shards,
                 dirty,
             )
         };
         let result = async {
-            let uploads = segments
-                .clone()
-                .into_iter()
-                .map(|(id, path, len, last_seq)| {
-                    let store = self.store.clone();
-                    async move {
-                        let b = tokio::fs::read(path)
+            let uploads =
+                segments
+                    .clone()
+                    .into_iter()
+                    .map(|(id, path, len, last_seq, capacity)| {
+                        let store = self.store.clone();
+                        async move {
+                            use tokio::io::AsyncReadExt;
+                            let mut file = tokio::fs::File::open(path)
+                                .await
+                                .inspect_err(|_| self.fail_closed())?;
+                            let physical = file
+                                .metadata()
+                                .await
+                                .inspect_err(|_| self.fail_closed())?
+                                .len();
+                            if physical != if capacity > 0 { capacity } else { len } {
+                                self.fail_closed();
+                                anyhow::bail!("sealed WAL physical length changed");
+                            }
+                            let mut b = vec![0; len as usize];
+                            file.read_exact(&mut b)
+                                .await
+                                .inspect_err(|_| self.fail_closed())?;
+                            let volume = self.identity.volume;
+                            let size = self.identity.size;
+                            let checked = tokio::task::spawn_blocking(move || {
+                                ensure!(b.len() as u64 == len, "sealed WAL length changed");
+                                wal::validate_upload(&b, volume, id, last_seq, size)?;
+                                Ok::<_, anyhow::Error>(b)
+                            })
                             .await
                             .inspect_err(|_| self.fail_closed())?;
-                        let volume = self.identity.volume;
-                        let size = self.identity.size;
-                        let checked = tokio::task::spawn_blocking(move || {
-                            ensure!(b.len() as u64 == len, "sealed WAL length changed");
-                            wal::validate_upload(&b, volume, id, last_seq, size)?;
-                            Ok::<_, anyhow::Error>(b)
-                        })
-                        .await
-                        .inspect_err(|_| self.fail_closed())?;
-                        let b = checked.inspect_err(|_| self.fail_closed())?;
-                        store.immutable(&format!("segments/{id}"), b.into()).await
-                    }
-                });
+                            let b = checked.inspect_err(|_| self.fail_closed())?;
+                            store.immutable(&format!("segments/{id}"), b.into()).await
+                        }
+                    });
             stream::iter(uploads)
                 .buffer_unordered(4)
                 .try_collect::<Vec<_>>()
@@ -872,8 +990,8 @@ impl Engine {
             if segment.last_seq <= seq {
                 // Keep recent writes on SSD after publication instead of making their
                 // first read pay an S3 GET. This cache is bounded and disposable.
-                s.pending -= segment.len;
-                s.resident_bytes += segment.len;
+                s.pending -= segment.storage_bytes();
+                s.resident_bytes += segment.storage_bytes();
                 s.resident.push_back(segment);
             } else {
                 retained.push(segment);
@@ -887,7 +1005,7 @@ impl Engine {
             };
             match std::fs::remove_file(&segment.path) {
                 Ok(()) => {
-                    s.resident_bytes -= segment.len;
+                    s.resident_bytes -= segment.storage_bytes();
                     s.local.remove(&segment.id);
                 }
                 Err(e) => {
@@ -910,7 +1028,7 @@ impl Engine {
             local_durable_sequence: s.durable,
             remote_sequence: r.head.seq,
             remote_generation: r.head.generation,
-            pending_bytes: s.pending + s.active.len,
+            pending_bytes: s.pending + s.active.storage_bytes(),
             allocated_pages: s.index.len(),
             poisoned: self.poisoned.load(Ordering::Acquire),
             uptime_seconds: self.started.elapsed().as_secs(),
@@ -920,7 +1038,130 @@ impl Engine {
             flush_wait_ns: self.flush_metrics.wait_ns.load(Ordering::Relaxed),
             wal_sync_ns: self.flush_metrics.wal_ns.load(Ordering::Relaxed),
             watermark_sync_ns: self.flush_metrics.watermark_ns.load(Ordering::Relaxed),
+            logical_cache_hits: self.flush_metrics.page_hits.load(Ordering::Relaxed),
+            remote_gets: self.flush_metrics.remote_gets.load(Ordering::Relaxed),
+            remote_bytes: self.flush_metrics.remote_bytes.load(Ordering::Relaxed),
         }
+    }
+    /// Offline only: opening takes the exclusive volume lock.
+    pub async fn warm(c: Config) -> Result<usize> {
+        ensure!(c.logical_cache, "warm requires logical_cache=true");
+        let e = Self::open(c).await?;
+        let refs: Vec<_> = {
+            let s = e.state.lock().await;
+            s.index
+                .iter()
+                .map(|(&p, r)| (p, r.clone(), s.local.get(&r.segment).cloned()))
+                .collect()
+        };
+        let count = refs.len();
+        ensure!(
+            (count as u64) * 4136 <= e.config.disk_cache_mib * 1024 * 1024,
+            "allocated pages do not fit the configured logical cache"
+        );
+        stream::iter(refs.into_iter().map(|(p, r, f)| e.page(p, Some(r), f)))
+            .buffered(32)
+            .try_for_each(|_| async { Ok(()) })
+            .await?;
+        Ok(count)
+    }
+    /// Offline layout experiment. Old remote objects remain available; CAS is last.
+    pub async fn compact(c: Config) -> Result<usize> {
+        let e = Self::open(c).await?;
+        e.checkpoint().await?;
+        let refs: Vec<_> = {
+            let s = e.state.lock().await;
+            s.index
+                .iter()
+                .map(|(&p, r)| (p, r.clone(), s.local.get(&r.segment).cloned()))
+                .collect()
+        };
+        let count = refs.len();
+        let mut index = BTreeMap::new();
+        let dir = e
+            .config
+            .local_dir
+            .join(format!("compact-{}", Uuid::new_v4()));
+        std::fs::create_dir(&dir)?;
+        let result = async {
+            let mut segment = Segment::create(&dir, e.identity.volume, 1)?;
+            let mut record_seq = 0;
+            for chunk in refs.chunks(256) {
+                let pages = stream::iter(
+                    chunk
+                        .iter()
+                        .map(|(p, r, f)| e.page(*p, Some(r.clone()), f.clone())),
+                )
+                .buffered(32)
+                .try_collect::<Vec<_>>()
+                .await?;
+                for ((p, _, _), b) in chunk.iter().zip(pages) {
+                    record_seq += 1;
+                    let r = segment.append(record_seq, *p, &b)?.remove(0).0;
+                    index.insert(*p, r);
+                }
+                if segment.len >= e.config.segment_mib * 1024 * 1024 {
+                    let b = std::fs::read(&segment.path)?;
+                    wal::validate_upload(
+                        &b,
+                        e.identity.volume,
+                        segment.id,
+                        segment.last_seq,
+                        e.identity.size,
+                    )?;
+                    for r in index.values_mut().filter(|r| r.segment == segment.id) {
+                        r.segment_len = segment.len;
+                    }
+                    e.store
+                        .immutable(&format!("segments/{}", segment.id), b.into())
+                        .await?;
+                    std::fs::remove_file(&segment.path)?;
+                    segment = Segment::create(&dir, e.identity.volume, record_seq + 1)?;
+                }
+            }
+            if segment.len > 64 {
+                let b = std::fs::read(&segment.path)?;
+                wal::validate_upload(
+                    &b,
+                    e.identity.volume,
+                    segment.id,
+                    segment.last_seq,
+                    e.identity.size,
+                )?;
+                for r in index.values_mut().filter(|r| r.segment == segment.id) {
+                    r.segment_len = segment.len;
+                }
+                e.store
+                    .immutable(&format!("segments/{}", segment.id), b.into())
+                    .await?;
+            }
+            let mut remote = e.remote.lock().await;
+            let mut h = remote.head.clone();
+            h.shards.clear();
+            for (id, rows) in &index.into_iter().fold(
+                BTreeMap::<u64, BTreeMap<u64, Ref>>::new(),
+                |mut a, (p, r)| {
+                    a.entry(p / SHARD_PAGES).or_default().insert(p, r);
+                    a
+                },
+            ) {
+                let b = bincode::serialize(rows)?;
+                let hash = hex::encode(Sha256::digest(&b));
+                let key = format!("indexes/{id}/{}", Uuid::new_v4());
+                e.store.immutable(&key, b.into()).await?;
+                h.shards.insert(*id, Shard { key, hash });
+            }
+            h.generation += 1;
+            e.store
+                .cas(encode(&h)?, Some(remote.version.clone()))
+                .await?;
+            remote.head = h;
+            Ok::<_, anyhow::Error>(())
+        }
+        .await;
+        std::fs::remove_dir_all(&dir)?;
+        result?;
+        Ok(count)
     }
     pub async fn inspect(c: &Config) -> Result<Head> {
         let store = Store::new(c)?;
@@ -1109,6 +1350,114 @@ mod tests {
         let e = Engine::open(other).await?;
         assert_eq!(e.read(0, PAGE * 2).await?, expected);
         assert!(Engine::open(c).await.is_err());
+        Ok(())
+    }
+    #[tokio::test]
+    async fn experimental_cache_compaction_and_single_barrier_recover() -> Result<()> {
+        let t = tempfile::tempdir()?;
+        let mut c = config(&t);
+        c.logical_cache = true;
+        c.disk_cache_mib = 1;
+        c.wal_commit_records = true;
+        c.wal_fixed_size = true;
+        Engine::init(&c, 1024 * 1024).await?;
+        let e = Engine::open(c.clone()).await?;
+        for n in 0..20 {
+            e.write(0, &vec![n; PAGE * 8]).await?;
+            e.flush().await?;
+        }
+        assert_eq!(Watermark::open(&c.local_dir.join("durable"))?.seq, 0);
+        let seq = e.status().await.local_durable_sequence;
+        drop(e);
+        let e = Engine::open(c.clone()).await?;
+        assert_eq!(e.status().await.local_durable_sequence, seq);
+        assert_eq!(e.read(0, PAGE * 8).await?, vec![19; PAGE * 8]);
+        e.zero(PAGE as u64, PAGE as u64).await?;
+        e.flush().await?;
+        let expected = e.read(0, PAGE * 8).await?;
+        e.checkpoint().await?;
+        drop(e);
+        assert_eq!(Engine::compact(c.clone()).await?, 7);
+        assert_eq!(Engine::verify_remote(&c).await?.1, 7);
+        std::fs::remove_dir_all(c.local_dir.join("logical-cache"))?;
+        assert_eq!(Engine::warm(c.clone()).await?, 7);
+        let e = Engine::open(c.clone()).await?;
+        assert_eq!(e.read(0, PAGE * 8).await?, expected);
+        drop(e);
+        let mut restored = c;
+        restored.local_dir = t.path().join("fresh");
+        Engine::adopt(&restored, true).await?;
+        let e = Engine::open(restored).await?;
+        assert_eq!(e.read(0, PAGE * 8).await?, expected);
+        Ok(())
+    }
+    #[tokio::test]
+    async fn single_barrier_rotation_requires_all_prefix_records() -> Result<()> {
+        let t = tempfile::tempdir()?;
+        let mut c = config(&t);
+        c.wal_commit_records = true;
+        Engine::init(&c, 4 * 1024 * 1024).await?;
+        let e = Engine::open(c.clone()).await?;
+        e.write(0, &vec![3; 1024 * 1024]).await?;
+        e.write(1024 * 1024, &vec![4; PAGE]).await?;
+        e.flush().await?;
+        drop(e);
+        let paths: Vec<_> = std::fs::read_dir(c.local_dir.join("wal"))?
+            .map(|e| e.unwrap().path())
+            .collect();
+        let oldest = paths.iter().min().unwrap();
+        std::fs::remove_file(oldest)?;
+        assert!(Engine::open(c).await.is_err());
+        Ok(())
+    }
+    #[tokio::test]
+    async fn compaction_upload_failure_preserves_the_previous_remote_root() -> Result<()> {
+        let t = tempfile::tempdir()?;
+        let c = config(&t);
+        Engine::init(&c, 1024 * 1024).await?;
+        let e = Engine::open(c.clone()).await?;
+        e.write(0, &vec![7; PAGE * 2]).await?;
+        e.checkpoint().await?;
+        // Prime a verified cache so the failure is at immutable PUT, not source GET.
+        assert_eq!(e.read(0, PAGE * 2).await?, vec![7; PAGE * 2]);
+        drop(e);
+        let before = encode(&Engine::inspect(&c).await?)?;
+        let segments = t.path().join("remote/segments");
+        let backup = t.path().join("remote/segments-backup");
+        std::fs::rename(&segments, &backup)?;
+        std::fs::write(&segments, b"block uploads")?;
+        assert!(Engine::compact(c.clone()).await.is_err());
+        assert_eq!(encode(&Engine::inspect(&c).await?)?, before);
+        std::fs::remove_file(&segments)?;
+        std::fs::rename(&backup, &segments)?;
+        assert_eq!(Engine::verify_remote(&c).await?.1, 2);
+        let e = Engine::open(c).await?;
+        assert_eq!(e.read(0, PAGE * 2).await?, vec![7; PAGE * 2]);
+        Ok(())
+    }
+    #[tokio::test]
+    async fn fixed_wal_accounts_physical_capacity_and_backpressures_before_rotation() -> Result<()>
+    {
+        let t = tempfile::tempdir()?;
+        let mut c = config(&t);
+        c.wal_fixed_size = true;
+        c.max_pending_mib = 20;
+        Engine::init(&c, 4 * 1024 * 1024).await?;
+        let e = Engine::open(c).await?;
+        e.write(0, &vec![7; 1024 * 1024]).await?;
+        assert!(e.status().await.pending_bytes > 18 * 1024 * 1024);
+        assert!(
+            tokio::time::timeout(
+                std::time::Duration::from_millis(50),
+                e.write(1024 * 1024, &vec![8; PAGE])
+            )
+            .await
+            .is_err()
+        );
+        e.checkpoint().await?;
+        e.write(1024 * 1024, &vec![8; PAGE]).await?;
+        e.flush().await?;
+        assert_eq!(e.read(1024 * 1024, PAGE).await?, vec![8; PAGE]);
         Ok(())
     }
     #[tokio::test]

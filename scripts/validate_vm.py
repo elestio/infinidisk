@@ -12,6 +12,9 @@ parser.add_argument('--s3',action='store_true')
 parser.add_argument('--credentials',type=pathlib.Path)
 parser.add_argument('--bucket',default='testperf-6czebk')
 parser.add_argument('--endpoint',default='https://storage.elestio.com')
+parser.add_argument('--logical-cache',action='store_true')
+parser.add_argument('--wal-fixed-size',action='store_true')
+parser.add_argument('--wal-commit-records',action='store_true')
 parser.add_argument('--postgres',action='store_true')
 parser.add_argument('--resume-report',type=pathlib.Path,help='repeat remote recovery/cache tests of an existing completed run')
 args=parser.parse_args()
@@ -48,6 +51,8 @@ if not args.resume_report:
     segment_mib = 8
     max_inflight = 128
     ''')
+if not args.resume_report:
+    with config.open('a') as f:f.write('\nlogical_cache = '+str(args.logical_cache).lower()+'\nwal_commit_records = '+str(args.wal_commit_records).lower()+'\nwal_fixed_size = '+str(args.wal_fixed_size).lower()+'\n')
 devices=[pathlib.Path(f'/dev/nbd{n}') for n in range(31,1,-1) if pathlib.Path(f'/dev/nbd{n}').exists() and not pathlib.Path(f'/sys/class/block/nbd{n}/pid').exists()]
 if not devices:raise RuntimeError('no unused NBD device; existing devices will never be disconnected')
 device=devices[0]

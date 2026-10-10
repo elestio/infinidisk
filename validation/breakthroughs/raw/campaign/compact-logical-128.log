@@ -1,0 +1,16 @@
+host
+fio-version
+zerofs-version
+id2-version
+infinidisk2-compact-logical-128-mount
+infinidisk2-compact-logical-128-mysql-start
+infinidisk2-compact-logical-128-mysql-settings
+infinidisk2-compact-logical-128-mysql-warm
+infinidisk2-compact-logical-128-mysql-read_only-0
+infinidisk2-compact-logical-128-mysql-read_only-1
+infinidisk2-compact-logical-128-mysql-read_only-2
+infinidisk2-compact-logical-128-mysql-stop
+infinidisk2-compact-logical-128-mysql-remove
+infinidisk2-compact-logical-128-mysql-unmount
+detach-1791614478651673417
+REPORT /root/infinidisk2/test-output/comparison-be4ba51a4a38/optimization-compact-logical-128.json

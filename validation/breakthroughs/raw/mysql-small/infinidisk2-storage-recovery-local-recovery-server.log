@@ -1,0 +1,12 @@
+
+dev id 31: nr_hw_queues 4 queue_depth 32 block size 512 dev_capacity 4194304
+	max rq size 1048576 daemon pid 207762 flags 0x26042 state LIVE
+	ublkc: 238:31 ublkb: 259:0 owner: 0:0
+	queue 0 tid: 207783 affinity(1)
+	queue 1 tid: 207784 affinity(3)
+	queue 2 tid: 207785 affinity(2)
+	queue 3 tid: 207786 affinity(0)
+	target {"dev_size":2147483648,"name":"infinidisk2-experimental","type":0}
+	target_data null
+	ublksrv_flags: 0x0
+[2m2026-10-10T07:28:18.056282Z[0m [32m INFO[0m [2minfinidisk2[0m[2m:[0m volume status [3mstatus[0m[2m=[0m{"volume":"63d9bdaa-1d2c-4953-b9d8-c7d9fa47dae7","size":2147483648,"sequence":1565575,"local_durable_sequence":1565574,"remote_sequence":1565443,"remote_generation":338,"pending_bytes":16781440,"allocated_pages":388607,"poisoned":false,"uptime_seconds":1,"hot_wal_bytes":0,"flush_calls":120,"flush_groups":114,"flush_wait_ns":17745,"wal_sync_ns":56485091,"watermark_sync_ns":19447,"logical_cache_hits":16980,"remote_gets":6,"remote_bytes":417792}

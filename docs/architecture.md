@@ -132,3 +132,12 @@ La réservation optionnelle `wal_preallocate` utilise KEEP_SIZE puis libère les
 ## Préserver le dernier checkpoint sain
 
 Le publisher vérifie le buffer exact avant upload : identités de volume/segment, longueur connue, enregistrements complets et bornés, CRC et dernière séquence. Une lecture locale impossible ou une validation invalide bloque les nouvelles écritures ; la racine HEAD n’est pas remplacée. Les erreurs de transport S3 restent réessayables comme auparavant. Le test `corrupted_pending_wal_never_replaces_the_last_remote_checkpoint` injecte une corruption après FLUSH, constate le refus de publication puis restaure le checkpoint précédent depuis un nouveau répertoire local. L’injection échouait avant correction : le segment endommagé pouvait jusque-là devenir la nouvelle racine distante.
+
+
+## Changements d’architecture expérimentaux
+
+Les variantes de la campagne du 10 octobre sont décrites dans [breakthroughs.md](breakthroughs.md). Elles ajoutent un cache jetable des versions actuelles des pages, un compacteur hors ligne, un préchauffage complet, des marqueurs de commit dans le WAL, un WAL à capacité physique fixe et un adaptateur ublk optionnel. Les formats de journal sont incompatibles avec les anciens lecteurs et les options restent désactivées par défaut. Le transport change sans modifier le contrat de publication distante.
+
+Les limites du WAL fixe comptent sa capacité physique, y compris les segments en attente et les segments récents, et réservent la place d’une rotation. Seul le préfixe logique vérifié est envoyé sur S3. Les octets nuls de padding ne sont acceptés à la reprise que si tout le suffixe est nul ; un trou devant un enregistrement ultérieur provoque une erreur. Une troncature contenant des enregistrements n’est pas considérée comme un simple cache à reconstruire.
+
+La compaction vérifie les pages sources et les nouveaux segments, publie tous les objets puis remplace HEAD conditionnellement. Un upload raté conserve la racine précédente ; les objets orphelins restent récupérables par le GC hors ligne. La compaction expérimentale n’a pas de scheduler et ne s’exécute pas en parallèle du serveur.

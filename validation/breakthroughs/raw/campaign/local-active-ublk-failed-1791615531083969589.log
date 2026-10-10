@@ -1,0 +1,41 @@
+host
+fio-version
+zerofs-version
+id2-version
+infinidisk2-local-active-ublk-mount
+ublk-delete-1791615272974036301
+Traceback (most recent call last):
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 425, in <module>
+    start(engine,label);mysql(label,existing=True);stop();continue
+                        ~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 271, in mysql
+    run(['mount','-o','noatime',DEV,mount],label+'-mount');mounted=True
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 94, in run
+    try: output,_=p.communicate(timeout=timeout)
+                  ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 1221, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 2154, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 1268, in _check_timeout
+    raise TimeoutExpired(
+    ...<2 lines>...
+            stderr=b''.join(stderr_seq) if stderr_seq else None)
+subprocess.TimeoutExpired: Command '['mount', '-o', 'noatime', '/dev/ublkb31', '/root/infinidisk2/test-output/comparison-be4ba51a4a38/mount']' timed out after 240 seconds
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 515, in <module>
+    stop();save()
+    ~~~~^^
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 168, in stop
+    run([BIN,'-c',cfg,'ublk-delete','--id','31'],'ublk-delete-'+str(time.time_ns()))
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 98, in run
+    if check and p.returncode:raise RuntimeError(label+' failed: '+str(p.returncode))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: ublk-delete-1791615272974036301 failed: -9

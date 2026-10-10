@@ -31,6 +31,14 @@ pub struct Config {
     pub wal_preallocate: bool,
     /// Submit each WAL header and payload through one vectored write.
     pub wal_writev: bool,
+    /// Experimental logical-page SSD cache, within disk_cache_mib.
+    pub logical_cache: bool,
+    /// Experimental commit records in the WAL: one durability barrier.
+    pub wal_commit_records: bool,
+    /// Experimental fully initialized fixed-capacity WAL segments.
+    pub wal_fixed_size: bool,
+    /// Maximum additional delay to merge concurrent flush requests.
+    pub flush_batch_us: u64,
 }
 impl Default for Config {
     fn default() -> Self {
@@ -52,6 +60,10 @@ impl Default for Config {
             sync_data_only: true,
             wal_preallocate: false,
             wal_writev: true,
+            logical_cache: false,
+            wal_commit_records: false,
+            wal_fixed_size: false,
+            flush_batch_us: 0,
         }
     }
 }
@@ -66,6 +78,10 @@ impl Config {
         ensure!(
             c.checkpoint_seconds > 0 && c.segment_mib > 0 && c.max_inflight > 0,
             "zero configuration limit"
+        );
+        ensure!(
+            c.flush_batch_us <= 5000,
+            "flush batching delay exceeds 5 ms"
         );
         ensure!(c.memory_cache_mib <= 16384, "memory cache too large");
         ensure!(

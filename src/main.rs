@@ -29,6 +29,24 @@ enum Command {
     },
     /// Serve the block device over loopback NBD.
     Serve,
+    /// Offline: cache all allocated logical pages (must fit the SSD budget).
+    Warm,
+    #[cfg(feature = "ublk")]
+    /// Experimental direct userspace block transport.
+    Ublk {
+        #[arg(long)]
+        id: i32,
+        #[arg(long, default_value_t = 4)]
+        queues: u16,
+    },
+    #[cfg(feature = "ublk")]
+    /// Delete only the specified experimental ublk device after unmount.
+    UblkDelete {
+        #[arg(long)]
+        id: i32,
+    },
+    /// Offline: rewrite current remote pages into logical address order.
+    Compact,
     /// Inspect the committed remote HEAD without opening the volume for writing.
     Status,
     /// Verify every referenced remote page and all metadata checksums.
@@ -96,6 +114,41 @@ async fn main() -> Result<()> {
             "{}",
             serde_json::to_string_pretty(&Engine::adopt(&c, takeover).await?)?
         ),
+        #[cfg(feature = "ublk")]
+        Command::Ublk { id, queues } => {
+            let e = Engine::open(c).await?;
+            let engine = e.clone();
+            let handle = tokio::runtime::Handle::current();
+            let background_engine = e.clone();
+            let (stop, mut stopped) = watch::channel(false);
+            let background = tokio::spawn(async move {
+                let mut interval = tokio::time::interval(Duration::from_secs(
+                    background_engine.config.checkpoint_seconds,
+                ));
+                interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+                loop {
+                    tokio::select! {
+                        _=stopped.changed()=>break,
+                        _=interval.tick()=> {if let Err(err)=background_engine.checkpoint().await {tracing::error!(error=%err,"ublk checkpoint failed");} let status=serde_json::to_string(&background_engine.status().await).unwrap(); tracing::info!(%status,"volume status");}
+                    }
+                }
+            });
+            let result = tokio::task::spawn_blocking(move || {
+                infinidisk2::ublk::serve(engine, handle, id, queues)
+            })
+            .await?;
+            let _ = stop.send(true);
+            background.await?;
+            result?;
+            e.flush().await?;
+            e.checkpoint().await?;
+        }
+        #[cfg(feature = "ublk")]
+        Command::UblkDelete { id } => {
+            tokio::task::spawn_blocking(move || infinidisk2::ublk::delete(id)).await??;
+        }
+        Command::Warm => println!("Warmed {} allocated pages", Engine::warm(c).await?),
+        Command::Compact => println!("Compacted {} allocated pages", Engine::compact(c).await?),
         Command::Status => println!(
             "{}",
             serde_json::to_string_pretty(&Engine::inspect(&c).await?)?

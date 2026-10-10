@@ -1,0 +1,26 @@
+host
+fio-version
+zerofs-version
+id2-version
+infinidisk2-local-active-fixed-mixed-mount
+infinidisk2-local-active-fixed-mixed-mysql-start
+infinidisk2-local-active-fixed-mixed-mysql-settings
+infinidisk2-local-active-fixed-mixed-mysql-warm
+infinidisk2-local-active-fixed-mixed-mysql-read_only-0
+infinidisk2-local-active-fixed-mixed-mysql-read_only-1
+infinidisk2-local-active-fixed-mixed-mysql-read_only-2
+infinidisk2-local-active-fixed-mixed-mysql-read_write-0
+infinidisk2-local-active-fixed-mixed-mysql-read_write-1
+infinidisk2-local-active-fixed-mixed-mysql-read_write-2
+infinidisk2-local-active-fixed-mixed-mysql-write_only-0
+infinidisk2-local-active-fixed-mixed-mysql-write_only-1
+infinidisk2-local-active-fixed-mixed-mysql-write_only-2
+infinidisk2-local-active-fixed-mixed-mysql-crash
+infinidisk2-local-active-fixed-mixed-mysql-restart
+infinidisk2-local-active-fixed-mixed-mysql-counts
+infinidisk2-local-active-fixed-mixed-mysql-check
+infinidisk2-local-active-fixed-mixed-mysql-stop
+infinidisk2-local-active-fixed-mixed-mysql-remove
+infinidisk2-local-active-fixed-mixed-mysql-unmount
+detach-1791617527176909785
+REPORT /root/infinidisk2/test-output/comparison-be4ba51a4a38/optimization-local-active-fixed-mixed.json

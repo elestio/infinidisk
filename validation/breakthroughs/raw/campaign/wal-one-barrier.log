@@ -1,0 +1,20 @@
+host
+fio-version
+zerofs-version
+id2-version
+infinidisk2-wal-one-barrier-mount
+infinidisk2-wal-one-barrier-mysql-start
+infinidisk2-wal-one-barrier-mysql-settings
+infinidisk2-wal-one-barrier-mysql-warm
+infinidisk2-wal-one-barrier-mysql-write_only-0
+infinidisk2-wal-one-barrier-mysql-write_only-1
+infinidisk2-wal-one-barrier-mysql-write_only-2
+infinidisk2-wal-one-barrier-mysql-crash
+infinidisk2-wal-one-barrier-mysql-restart
+infinidisk2-wal-one-barrier-mysql-counts
+infinidisk2-wal-one-barrier-mysql-check
+infinidisk2-wal-one-barrier-mysql-stop
+infinidisk2-wal-one-barrier-mysql-remove
+infinidisk2-wal-one-barrier-mysql-unmount
+detach-1791612705900293084
+REPORT /root/infinidisk2/test-output/comparison-323bb1097b47/optimization-wal-one-barrier.json

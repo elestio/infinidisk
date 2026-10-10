@@ -1,0 +1,31 @@
+{
+  "utc": "2026-10-10T07:38:26.900912+00:00",
+  "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+  "containers": [
+    "app-wordpress-1",
+    "app-phpmyadmin-1",
+    "app-database-1",
+    "elestio-postfix",
+    "elestio-nginx",
+    "app-redis-1"
+  ],
+  "test_nbd31_free": true,
+  "test_ublk31_free": true,
+  "test_mounts": [],
+  "services": {
+    "infinidisk@bench": [
+      "ActiveState=active",
+      "ActiveEnterTimestamp=Fri 2026-10-09 18:56:05 UTC",
+      "MainPID=5339"
+    ],
+    "infinidisk@data": [
+      "ActiveState=active",
+      "ActiveEnterTimestamp=Fri 2026-10-09 18:55:59 UTC",
+      "MainPID=5112"
+    ]
+  },
+  "free_test_ports": [
+    11990,
+    11991
+  ]
+}

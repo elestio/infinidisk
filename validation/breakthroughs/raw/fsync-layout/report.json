@@ -1,0 +1,52 @@
+{
+  "scope": "single pwrite(4128)+fdatasync; preparation excluded; no DB or recovery guarantee",
+  "samples": [
+    {
+      "mode": "growing",
+      "operations": 21924,
+      "seconds": 10.00040457999421,
+      "operations_per_second": 2192.3113034705534,
+      "mean_operation_ms": 0.4561395995253699
+    },
+    {
+      "mode": "initialized",
+      "operations": 71004,
+      "seconds": 10.000081745994976,
+      "operations_per_second": 7100.341957548201,
+      "mean_operation_ms": 0.14083828722318426
+    },
+    {
+      "mode": "initialized",
+      "operations": 76387,
+      "seconds": 10.000118253003166,
+      "operations_per_second": 7638.609671146638,
+      "mean_operation_ms": 0.13091387609152297
+    },
+    {
+      "mode": "growing",
+      "operations": 22267,
+      "seconds": 10.00024996799766,
+      "operations_per_second": 2226.6443410172574,
+      "mean_operation_ms": 0.4491062993666709
+    },
+    {
+      "mode": "growing",
+      "operations": 24172,
+      "seconds": 10.000113309004519,
+      "operations_per_second": 2417.1726112577667,
+      "mean_operation_ms": 0.41370649135381926
+    },
+    {
+      "mode": "initialized",
+      "operations": 74272,
+      "seconds": 10.000069565001468,
+      "operations_per_second": 7427.148333041531,
+      "mean_operation_ms": 0.13464117790017055
+    }
+  ],
+  "median_operations_per_second": {
+    "growing": 2226.6443410172574,
+    "initialized": 7427.148333041531
+  },
+  "host": "wordpress-ovh-u3"
+}

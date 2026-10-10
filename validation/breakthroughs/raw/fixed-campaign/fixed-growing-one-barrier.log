@@ -1,0 +1,20 @@
+host
+fio-version
+zerofs-version
+id2-version
+infinidisk2-fixed-growing-one-barrier-mount
+infinidisk2-fixed-growing-one-barrier-mysql-start
+infinidisk2-fixed-growing-one-barrier-mysql-settings
+infinidisk2-fixed-growing-one-barrier-mysql-warm
+infinidisk2-fixed-growing-one-barrier-mysql-write_only-0
+infinidisk2-fixed-growing-one-barrier-mysql-write_only-1
+infinidisk2-fixed-growing-one-barrier-mysql-write_only-2
+infinidisk2-fixed-growing-one-barrier-mysql-crash
+infinidisk2-fixed-growing-one-barrier-mysql-restart
+infinidisk2-fixed-growing-one-barrier-mysql-counts
+infinidisk2-fixed-growing-one-barrier-mysql-check
+infinidisk2-fixed-growing-one-barrier-mysql-stop
+infinidisk2-fixed-growing-one-barrier-mysql-remove
+infinidisk2-fixed-growing-one-barrier-mysql-unmount
+detach-1791616480312751266
+REPORT /root/infinidisk2/test-output/comparison-323bb1097b47/optimization-fixed-growing-one-barrier.json

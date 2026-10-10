@@ -31,6 +31,14 @@ parser.add_argument('--mysql-warm-seconds',type=int,default=10)
 parser.add_argument('--read-extent-kib',type=int,choices=[16,64,256])
 parser.add_argument('--wal-preallocate',choices=['on','off'])
 parser.add_argument('--wal-writev',choices=['on','off'])
+parser.add_argument('--logical-cache',choices=['on','off'])
+parser.add_argument('--wal-fixed-size',choices=['on','off'])
+parser.add_argument('--wal-commit-records',choices=['on','off'])
+parser.add_argument('--flush-batch-us',type=int)
+parser.add_argument('--hot-wal-mib',type=int)
+parser.add_argument('--offline-warm',action='store_true')
+parser.add_argument('--offline-compact',action='store_true')
+parser.add_argument('--transport',choices=['nbd','ublk'],default='nbd')
 parser.add_argument('--trace-engine',action='store_true',help='strace aggregate counters; timings are profiling only')
 ARGS=parser.parse_args()
 if not 1000<=ARGS.mysql_rows<=2000000 or not 2<=ARGS.mysql_volume_gib<=16 or not 1<=ARGS.mysql_memory_cache_mib<=16384 or not 1<=ARGS.mysql_disk_cache_mib<=65536:parser.error('invalid MySQL dataset/cache limits')
@@ -57,6 +65,11 @@ for line in pathlib.Path('/opt/elestio/infinidisk/bench.env').read_text().splitl
         ENV[k]=shlex.split(v)[0]
 ENV['ZEROFS_PASSWORD']=ENV.pop('INFINIDISK_PASSWORD')
 DEV=next(pathlib.Path('/dev/nbd'+str(n)) for n in range(31,1,-1) if pathlib.Path('/dev/nbd'+str(n)).exists() and not pathlib.Path('/sys/class/block/nbd'+str(n)+'/pid').exists())
+if ARGS.transport=='ublk':
+    if ARGS.engine!='infinidisk2' or pathlib.Path('/dev/ublkc31').exists():raise RuntimeError('ublk31 already exists or unsupported engine')
+    subprocess.run(['modprobe','ublk_drv'],check=True)
+    DEV=pathlib.Path('/dev/ublkb31')
+ublk_started=False
 R={'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'work':str(W),'device':str(DEV),'size_bytes':268435456,'duration_seconds':15,'connections':8,'memory_mib':64,'cold_disk_mib':128,'warm_disk_mib':512,'runs':{},'contracts':{'infinidisk2':'FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog','zerofs':'ignore_fsync=false: explicit FLUSH/FUA seals extents and flushes metadata to S3','zerofs-async':'ignore_fsync=true: explicit FLUSH/FUA ignored; not a durable database configuration'}}
 if EXISTING:
     R=json.loads(EXISTING.read_text())
@@ -91,11 +104,39 @@ def waitport(port):
             with socket.create_connection(('127.0.0.1',port),timeout=.1):return
         except OSError:time.sleep(.2)
     raise RuntimeError('startup timeout')
+def delete_ublk(label):
+    run([BIN,'-c',cfg,'ublk-delete','--id','31'],label)
+    deadline=time.monotonic()+10
+    while pathlib.Path('/dev/ublkc31').exists() or pathlib.Path('/sys/class/block/ublkb31').exists():
+        if time.monotonic()>deadline:raise RuntimeError('ublk31 deletion did not finish')
+        time.sleep(.02)
 def start(engine,label):
-    global server,client,tracer
+    global server,client,tracer,ublk_started
+    if engine=='infinidisk2':
+        import re
+        text=cfg.read_text()
+        for key,value in [('logical_cache',ARGS.logical_cache),('wal_commit_records',ARGS.wal_commit_records),('wal_fixed_size',ARGS.wal_fixed_size),('flush_batch_us',ARGS.flush_batch_us),('hot_wal_mib',ARGS.hot_wal_mib)]:
+            if value is not None:
+                text=re.sub(r'^'+key+r'\s*=.*$', '',text,flags=re.M)
+                text+='\n'+key+' = '+(str(value=='on').lower() if isinstance(value,str) else str(value))+'\n'
+        cfg.write_text(text)
+        (W/(label+'-config.toml')).write_text(text)
+        for operation,enabled in [('compact',ARGS.offline_compact),('warm',ARGS.offline_warm)]:
+            if enabled:
+                preparation_at=time.monotonic();run([BIN,'-c',cfg,operation],label+'-offline-'+operation,timeout=3600)
+                R.setdefault('preparation',{}).setdefault(label,{})[operation+'_seconds']=time.monotonic()-preparation_at
     f=open(W/(label+'-server.log'),'w')
     a=[BIN,'-c',cfg,'serve'] if engine=='infinidisk2' else ['zerofs','run','-c',cfg]
-    server=subprocess.Popen(list(map(str,a)),env=ENV,stdout=f,stderr=subprocess.STDOUT);f.close();waitport(11991)
+    if ARGS.transport=='ublk':a=[BIN,'-c',cfg,'ublk','--id','31','--queues','4']
+    server=subprocess.Popen(list(map(str,a)),env=ENV,stdout=f,stderr=subprocess.STDOUT);f.close()
+    if ARGS.transport=='ublk':
+        for _ in range(600):
+            if server.poll() is not None:raise RuntimeError('ublk server startup failed')
+            if DEV.exists():ublk_started=True;return
+            time.sleep(.1)
+        server.kill();server.wait();server=None
+        raise RuntimeError('ublk device startup timeout')
+    waitport(11991)
     if ARGS.trace_engine and engine=='infinidisk2':
         tracer=subprocess.Popen(['strace','-f','-c','-w','-e','trace=write,writev,pwrite64,pwritev,fdatasync,fsync,fallocate,futex,clone,openat,close','-p',str(server.pid),'-o',str(W/(label+'-strace.log'))],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
         time.sleep(.2)
@@ -117,20 +158,26 @@ def start(engine,label):
         time.sleep(.1)
     raise RuntimeError('attachment timeout')
 def stop():
-    global server,client,tracer,nfsmounted,mounted,pgname,mysqlname
+    global server,client,tracer,nfsmounted,mounted,pgname,mysqlname,ublk_started
     if mysqlname:
         run(['docker','rm','-f',mysqlname],'cleanup-mysql-'+str(time.time_ns()),check=False);mysqlname=None
     if pgname:
         run(['docker','rm','-f',pgname],'cleanup-pg-'+str(time.time_ns()),check=False);pgname=None
-    if mounted:run(['umount',W/'mount'],'cleanup-ext4-'+str(time.time_ns()));mounted=False
+    # mount(8) may time out after the kernel has already mounted the filesystem.
+    # Only inspect our isolated fixture's exact mountpoint, never a global unmount.
+    if mounted or subprocess.run(['mountpoint','-q',W/'mount']).returncode==0:
+        run(['umount',W/'mount'],'cleanup-ext4-'+str(time.time_ns()));mounted=False
     if nfsmounted:run(['umount',W/'nfs'],'cleanup-nfs',check=False);nfsmounted=False
     if client:
         if pathlib.Path('/sys/class/block/'+DEV.name+'/pid').exists():run([BIN,'-c',W/'attach.toml','detach','--device',DEV],'detach-'+str(time.time_ns()))
         client.wait(timeout=70);client=None
     if tracer:
         tracer.send_signal(signal.SIGINT);tracer.wait(timeout=10);tracer=None
+    if ublk_started and pathlib.Path('/dev/ublkc31').exists():
+        delete_ublk('ublk-delete-'+str(time.time_ns()))
+    ublk_started=False
     if server:
-        server.send_signal(signal.SIGTERM)
+        if ARGS.transport!='ublk':server.send_signal(signal.SIGTERM)
         try:server.wait(timeout=240)
         except subprocess.TimeoutExpired:server.kill();server.wait();raise RuntimeError('shutdown timeout; checkpoint not established')
         if server.returncode:raise RuntimeError('server shutdown failure')
@@ -224,7 +271,7 @@ def postgres(engine,existing=False):
     run(['docker','rm',pgname],engine+'-pg-remove');pgname=None
     run(['umount',mount],engine+'-unmount');mounted=False;save()
 def mysql(label,native=False,existing=False,measure=True,storage_crash=False):
-    global mounted,mysqlname,mysql_password,server,client
+    global mounted,mysqlname,mysql_password,server,client,ublk_started
     import re
     mount=W/'mount';mount.mkdir(exist_ok=True)
     if native:datadir=W/'native-mysql';datadir.mkdir(exist_ok=True)
@@ -261,7 +308,7 @@ def mysql(label,native=False,existing=False,measure=True,storage_crash=False):
     ready()
     settings=sql('SELECT @@innodb_flush_log_at_trx_commit,@@sync_binlog,@@innodb_doublewrite,@@innodb_flush_method,@@innodb_buffer_pool_size,@@version,@@log_bin','mysql-settings').stdout.strip().split('\t')
     if settings[:4]!=['1','1','ON','O_DIRECT'] or settings[-1]!='1':raise RuntimeError('InnoDB durability settings unexpected: '+str(settings))
-    R.setdefault('mysql',{})[label]={'settings':settings,'tables':4,'rows_per_table':rows_per_table,'threads':8,'cpu_limit':1,'memory_mib':1024,'samples':{},'sample_count':ARGS.mysql_samples,'sample_seconds':ARGS.mysql_seconds,'trace_engine':ARGS.trace_engine,'warmup_seconds':ARGS.mysql_warm_seconds,'startup_seconds':time.monotonic()-startup_at}
+    R.setdefault('mysql',{})[label]={'settings':settings,'tables':4,'rows_per_table':rows_per_table,'threads':8,'cpu_limit':1,'memory_mib':1024,'samples':{},'sample_count':ARGS.mysql_samples,'sample_seconds':ARGS.mysql_seconds,'trace_engine':ARGS.trace_engine,'transport':ARGS.transport,'warmup_seconds':ARGS.mysql_warm_seconds,'startup_seconds':time.monotonic()-startup_at}
     if not existing:sql('CREATE DATABASE bench','mysql-create')
     common=['sysbench','--db-driver=mysql','--mysql-socket='+str(datadir/'mysql.sock'),'--mysql-user=root','--mysql-password='+ENV['MYSQL_ROOT_PASSWORD'],'--mysql-db=bench','--tables=4','--table-size='+str(rows_per_table),'--threads=8','--rand-seed=42','--rand-type='+ARGS.mysql_rand_type]
     if not existing:run(common+['/usr/share/sysbench/oltp_read_write.lua','prepare'],label+'-mysql-prepare',timeout=900)
@@ -277,7 +324,15 @@ def mysql(label,native=False,existing=False,measure=True,storage_crash=False):
             for entry in cache_dir.glob('*.cache'):
                 try:cache_bytes+=entry.stat().st_size
                 except FileNotFoundError:pass
+            if settings_cache.get('logical_cache'):
+                page_dir=pathlib.Path(settings_cache['local_dir'])/'logical-cache'
+                cache_bytes=sum(f.stat().st_blocks*512 for f in page_dir.iterdir() if f.is_file())
             R['mysql'][label]['ssd_cache_bytes_before_samples']=cache_bytes
+            if server:
+                status=pathlib.Path('/proc')/str(server.pid)/'status'
+                fields={line.split(':')[0]:line.split(':')[1].strip() for line in status.read_text().splitlines() if ':' in line}
+                R['mysql'][label]['engine_rss_kib_before_samples']=int(fields['VmRSS'].split()[0])
+                R['mysql'][label]['engine_peak_rss_kib_before_samples']=int(fields['VmHWM'].split()[0])
             R['mysql'][label]['engine_memory_cache_mib']=settings_cache.get('memory_cache_mib',128)
             R['mysql'][label]['engine_disk_cache_mib']=settings_cache.get('disk_cache_mib',2048)
     for work in (ARGS.mysql_workloads if measure else ()):
@@ -308,8 +363,11 @@ def mysql(label,native=False,existing=False,measure=True,storage_crash=False):
                 run(['umount','-l',mount],label+'-storage-crash-unmount');mounted=False
                 try:workload.wait(timeout=10)
                 except subprocess.TimeoutExpired:os.killpg(workload.pid,signal.SIGKILL);workload.wait()
-                if pathlib.Path('/sys/class/block/'+DEV.name+'/pid').exists():run([BIN,'-c',W/'attach.toml','detach','--device',DEV],label+'-storage-crash-detach')
-                client.wait(timeout=70);client=None
+                if ARGS.transport=='ublk':
+                    delete_ublk(label+'-storage-crash-ublk-delete');ublk_started=False
+                else:
+                    if pathlib.Path('/sys/class/block/'+DEV.name+'/pid').exists():run([BIN,'-c',W/'attach.toml','detach','--device',DEV],label+'-storage-crash-detach')
+                    client.wait(timeout=70);client=None
                 start('infinidisk2',label+'-local-recovery')
                 p=run(['e2fsck','-f','-p',DEV],label+'-storage-crash-fsck',check=False)
                 if p.returncode not in (0,1):raise RuntimeError('ext4 recovery failed after storage crash')
