@@ -1,0 +1,6 @@
+{
+  "schema": "infinidisk2.astra.durable-evidence-pointer.v1",
+  "manifest": "attempts/20261010T141640Z-1c7c7678/manifest.json",
+  "sha256": "c38a65facae7860a7b7688e975730fad46d2e25e4e3c4e6d97ce334b53a15742",
+  "report_sha256": "7c87db5b97e5fb00157629f11b67bc2f0f23eb0b7c0536d54f06f55db59439e9"
+}

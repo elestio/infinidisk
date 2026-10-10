@@ -1,0 +1,28 @@
+{
+  "utc": "2026-10-10T09:41:58.672596+00:00",
+  "before_block_stat": "     361       31     5066       22        3        9       96        0        1   630653       22        0        0        0        0        0        0\n",
+  "reads": [
+    {
+      "cpu": 0,
+      "returncode": 0,
+      "output": ""
+    },
+    {
+      "cpu": 1,
+      "returncode": 0,
+      "output": ""
+    },
+    {
+      "cpu": 2,
+      "returncode": 0,
+      "output": ""
+    },
+    {
+      "cpu": 3,
+      "returncode": 0,
+      "output": ""
+    }
+  ],
+  "after_block_stat": "     365       31     5098       22        3        9       96        0        1   630672       23        0        0        0        0        0        0\n",
+  "mysql_wchan": "jbd2_log_wait_commit"
+}

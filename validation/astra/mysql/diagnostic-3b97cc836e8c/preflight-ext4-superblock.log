@@ -1,0 +1,61 @@
+Filesystem volume name:   <none>
+Last mounted on:          /var/lib/mysql
+Filesystem UUID:          51bf1e91-cfcf-4586-a0fd-c01ee0eef583
+Filesystem magic number:  0xEF53
+Filesystem revision #:    1 (dynamic)
+Filesystem features:      has_journal ext_attr resize_inode dir_index orphan_file filetype extent 64bit flex_bg metadata_csum_seed sparse_super large_file huge_file dir_nlink extra_isize metadata_csum
+Filesystem flags:         signed_directory_hash 
+Default mount options:    user_xattr acl
+Filesystem state:         clean
+Errors behavior:          Continue
+Filesystem OS type:       Linux
+Inode count:              262144
+Block count:              1048576
+Reserved block count:     52428
+Overhead clusters:        36936
+Free blocks:              702836
+Free inodes:              261953
+First block:              0
+Block size:               4096
+Fragment size:            4096
+Group descriptor size:    64
+Reserved GDT blocks:      511
+Blocks per group:         32768
+Fragments per group:      32768
+Inodes per group:         8192
+Inode blocks per group:   512
+RAID stripe width:        32
+Flex block group size:    16
+Filesystem created:       Sat Oct 10 04:26:46 2026
+Last mount time:          Sat Oct 10 09:54:37 2026
+Last write time:          Sat Oct 10 10:15:11 2026
+Mount count:              0
+Maximum mount count:      -1
+Last checked:             Sat Oct 10 10:15:11 2026
+Check interval:           0 (<none>)
+Lifetime writes:          13 GB
+Reserved blocks uid:      0 (user root)
+Reserved blocks gid:      0 (group root)
+First inode:              11
+Inode size:               256
+Required extra isize:     32
+Desired extra isize:      32
+Journal inode:            8
+Default directory hash:   half_md4
+Directory Hash Seed:      75032a8e-4ce0-40c0-a0a1-d8573eef6da4
+Journal backup:           inode blocks
+Checksum type:            crc32c
+Checksum:                 0xf00657c1
+Checksum seed:            0x316304d8
+Orphan file inode:        12
+Journal features:         journal_incompat_revoke journal_64bit journal_checksum_v3
+Total journal size:       64M
+Total journal blocks:     16384
+Max transaction length:   16384
+Fast commit length:       0
+Journal sequence:         0x0001a7f8
+Journal start:            0
+Journal checksum type:    crc32c
+Journal checksum:         0xe65c2caa
+
+dumpe2fs 1.47.2 (1-Jan-2025)

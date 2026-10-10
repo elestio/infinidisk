@@ -1,0 +1,23 @@
+host
+fio-version
+zerofs-version
+id2-version
+zerofs-initial-nfs
+zerofs-initial-nfs-umount
+zerofs-mkfs
+zerofs-mount
+zerofs-pg-start
+zerofs-pg-settings
+zerofs-pg-init
+zerofs-pgbench-0
+zerofs-pgbench-1
+zerofs-pgbench-2
+zerofs-pg-crash
+zerofs-pg-restart
+zerofs-pg-sums
+zerofs-pg-amcheck
+zerofs-pg-stop
+zerofs-pg-remove
+zerofs-unmount
+detach-1791635108211334176
+REPORT /root/infinidisk2/test-output/comparison-a7d403575484/report.json

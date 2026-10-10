@@ -1,0 +1,9 @@
+{
+  "utc": "2026-10-10T11:24:46.937290+00:00",
+  "phase": "astra-c3588919f4-small-qualified-compact-1",
+  "planned_pause": true,
+  "ignored_sql_errors_total": 3,
+  "database_recovery": "passed",
+  "reason": "Separate diagnosis of ignored SQL errors; completed measurements retained and excluded, no automatic retry",
+  "test_devices_free": true
+}

@@ -1,0 +1,1294 @@
+{
+  "complete": true,
+  "integrity": {
+    "initial_crc32c": "passed",
+    "remote_crc32c": "passed"
+  },
+  "phases": {
+    "fio.init": {
+      "started_utc": "2026-10-10T13:59:05.769818+00:00",
+      "seconds": 0.7256743259931682,
+      "summary": {
+        "total_upstream_attempts": 3,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 1,
+          "B": 2,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 1,
+          "B": 2
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "GetObject": 2,
+          "PutObject": 1
+        },
+        "by_status": {
+          "200": 2,
+          "404": 1
+        },
+        "by_phase": {
+          "fio.init": 3
+        },
+        "by_object_type": {
+          "infinidisk_head": 3
+        },
+        "request_payload_bytes": 125,
+        "response_payload_bytes": 502,
+        "estimated_gross_request_cost_usd": 6e-06,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "fio.bulk_write": {
+      "started_utc": "2026-10-10T13:59:06.495499+00:00",
+      "seconds": 0.8336152390111238,
+      "summary": {
+        "total_upstream_attempts": 0,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 0,
+          "B": 0,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 0,
+          "B": 0
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {},
+        "by_status": {},
+        "by_phase": {},
+        "by_object_type": {},
+        "request_payload_bytes": 0,
+        "response_payload_bytes": 0,
+        "estimated_gross_request_cost_usd": 0.0,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "fio.fsync_write": {
+      "started_utc": "2026-10-10T13:59:07.329113+00:00",
+      "seconds": 1.5851872279890813,
+      "summary": {
+        "total_upstream_attempts": 0,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 0,
+          "B": 0,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 0,
+          "B": 0
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {},
+        "by_status": {},
+        "by_phase": {},
+        "by_object_type": {},
+        "request_payload_bytes": 0,
+        "response_payload_bytes": 0,
+        "estimated_gross_request_cost_usd": 0.0,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "fio.drain": {
+      "started_utc": "2026-10-10T13:59:08.914301+00:00",
+      "seconds": 3.0091997920098947,
+      "summary": {
+        "total_upstream_attempts": 65,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 65,
+          "B": 0,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 65,
+          "B": 0
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "PutObject": 65
+        },
+        "by_status": {
+          "200": 65
+        },
+        "by_phase": {
+          "fio.drain": 65
+        },
+        "by_object_type": {
+          "infinidisk_head": 1,
+          "infinidisk_index": 32,
+          "segment": 32
+        },
+        "request_payload_bytes": 288960500,
+        "response_payload_bytes": 0,
+        "estimated_gross_request_cost_usd": 0.000325,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "fio.restore_open": {
+      "started_utc": "2026-10-10T13:59:11.923502+00:00",
+      "seconds": 0.6615734859951772,
+      "summary": {
+        "total_upstream_attempts": 67,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 1,
+          "B": 66,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 1,
+          "B": 66
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "GetObject": 66,
+          "PutObject": 1
+        },
+        "by_status": {
+          "200": 67
+        },
+        "by_phase": {
+          "fio.restore_open": 67
+        },
+        "by_object_type": {
+          "infinidisk_head": 3,
+          "infinidisk_index": 64
+        },
+        "request_payload_bytes": 4436,
+        "response_payload_bytes": 7251112,
+        "estimated_gross_request_cost_usd": 3.8e-05,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "fio.restore_check": {
+      "started_utc": "2026-10-10T13:59:12.585076+00:00",
+      "seconds": 6.584616288993857,
+      "summary": {
+        "total_upstream_attempts": 4096,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 0,
+          "B": 4096,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 0,
+          "B": 4096
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "GetObject": 4096
+        },
+        "by_status": {
+          "206": 4096
+        },
+        "by_phase": {
+          "fio.restore_check": 4096
+        },
+        "by_object_type": {
+          "segment": 4096
+        },
+        "request_payload_bytes": 0,
+        "response_payload_bytes": 285149184,
+        "estimated_gross_request_cost_usd": 0.002048,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "fio.restore_drain": {
+      "started_utc": "2026-10-10T13:59:19.169691+00:00",
+      "seconds": 0.08427296300942544,
+      "summary": {
+        "total_upstream_attempts": 0,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 0,
+          "B": 0,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 0,
+          "B": 0
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {},
+        "by_status": {},
+        "by_phase": {},
+        "by_object_type": {},
+        "request_payload_bytes": 0,
+        "response_payload_bytes": 0,
+        "estimated_gross_request_cost_usd": 0.0,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    }
+  },
+  "kind": "write",
+  "options": {
+    "aligned_wal": false,
+    "async_cache": true,
+    "cache_queue_mib": 16,
+    "checkpoint_pipeline": true,
+    "checkpoint_seconds": 5,
+    "compact_checkpoints": true,
+    "disk_cache_mib": 128,
+    "fast_local_reads": true,
+    "flush_batch_us": 0,
+    "generation_max_lag_seconds": 30,
+    "generation_mode": false,
+    "hot_wal_mib": 64,
+    "logical_cache": true,
+    "max_index_mib": 64,
+    "max_inflight": 128,
+    "max_pending_mib": 1024,
+    "memory_cache_mib": 64,
+    "paged_index": true,
+    "read_extent_kib": 64,
+    "segment_mib": 16,
+    "selective_sync": true,
+    "sync_data_only": true,
+    "ublk_fast_path": false,
+    "wal_commit_records": true,
+    "wal_fixed_size": true,
+    "wal_preallocate": false,
+    "wal_writev": true
+  },
+  "samples": {
+    "bulk-write": {
+      "jobname": "bulk-write",
+      "groupid": 0,
+      "job_start": 1791640746682,
+      "error": 0,
+      "eta": 2147483647,
+      "elapsed": 1,
+      "job options": {
+        "name": "bulk-write",
+        "filename": "/dev/nbd31",
+        "ioengine": "libaio",
+        "direct": "1",
+        "numjobs": "1",
+        "group_reporting": "1",
+        "size": "256m",
+        "offset": "16m",
+        "randseed": "42",
+        "randrepeat": "1",
+        "rw": "write",
+        "bs": "128k",
+        "iodepth": "16",
+        "verify": "crc32c",
+        "verify_interval": "4k",
+        "verify_fatal": "1",
+        "do_verify": "1",
+        "refill_buffers": "1",
+        "fsync_on_close": "1"
+      },
+      "read": {
+        "io_bytes": 268435456,
+        "io_kbytes": 262144,
+        "bw_bytes": 1877171020,
+        "bw": 1833174,
+        "iops": 14321.678322,
+        "runtime": 143,
+        "total_ios": 2048,
+        "short_ios": 0,
+        "drop_ios": 0,
+        "slat_ns": {
+          "min": 5058,
+          "max": 520092,
+          "mean": 16994.604492,
+          "stddev": 22868.333856,
+          "N": 2048
+        },
+        "clat_ns": {
+          "min": 119718,
+          "max": 4283057,
+          "mean": 1074455.761719,
+          "stddev": 418895.672763,
+          "N": 2048,
+          "percentile": {
+            "1.000000": 485376,
+            "5.000000": 651264,
+            "10.000000": 708608,
+            "20.000000": 790528,
+            "30.000000": 839680,
+            "40.000000": 913408,
+            "50.000000": 995328,
+            "60.000000": 1056768,
+            "70.000000": 1122304,
+            "80.000000": 1253376,
+            "90.000000": 1548288,
+            "95.000000": 1843200,
+            "99.000000": 2932736,
+            "99.500000": 3129344,
+            "99.900000": 3522560,
+            "99.950000": 3522560,
+            "99.990000": 4292608
+          }
+        },
+        "lat_ns": {
+          "min": 124966,
+          "max": 4293414,
+          "mean": 1091450.366211,
+          "stddev": 421505.51205,
+          "N": 2048
+        },
+        "bw_min": 0,
+        "bw_max": 0,
+        "bw_agg": 0.0,
+        "bw_mean": 0.0,
+        "bw_dev": 0.0,
+        "bw_samples": 0,
+        "iops_min": 0,
+        "iops_max": 0,
+        "iops_mean": 0.0,
+        "iops_stddev": 0.0,
+        "iops_samples": 0
+      },
+      "write": {
+        "io_bytes": 268435456,
+        "io_kbytes": 262144,
+        "bw_bytes": 661171073,
+        "bw": 645674,
+        "iops": 5044.334975,
+        "runtime": 406,
+        "total_ios": 2048,
+        "short_ios": 0,
+        "drop_ios": 0,
+        "slat_ns": {
+          "min": 42836,
+          "max": 2535289,
+          "mean": 76534.000977,
+          "stddev": 67803.441543,
+          "N": 2048
+        },
+        "clat_ns": {
+          "min": 242409,
+          "max": 11644484,
+          "mean": 2028549.123535,
+          "stddev": 1470969.106731,
+          "N": 2048,
+          "percentile": {
+            "1.000000": 962560,
+            "5.000000": 1171456,
+            "10.000000": 1236992,
+            "20.000000": 1318912,
+            "30.000000": 1384448,
+            "40.000000": 1433600,
+            "50.000000": 1499136,
+            "60.000000": 1646592,
+            "70.000000": 1908736,
+            "80.000000": 2277376,
+            "90.000000": 3096576,
+            "95.000000": 5734400,
+            "99.000000": 8716288,
+            "99.500000": 11337728,
+            "99.900000": 11599872,
+            "99.950000": 11599872,
+            "99.990000": 11599872
+          }
+        },
+        "lat_ns": {
+          "min": 304245,
+          "max": 11689294,
+          "mean": 2105083.124512,
+          "stddev": 1465407.251319,
+          "N": 2048
+        },
+        "bw_min": 0,
+        "bw_max": 0,
+        "bw_agg": 0.0,
+        "bw_mean": 0.0,
+        "bw_dev": 0.0,
+        "bw_samples": 0,
+        "iops_min": 0,
+        "iops_max": 0,
+        "iops_mean": 0.0,
+        "iops_stddev": 0.0,
+        "iops_samples": 0
+      },
+      "trim": {
+        "io_bytes": 0,
+        "io_kbytes": 0,
+        "bw_bytes": 0,
+        "bw": 0,
+        "iops": 0.0,
+        "runtime": 0,
+        "total_ios": 0,
+        "short_ios": 0,
+        "drop_ios": 0,
+        "slat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "clat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "lat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "bw_min": 0,
+        "bw_max": 0,
+        "bw_agg": 0.0,
+        "bw_mean": 0.0,
+        "bw_dev": 0.0,
+        "bw_samples": 0,
+        "iops_min": 0,
+        "iops_max": 0,
+        "iops_mean": 0.0,
+        "iops_stddev": 0.0,
+        "iops_samples": 0
+      },
+      "sync": {
+        "total_ios": 0,
+        "lat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        }
+      },
+      "job_runtime": 548,
+      "usr_cpu": 16.970803,
+      "sys_cpu": 24.635036,
+      "ctx": 3550,
+      "majf": 0,
+      "minf": 68,
+      "iodepth_level": {
+        "1": 0.1,
+        "2": 0.1,
+        "4": 0.195312,
+        "8": 0.390625,
+        "16": 99.267578,
+        "32": 0.0,
+        ">=64": 0.0
+      },
+      "iodepth_submit": {
+        "0": 0.0,
+        "4": 100.0,
+        "8": 0.0,
+        "16": 0.0,
+        "32": 0.0,
+        "64": 0.0,
+        ">=64": 0.0
+      },
+      "iodepth_complete": {
+        "0": 0.0,
+        "4": 99.950848,
+        "8": 0.0,
+        "16": 0.1,
+        "32": 0.0,
+        "64": 0.0,
+        ">=64": 0.0
+      },
+      "latency_ns": {
+        "2": 0.0,
+        "4": 0.0,
+        "10": 0.0,
+        "20": 0.0,
+        "50": 0.0,
+        "100": 0.0,
+        "250": 0.0,
+        "500": 0.0,
+        "750": 0.0,
+        "1000": 0.0
+      },
+      "latency_us": {
+        "2": 0.0,
+        "4": 0.0,
+        "10": 0.0,
+        "20": 0.0,
+        "50": 0.0,
+        "100": 0.0,
+        "250": 0.073242,
+        "500": 0.65918,
+        "750": 6.787109,
+        "1000": 18.896484
+      },
+      "latency_ms": {
+        "2": 58.764648,
+        "4": 11.523438,
+        "10": 2.978516,
+        "20": 0.317383,
+        "50": 0.0,
+        "100": 0.0,
+        "250": 0.0,
+        "500": 0.0,
+        "750": 0.0,
+        "1000": 0.0,
+        "2000": 0.0,
+        ">=2000": 0.0
+      },
+      "latency_depth": 16,
+      "latency_target": 0,
+      "latency_percentile": 100.0,
+      "latency_window": 0
+    },
+    "fsync-write": {
+      "jobname": "fsync-write",
+      "groupid": 0,
+      "job_start": 1791640747517,
+      "error": 0,
+      "eta": 2147483647,
+      "elapsed": 2,
+      "job options": {
+        "name": "fsync-write",
+        "filename": "/dev/nbd31",
+        "ioengine": "libaio",
+        "direct": "1",
+        "numjobs": "1",
+        "group_reporting": "1",
+        "size": "256m",
+        "offset": "512m",
+        "randseed": "42",
+        "randrepeat": "1",
+        "rw": "randwrite",
+        "bs": "4k",
+        "iodepth": "1",
+        "io_size": "16m",
+        "fsync": "1",
+        "refill_buffers": "1"
+      },
+      "read": {
+        "io_bytes": 0,
+        "io_kbytes": 0,
+        "bw_bytes": 0,
+        "bw": 0,
+        "iops": 0.0,
+        "runtime": 0,
+        "total_ios": 0,
+        "short_ios": 0,
+        "drop_ios": 0,
+        "slat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "clat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "lat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "bw_min": 0,
+        "bw_max": 0,
+        "bw_agg": 0.0,
+        "bw_mean": 0.0,
+        "bw_dev": 0.0,
+        "bw_samples": 0,
+        "iops_min": 0,
+        "iops_max": 0,
+        "iops_mean": 0.0,
+        "iops_stddev": 0.0,
+        "iops_samples": 0
+      },
+      "write": {
+        "io_bytes": 16777216,
+        "io_kbytes": 16384,
+        "bw_bytes": 14122235,
+        "bw": 13791,
+        "iops": 3447.811448,
+        "runtime": 1188,
+        "total_ios": 4096,
+        "short_ios": 0,
+        "drop_ios": 0,
+        "slat_ns": {
+          "min": 4938,
+          "max": 113678,
+          "mean": 8614.960693,
+          "stddev": 4566.951031,
+          "N": 4096
+        },
+        "clat_ns": {
+          "min": 490,
+          "max": 1886656,
+          "mean": 42009.508057,
+          "stddev": 29824.098628,
+          "N": 4096,
+          "percentile": {
+            "1.000000": 29568,
+            "5.000000": 30592,
+            "10.000000": 31616,
+            "20.000000": 36608,
+            "30.000000": 41216,
+            "40.000000": 41728,
+            "50.000000": 42240,
+            "60.000000": 42752,
+            "70.000000": 43264,
+            "80.000000": 44288,
+            "90.000000": 46848,
+            "95.000000": 49920,
+            "99.000000": 59648,
+            "99.500000": 76288,
+            "99.900000": 121344,
+            "99.950000": 152576,
+            "99.990000": 1892352
+          }
+        },
+        "lat_ns": {
+          "min": 34684,
+          "max": 1895520,
+          "mean": 50624.46875,
+          "stddev": 30248.801641,
+          "N": 4096
+        },
+        "bw_min": 13808,
+        "bw_max": 14048,
+        "bw_agg": 100.0,
+        "bw_mean": 13928.0,
+        "bw_dev": 169.705627,
+        "bw_samples": 2,
+        "iops_min": 3452,
+        "iops_max": 3512,
+        "iops_mean": 3482.0,
+        "iops_stddev": 42.426407,
+        "iops_samples": 2
+      },
+      "trim": {
+        "io_bytes": 0,
+        "io_kbytes": 0,
+        "bw_bytes": 0,
+        "bw": 0,
+        "iops": 0.0,
+        "runtime": 0,
+        "total_ios": 0,
+        "short_ios": 0,
+        "drop_ios": 0,
+        "slat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "clat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "lat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "bw_min": 0,
+        "bw_max": 0,
+        "bw_agg": 0.0,
+        "bw_mean": 0.0,
+        "bw_dev": 0.0,
+        "bw_samples": 0,
+        "iops_min": 0,
+        "iops_max": 0,
+        "iops_mean": 0.0,
+        "iops_stddev": 0.0,
+        "iops_samples": 0
+      },
+      "sync": {
+        "total_ios": 4095,
+        "lat_ns": {
+          "min": 144636,
+          "max": 7285939,
+          "mean": 229848.103053,
+          "stddev": 136897.49148,
+          "N": 4095,
+          "percentile": {
+            "1.000000": 152576,
+            "5.000000": 160768,
+            "10.000000": 166912,
+            "20.000000": 177152,
+            "30.000000": 187392,
+            "40.000000": 216064,
+            "50.000000": 232448,
+            "60.000000": 240640,
+            "70.000000": 246784,
+            "80.000000": 257024,
+            "90.000000": 272384,
+            "95.000000": 292864,
+            "99.000000": 464896,
+            "99.500000": 675840,
+            "99.900000": 1269760,
+            "99.950000": 1908736,
+            "99.990000": 7307264
+          }
+        }
+      },
+      "job_runtime": 1187,
+      "usr_cpu": 0.589722,
+      "sys_cpu": 4.043808,
+      "ctx": 11597,
+      "majf": 0,
+      "minf": 13,
+      "iodepth_level": {
+        "1": 199.975586,
+        "2": 0.0,
+        "4": 0.0,
+        "8": 0.0,
+        "16": 0.0,
+        "32": 0.0,
+        ">=64": 0.0
+      },
+      "iodepth_submit": {
+        "0": 0.0,
+        "4": 100.0,
+        "8": 0.0,
+        "16": 0.0,
+        "32": 0.0,
+        "64": 0.0,
+        ">=64": 0.0
+      },
+      "iodepth_complete": {
+        "0": 0.0,
+        "4": 100.0,
+        "8": 0.0,
+        "16": 0.0,
+        "32": 0.0,
+        "64": 0.0,
+        ">=64": 0.0
+      },
+      "latency_ns": {
+        "2": 0.0,
+        "4": 0.0,
+        "10": 0.0,
+        "20": 0.0,
+        "50": 0.0,
+        "100": 0.0,
+        "250": 0.0,
+        "500": 0.024414,
+        "750": 0.024414,
+        "1000": 0.0
+      },
+      "latency_us": {
+        "2": 0.048828,
+        "4": 0.0,
+        "10": 0.024414,
+        "20": 0.244141,
+        "50": 94.677734,
+        "100": 4.736328,
+        "250": 0.195312,
+        "500": 0.0,
+        "750": 0.0,
+        "1000": 0.0
+      },
+      "latency_ms": {
+        "2": 0.024414,
+        "4": 0.0,
+        "10": 0.0,
+        "20": 0.0,
+        "50": 0.0,
+        "100": 0.0,
+        "250": 0.0,
+        "500": 0.0,
+        "750": 0.0,
+        "1000": 0.0,
+        "2000": 0.0,
+        ">=2000": 0.0
+      },
+      "latency_depth": 1,
+      "latency_target": 0,
+      "latency_percentile": 100.0,
+      "latency_window": 0
+    },
+    "restored-crc32c": {
+      "jobname": "restored-crc32c",
+      "groupid": 0,
+      "job_start": 1791640752772,
+      "error": 0,
+      "eta": 0,
+      "elapsed": 7,
+      "job options": {
+        "name": "restored-crc32c",
+        "filename": "/dev/nbd31",
+        "ioengine": "libaio",
+        "direct": "1",
+        "numjobs": "1",
+        "group_reporting": "1",
+        "size": "256m",
+        "offset": "16m",
+        "randseed": "42",
+        "randrepeat": "1",
+        "rw": "read",
+        "bs": "128k",
+        "iodepth": "16",
+        "verify": "crc32c",
+        "verify_interval": "4k",
+        "verify_fatal": "1",
+        "verify_only": "1"
+      },
+      "read": {
+        "io_bytes": 268435456,
+        "io_kbytes": 262144,
+        "bw_bytes": 43534780,
+        "bw": 42514,
+        "iops": 332.144016,
+        "runtime": 6166,
+        "total_ios": 2048,
+        "short_ios": 0,
+        "drop_ios": 0,
+        "slat_ns": {
+          "min": 5658,
+          "max": 717440,
+          "mean": 31619.413574,
+          "stddev": 48904.149091,
+          "N": 2048
+        },
+        "clat_ns": {
+          "min": 16883726,
+          "max": 371510398,
+          "mean": 48020384.477051,
+          "stddev": 55237658.265379,
+          "N": 2048,
+          "percentile": {
+            "1.000000": 18481152,
+            "5.000000": 20054016,
+            "10.000000": 21364736,
+            "20.000000": 23199744,
+            "30.000000": 24772608,
+            "40.000000": 26607616,
+            "50.000000": 28966912,
+            "60.000000": 32374784,
+            "70.000000": 37486592,
+            "80.000000": 46923776,
+            "90.000000": 86507520,
+            "95.000000": 181403648,
+            "99.000000": 325058560,
+            "99.500000": 333447168,
+            "99.900000": 337641472,
+            "99.950000": 346030080,
+            "99.990000": 371195904
+          }
+        },
+        "lat_ns": {
+          "min": 16904098,
+          "max": 371602512,
+          "mean": 48052003.890625,
+          "stddev": 55239364.371806,
+          "N": 2048
+        },
+        "bw_min": 17920,
+        "bw_max": 62464,
+        "bw_agg": 100.0,
+        "bw_mean": 43370.666667,
+        "bw_dev": 12755.919249,
+        "bw_samples": 12,
+        "iops_min": 140,
+        "iops_max": 488,
+        "iops_mean": 338.833333,
+        "iops_stddev": 99.655619,
+        "iops_samples": 12
+      },
+      "write": {
+        "io_bytes": 0,
+        "io_kbytes": 0,
+        "bw_bytes": 0,
+        "bw": 0,
+        "iops": 0.0,
+        "runtime": 0,
+        "total_ios": 0,
+        "short_ios": 0,
+        "drop_ios": 0,
+        "slat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "clat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "lat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "bw_min": 0,
+        "bw_max": 0,
+        "bw_agg": 0.0,
+        "bw_mean": 0.0,
+        "bw_dev": 0.0,
+        "bw_samples": 0,
+        "iops_min": 0,
+        "iops_max": 0,
+        "iops_mean": 0.0,
+        "iops_stddev": 0.0,
+        "iops_samples": 0
+      },
+      "trim": {
+        "io_bytes": 0,
+        "io_kbytes": 0,
+        "bw_bytes": 0,
+        "bw": 0,
+        "iops": 0.0,
+        "runtime": 0,
+        "total_ios": 0,
+        "short_ios": 0,
+        "drop_ios": 0,
+        "slat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "clat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "lat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        },
+        "bw_min": 0,
+        "bw_max": 0,
+        "bw_agg": 0.0,
+        "bw_mean": 0.0,
+        "bw_dev": 0.0,
+        "bw_samples": 0,
+        "iops_min": 0,
+        "iops_max": 0,
+        "iops_mean": 0.0,
+        "iops_stddev": 0.0,
+        "iops_samples": 0
+      },
+      "sync": {
+        "total_ios": 0,
+        "lat_ns": {
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "stddev": 0.0,
+          "N": 0
+        }
+      },
+      "job_runtime": 6165,
+      "usr_cpu": 0.665045,
+      "sys_cpu": 0.762368,
+      "ctx": 2328,
+      "majf": 0,
+      "minf": 521,
+      "iodepth_level": {
+        "1": 0.1,
+        "2": 0.1,
+        "4": 0.195312,
+        "8": 0.390625,
+        "16": 99.267578,
+        "32": 0.0,
+        ">=64": 0.0
+      },
+      "iodepth_submit": {
+        "0": 0.0,
+        "4": 100.0,
+        "8": 0.0,
+        "16": 0.0,
+        "32": 0.0,
+        "64": 0.0,
+        ">=64": 0.0
+      },
+      "iodepth_complete": {
+        "0": 0.0,
+        "4": 99.950836,
+        "8": 0.0,
+        "16": 0.1,
+        "32": 0.0,
+        "64": 0.0,
+        ">=64": 0.0
+      },
+      "latency_ns": {
+        "2": 0.0,
+        "4": 0.0,
+        "10": 0.0,
+        "20": 0.0,
+        "50": 0.0,
+        "100": 0.0,
+        "250": 0.0,
+        "500": 0.0,
+        "750": 0.0,
+        "1000": 0.0
+      },
+      "latency_us": {
+        "2": 0.0,
+        "4": 0.0,
+        "10": 0.0,
+        "20": 0.0,
+        "50": 0.0,
+        "100": 0.0,
+        "250": 0.0,
+        "500": 0.0,
+        "750": 0.0,
+        "1000": 0.0
+      },
+      "latency_ms": {
+        "2": 0.0,
+        "4": 0.0,
+        "10": 0.0,
+        "20": 4.589844,
+        "50": 77.392578,
+        "100": 9.619141,
+        "250": 6.640625,
+        "500": 1.757812,
+        "750": 0.0,
+        "1000": 0.0,
+        "2000": 0.0,
+        ">=2000": 0.0
+      },
+      "latency_depth": 16,
+      "latency_target": 0,
+      "latency_percentile": 100.0,
+      "latency_window": 0
+    }
+  },
+  "proxy": {
+    "backend_attempts": 4231,
+    "forwarded": 4231,
+    "finished": 4231,
+    "inflight": 0,
+    "peak_inflight": 32,
+    "upload_bytes": 288965061,
+    "download_bytes": 292400798,
+    "local_rejections": 0,
+    "closed_error": null,
+    "journal_complete": true
+  },
+  "summary": {
+    "total_upstream_attempts": 4231,
+    "local_only_requests": 0,
+    "request_classes": {
+      "A": 67,
+      "B": 4164,
+      "FREE": 0,
+      "UNKNOWN": 0
+    },
+    "estimated_billable_requests": {
+      "A": 67,
+      "B": 4164
+    },
+    "explicitly_nonbillable_status_requests": 0,
+    "transport_uncertain_requests": 0,
+    "unknown_class_requests": 0,
+    "assumed_class_requests": 0,
+    "by_operation": {
+      "GetObject": 4164,
+      "PutObject": 67
+    },
+    "by_status": {
+      "200": 134,
+      "206": 4096,
+      "404": 1
+    },
+    "by_phase": {
+      "fio.drain": 65,
+      "fio.init": 3,
+      "fio.restore_check": 4096,
+      "fio.restore_open": 67
+    },
+    "by_object_type": {
+      "infinidisk_head": 7,
+      "infinidisk_index": 96,
+      "segment": 4128
+    },
+    "request_payload_bytes": 288965061,
+    "response_payload_bytes": 292400798,
+    "estimated_gross_request_cost_usd": 0.002417,
+    "completed_transactions_for_normalization": null,
+    "estimated_usd_per_1000_transactions": null,
+    "estimated_usd_per_10000_transactions": null,
+    "upstream_attempts_per_million_transactions": null,
+    "estimated_usd_per_million_transactions": null,
+    "cost_has_unpriced_or_uncertain_requests": false,
+    "pricing_source": "https://www.tigrisdata.com/pricing/",
+    "pricing_verified_utc": "2026-10-10",
+    "monthly_free_tier_applied": false,
+    "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+  },
+  "cleanup": {
+    "failures": [],
+    "nbd31_detached": true,
+    "mount_absent": true,
+    "container_removed": true
+  },
+  "write_accounting": {
+    "total_upstream_attempts": 65,
+    "local_only_requests": 0,
+    "request_classes": {
+      "A": 65,
+      "B": 0,
+      "FREE": 0,
+      "UNKNOWN": 0
+    },
+    "estimated_billable_requests": {
+      "A": 65,
+      "B": 0
+    },
+    "explicitly_nonbillable_status_requests": 0,
+    "transport_uncertain_requests": 0,
+    "unknown_class_requests": 0,
+    "assumed_class_requests": 0,
+    "by_operation": {
+      "PutObject": 65
+    },
+    "by_status": {
+      "200": 65
+    },
+    "by_phase": {
+      "fio.drain": 65
+    },
+    "by_object_type": {
+      "infinidisk_head": 1,
+      "infinidisk_index": 32,
+      "segment": 32
+    },
+    "request_payload_bytes": 288960500,
+    "response_payload_bytes": 0,
+    "estimated_gross_request_cost_usd": 0.000325,
+    "completed_transactions_for_normalization": null,
+    "estimated_usd_per_1000_transactions": null,
+    "estimated_usd_per_10000_transactions": null,
+    "upstream_attempts_per_million_transactions": null,
+    "estimated_usd_per_million_transactions": null,
+    "cost_has_unpriced_or_uncertain_requests": false,
+    "pricing_source": "https://www.tigrisdata.com/pricing/",
+    "pricing_verified_utc": "2026-10-10",
+    "monthly_free_tier_applied": false,
+    "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded.",
+    "phases": [
+      "fio.bulk_write",
+      "fio.fsync_write",
+      "fio.drain"
+    ]
+  },
+  "local_disposable_directories_removed_after_success": [
+    "local-0",
+    "local-1"
+  ]
+}

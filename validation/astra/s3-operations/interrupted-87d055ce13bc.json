@@ -1,0 +1,12 @@
+{
+  "campaign": "87d055ce13bc",
+  "qualified": false,
+  "cause": "Synchronous datadir.mkdir on a cold NBD-mounted filesystem blocked the same event loop serving the S3 accounting proxy; accountant observed in __wait_on_buffer after cold mount, no new proxy events.",
+  "intervention": "SIGINT to owned accountant PID365117 and SIGKILL to its owned baseline test server PID367371 to release blocked kernel IO; not a storage-engine crash experiment.",
+  "cleanup_observed": {
+    "nbd31_detached": true,
+    "mount_absent": true,
+    "container_removed": true
+  },
+  "correction": "Mounted-filesystem lookups and validation moved to asyncio.to_thread. Export no longer recursively visits fixture data directories. Added reentrancy regression test and committed-history row checks. Full accounting campaign rerun on fresh volumes; interrupted durations excluded."
+}

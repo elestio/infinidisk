@@ -1,0 +1,192 @@
+{
+  "stage": "astra-c3588919f4-large-screen-core-1",
+  "pid": 228522,
+  "binary_sha256": "839abdf0cec29812ba280cf24c26ed8f122970fb76195d5241f38c98f736d5e9",
+  "note": "Read-only snapshots during offline warm; socket counters cover currently established sockets, not total lifetime network traffic; no endpoint/credential included.",
+  "observations": [
+    {
+      "utc": "2026-10-10T09:21:05.609573+00:00",
+      "cache_allocated_bytes": {
+        "versions": 12132352,
+        "pages": 1228025856,
+        "identity": 4096
+      },
+      "process_io": {
+        "rchar": 59059406,
+        "wchar": 1291646024,
+        "syscr": 5965,
+        "syscw": 944576,
+        "read_bytes": 12288,
+        "write_bytes": 1315512320,
+        "cancelled_write_bytes": 4386816
+      },
+      "established_connections": 27,
+      "max_connection_bytes_received": 226180179
+    },
+    {
+      "utc": "2026-10-10T09:22:23.100925+00:00",
+      "cache_allocated_bytes": {
+        "versions": 13168640,
+        "pages": 1334566912,
+        "identity": 4096
+      },
+      "process_io": {
+        "rchar": 59059406,
+        "wchar": 1404244962,
+        "syscr": 5967,
+        "syscw": 1046829,
+        "read_bytes": 12288,
+        "write_bytes": 1432031232,
+        "cancelled_write_bytes": 4386816
+      },
+      "established_connections": 29,
+      "connection_byte_counters": [
+        {
+          "bytes_sent": 157397,
+          "bytes_acked": 157398,
+          "bytes_received": 17458986
+        },
+        {
+          "bytes_sent": 254205,
+          "bytes_acked": 254206,
+          "bytes_received": 28200722
+        },
+        {
+          "bytes_sent": 249128,
+          "bytes_acked": 249129,
+          "bytes_received": 27657463
+        },
+        {
+          "bytes_sent": 136511,
+          "bytes_acked": 136512,
+          "bytes_received": 15136854
+        },
+        {
+          "bytes_sent": 112461,
+          "bytes_acked": 112462,
+          "bytes_received": 12462499
+        },
+        {
+          "bytes_sent": 299778,
+          "bytes_acked": 299779,
+          "bytes_received": 33295815
+        },
+        {
+          "bytes_sent": 145392,
+          "bytes_acked": 145393,
+          "bytes_received": 16122423
+        },
+        {
+          "bytes_sent": 193283,
+          "bytes_acked": 193284,
+          "bytes_received": 21468630
+        },
+        {
+          "bytes_sent": 134466,
+          "bytes_acked": 134467,
+          "bytes_received": 14925589
+        },
+        {
+          "bytes_sent": 323785,
+          "bytes_acked": 323786,
+          "bytes_received": 35908863
+        },
+        {
+          "bytes_sent": 193955,
+          "bytes_acked": 193956,
+          "bytes_received": 21535614
+        },
+        {
+          "bytes_sent": 224950,
+          "bytes_acked": 224951,
+          "bytes_received": 24980097
+        },
+        {
+          "bytes_sent": 221301,
+          "bytes_acked": 221302,
+          "bytes_received": 24559925
+        },
+        {
+          "bytes_sent": 110550,
+          "bytes_acked": 110551,
+          "bytes_received": 12251279
+        },
+        {
+          "bytes_sent": 269376,
+          "bytes_acked": 269377,
+          "bytes_received": 29912754
+        },
+        {
+          "bytes_sent": 164329,
+          "bytes_acked": 164330,
+          "bytes_received": 18233921
+        },
+        {
+          "bytes_sent": 41601,
+          "bytes_acked": 41602,
+          "bytes_received": 4579646
+        },
+        {
+          "bytes_sent": 101069,
+          "bytes_acked": 101070,
+          "bytes_received": 11143333
+        },
+        {
+          "bytes_sent": 2193460,
+          "bytes_acked": 2193461,
+          "bytes_received": 243845867
+        },
+        {
+          "bytes_sent": 1129170,
+          "bytes_acked": 1129171,
+          "bytes_received": 125440078
+        },
+        {
+          "bytes_sent": 1190624,
+          "bytes_acked": 1190625,
+          "bytes_received": 132268863
+        },
+        {
+          "bytes_sent": 1127925,
+          "bytes_acked": 1127926,
+          "bytes_received": 125342483
+        },
+        {
+          "bytes_sent": 1078495,
+          "bytes_acked": 1078496,
+          "bytes_received": 119819985
+        },
+        {
+          "bytes_sent": 749530,
+          "bytes_acked": 749531,
+          "bytes_received": 83263444
+        },
+        {
+          "bytes_sent": 788828,
+          "bytes_acked": 788829,
+          "bytes_received": 87688627
+        },
+        {
+          "bytes_sent": 1866896,
+          "bytes_acked": 1866264,
+          "bytes_received": 207474876
+        },
+        {
+          "bytes_sent": 1762460,
+          "bytes_acked": 1762461,
+          "bytes_received": 195846491
+        },
+        {
+          "bytes_sent": 626789,
+          "bytes_acked": 626790,
+          "bytes_received": 69678528
+        },
+        {
+          "bytes_sent": 725570,
+          "bytes_acked": 725571,
+          "bytes_received": 80650306
+        }
+      ]
+    }
+  ]
+}

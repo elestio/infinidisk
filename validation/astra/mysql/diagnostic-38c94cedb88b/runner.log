@@ -1,0 +1,20 @@
+host
+fio-version
+zerofs-version
+id2-version
+infinidisk2-diagnostic-38c94cedb88b-ublk-offline-warm
+infinidisk2-diagnostic-38c94cedb88b-ublk-mount
+infinidisk2-diagnostic-38c94cedb88b-ublk-mysql-start
+infinidisk2-diagnostic-38c94cedb88b-ublk-mysql-settings
+infinidisk2-diagnostic-38c94cedb88b-ublk-mysql-warm
+infinidisk2-diagnostic-38c94cedb88b-ublk-mysql-host-pid
+infinidisk2-diagnostic-38c94cedb88b-ublk-mysql-read_only-0
+infinidisk2-diagnostic-38c94cedb88b-ublk-mysql-crash
+infinidisk2-diagnostic-38c94cedb88b-ublk-mysql-restart
+infinidisk2-diagnostic-38c94cedb88b-ublk-mysql-counts
+infinidisk2-diagnostic-38c94cedb88b-ublk-mysql-check
+infinidisk2-diagnostic-38c94cedb88b-ublk-mysql-stop
+infinidisk2-diagnostic-38c94cedb88b-ublk-mysql-remove
+infinidisk2-diagnostic-38c94cedb88b-ublk-mysql-unmount
+ublk-delete-1791628165850386496
+REPORT /root/infinidisk2/test-output/comparison-be4ba51a4a38/optimization-diagnostic-38c94cedb88b-ublk.json

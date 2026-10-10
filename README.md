@@ -2,18 +2,20 @@
 
 Moteur bloc Linux autonome en Rust : journal SSD local, cache borné et persistance asynchrone sur S3. Il expose un disque NBD et fournit son propre client Linux multiconnexion. Aucun processus ZeroFS, wrapper Bash ou `nbd-client` ne participe au chemin des données.
 
-Version **0.1.0 expérimentale**, fonctionnelle de bout en bout. Les essais ext4/PostgreSQL et les mesures réelles figurent dans [le rapport](validation/rapport.html). Cette version ne constitue pas une certification de sûreté pour toutes les bases de données ou tous les fournisseurs S3.
+Version **0.1.0 expérimentale**, fonctionnelle de bout en bout. Les mesures et l'état de qualification des dernières optimisations figurent dans [le rapport Astra](validation/astra/rapport.html), avec les graphiques MySQL, PostgreSQL, fio, les appels S3 et les reprises. Le [rapport initial](validation/rapport.html) conserve les premiers essais ext4/PostgreSQL. Cette version ne constitue pas une certification de sûreté pour toutes les bases de données ou tous les fournisseurs S3.
 
-## Contrat de stockage
+## Contrat de stockage par défaut
 
 * `WRITE` normal : append au journal local avant réponse ; les écritures non synchronisées peuvent être perdues lors d'une panne.
-* `FLUSH` / `WRITE FUA` : synchronisation du journal et d'un marqueur de durabilité local avant réponse. Les barrières ne sont jamais ignorées.
+* `FLUSH` / `WRITE FUA` : synchronisation du journal et d'un marqueur de durabilité local avant réponse. Ce contrat s'applique au mode local durable, qui reste le défaut.
 * Publication distante : segments immuables, index vérifiés, puis remplacement conditionnel atomique de `HEAD`. La restauration utilise un préfixe cohérent du journal.
 * Perte complète de la VM et de son disque : retour à la dernière génération S3 publiée. L'intervalle de 5 secondes est une cible de lancement, **pas une borne garantie de perte** : le transfert et une panne réseau peuvent accroître le retard.
 * Corruption détectée : une copie de cache est reconstruite depuis une copie distante vérifiée ; une donnée faisant autorité qui échoue au contrôle d'intégrité produit une erreur. Elle n'est jamais remplacée silencieusement par des zéros.
 * Un seul hôte écrivain. Une reprise sur un autre hôte nécessite l'arrêt ou le fencing externe de l'ancien hôte. Aucun basculement automatique avec bail distribué n'est promis.
 
 Les garanties supposent un disque local qui respecte `fsync`, un stockage objet qui respecte les PUT atomiques/conditionnels et une configuration correcte du système de fichiers et de la base. S3 contient un **format de volume privé** ; les objets d'un bucket existant ne deviennent pas automatiquement des fichiers Linux.
+
+Le [mode expérimental par générations](docs/generation-mode.md) utilise un volume neuf de format 2. Ses FLUSH/FUA ordonnent les écritures sans promettre leur persistance individuelle ; après arrêt complet de l'application et du montage, il revient uniquement à un HEAD S3 complet. Des transactions acquittées peuvent disparaître. Ce mode ne s'active pas sur un volume durable existant.
 
 ## Compilation sur la VM de développement
 
@@ -118,15 +120,17 @@ La collecte est hors ligne, limitée au préfixe du volume et protège les objet
 
 ## Performances et limites
 
-Le chemin chaud utilise le disque local. Le cache SSD doit couvrir le working set de la base ; une lecture froide S3 conserve la latence du réseau. Les tests mesurent séparément données récentes locales, cache distant insuffisant et cache distant suffisant. La synchronisation actuelle ajoute une amplification de barrières et deux synchronisations locales ; c'est le principal coût restant pour les écritures durables.
+Le [comptage S3 et le compromis entre tailles](docs/astra-s3-operations.md) présentent les coûts projetés par 1K/10K requêtes SQL, le redémarrage avec cache conservé ou neuf, et les plages de lecture/tailles de WAL. Les appels observés sur Elestio sont tarifés selon la grille Tigris, avant franchise ; le coût du stockage est séparé. Les chronométrages de confirmation sans proxy ne sont pas confondus avec les mesures instrumentées. Une grande plage peut réduire les GET tout en ralentissant les lectures aléatoires.
+
+Le chemin chaud utilise le disque local. Le cache SSD doit couvrir le working set de la base ; une lecture froide S3 conserve la latence du réseau. Les tests mesurent séparément données récentes locales, cache distant insuffisant et cache distant suffisant. Le format par défaut synchronise le WAL puis son watermark local. L'option `wal_commit_records=true` inscrit la frontière durable dans le WAL et évite cette seconde synchronisation ; les profils expérimentaux la mesurent séparément.
 
 Le défaut `sync_data_only=true` utilise maintenant `fdatasync` pour les segments WAL et le watermark : les données et métadonnées nécessaires à leur lecture restent persistées, sans imposer la persistance des horodatages internes. Les créations, répertoires et écritures atomiques gardent leurs barrières de métadonnées. `sync_data_only=false` conserve le chemin `fsync` initial pour comparaison. Les compteurs `flush_calls`, `flush_groups`, `flush_wait_ns`, `wal_sync_ns` et `watermark_sync_ns` apparaissent dans les statuts périodiques ; ils sont cumulés depuis le démarrage.
 
 Le journal en attente, les segments récents et le cache SSD ont des limites séparées. Un journal plein applique une attente jusqu'à 50 secondes, puis renvoie une erreur si aucune publication ne libère de place. Prévoir l'espace local correspondant aux trois budgets, plus la marge du système hôte.
 
-L'index de pages est actuellement en RAM, avec limite conservatrice `max_index_mib` (128 octets budgétés par page allouée). Le défaut de 1 Gio autorise environ 32 Gio de pages non nulles. Les volumes virtuels peuvent être plus grands s'ils sont creux, mais les très gros volumes remplis nécessitent davantage de RAM ou une prochaine implémentation d'index paginé. Atteindre la limite refuse une nouvelle allocation ; la taille virtuelle ne réserve pas toute la RAM au démarrage.
+L'index par défaut est en RAM, avec limite conservatrice `max_index_mib` (128 octets budgétés par page allouée). Le défaut de 1 Gio autorise environ 32 Gio de pages non nulles. L'option expérimentale `paged_index=true` conserve les shards froids sur SSD et permet de dépasser cette limite de pages ; les misses SSD peuvent toutefois ralentir les accès dispersés. Son budget ne couvre pas le RSS total du processus. La racine distante reste plafonnée à 64 Mio et une publication trop grande est refusée avant remplacement de HEAD ; un très grand volume rempli nécessitera aussi une racine à plusieurs niveaux.
 
-La collecte supprime des objets entièrement inutilisés. Les segments contenant quelques pages encore vivantes restent conservés : pas de compacteur automatique de segments partiellement vivants dans cette version. Pas de snapshots utilisateur, resize en ligne, chiffrement applicatif, réplication multi-écrivain ou compatibilité démontrée avec toutes les DB. Le nombre de connexions, la concurrence et les caches sont bornés ; leur dimensionnement reste à adapter au matériel.
+La collecte supprime des objets entièrement inutilisés. `compact_checkpoints=true` peut publier uniquement les dernières versions des pages du checkpoint, sans retraiter automatiquement tous les anciens segments partiellement vivants. Les objets anciens restent disponibles jusqu'à la collecte hors ligne. Pas de snapshots utilisateur, resize en ligne, chiffrement applicatif, réplication multi-écrivain ou compatibilité démontrée avec toutes les DB. Le nombre de connexions, la concurrence et les caches sont bornés ; leur dimensionnement reste à adapter au matériel.
 
 ## Validation reproductible
 
@@ -142,14 +146,16 @@ Voir [les spécifications et décisions](docs/architecture.md), [la review et le
 
 ## Variantes expérimentales de performance
 
+La [campagne Astra](validation/astra/rapport.html) et [ses spécifications](docs/astra-optimizations.md) ajoutent le cache asynchrone borné, les lectures groupées, les workers ublk persistants, les segments préparés/recyclés, la synchronisation sélective, le WAL aligné, l'index paginé et les checkpoints compacts. Les nouvelles options restent désactivées par défaut. Le rapport identifie chaque binaire, conserve les mesures individuelles et sépare les contrats de durabilité. Le WAL aligné et le mode génération utilisent des fixtures distinctes pour éviter une ouverture avec un ancien lecteur incompatible.
+
 La [spécification des variantes](docs/breakthroughs.md) décrit le cache par page logique, la compaction S3 hors ligne, le journal à marqueurs de commit, les segments entièrement préinitialisés, le préchauffage complet et le transport ublk. Les options `logical_cache`, `wal_commit_records` et `wal_fixed_size` sont désactivées par défaut ; `flush_batch_us` vaut zéro. Les formats de journal expérimentaux ne doivent pas être ouverts ensuite par un ancien binaire. Conserver le binaire et le journal associés jusqu’à une migration qualifiée.
 
 La [campagne complète du 10 octobre](validation/breakthroughs/rapport.html) observe ×1,57 en lecture à cache SSD identique et ×28 à ×32 avec le volume préchauffé dans un budget de 4 Gio, ainsi que +59 à +65 % en écriture sur la petite base avec WAL fixe et marqueurs. Le grand dataset reste derrière le disque natif en mixte/écriture. Les coûts de préparation, le page cache Linux, les erreurs et les reprises après crash figurent dans le rapport ; ces chiffres ne sont pas des garanties universelles.
 
-Les commandes hors ligne prennent le verrou exclusif du volume : arrêter le serveur avant de les exécuter. `warm` exige `logical_cache=true` et un cache SSD assez grand pour toutes les pages allouées. `compact` réécrit les pages vers de nouveaux objets ; les anciens objets restent présents jusqu’à une collecte ultérieure.
+Les commandes hors ligne prennent le verrou exclusif du volume : arrêter le serveur avant de les exécuter. `warm` exige `logical_cache=true` et un cache SSD assez grand pour toutes les pages allouées. Il télécharge les plages S3 par groupes physiques, avec 32 groupes simultanés par défaut ; `--concurrency` accepte 1 à 128. Les pages sont vérifiées avant leur remplissage SSD et les logs exposent la progression et le nombre d'appels de plage actifs. Voir [le préchargement parallèle et ses limites](docs/astra-warm-parallel.md). `compact` réécrit les pages vers de nouveaux objets ; les anciens objets restent présents jusqu’à une collecte ultérieure.
 
 ```sh
-./target/release/infinidisk2 -c volume.toml warm
+./target/release/infinidisk2 -c volume.toml warm --concurrency 32
 ./target/release/infinidisk2 -c volume.toml compact
 # Linux avec ublk_drv et io_uring, compilateur C/Clang pour libublk :
 cargo build --release --features ublk --locked -j 2

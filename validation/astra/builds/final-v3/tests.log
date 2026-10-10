@@ -1,0 +1,131 @@
+   Compiling infinidisk2 v0.1.0 (/root/infinidisk2)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.19s
+     Running unittests src/lib.rs (target/debug/deps/infinidisk2-94c38aa628d9e8b0)
+
+running 65 tests
+test config::tests::fixed_wal_budget_is_validated_using_physical_capacity ... ok
+test engine::tests::corrupted_disposable_cache_is_rebuilt_from_verified_remote_data ... ok
+test engine::tests::compaction_upload_failure_preserves_the_previous_remote_root ... ok
+test engine::tests::corrupted_pending_wal_never_replaces_the_last_remote_checkpoint ... ok
+test engine::tests::failed_checkpoint_keeps_wal_and_retries ... ok
+test engine::tests::head_writer_never_publishes_a_root_rejected_by_its_reader_size_limit ... ok
+test engine::tests::full_pending_wal_waits_for_checkpoint_instead_of_acknowledging_missing_data ... ok
+test engine::tests::missing_acknowledged_wal_fails_closed ... ok
+test engine::tests::fixed_wal_accounts_physical_capacity_and_backpressures_before_rotation ... ok
+test engine::tests::local_and_remote_recovery_partial_writes_and_trim ... ok
+test engine::tests::queued_barrier_rejects_acknowledgement_after_volume_failure ... ok
+test engine::tests::remote_corruption_is_never_returned_as_data ... ok
+test engine::tests::offline_gc_keeps_live_data_and_resumes_a_crashed_maintenance_fence ... ok
+test engine::tests::single_barrier_rotation_requires_all_prefix_records ... ok
+test engine::tests::experimental_cache_compaction_and_single_barrier_recover ... ok
+test engine::warm_tests::corrupt_range_never_partially_fills_valid_pages_from_that_group ... ok
+test engine::tests::model_and_concurrent_flush ... ok
+test engine::warm_tests::unpublished_missing_or_corrupt_local_pages_fail_closed_without_remote_reads ... ok
+test index::tests::checkpoint_captures_resident_and_spilled_versions_without_loading_every_shard ... ok
+test index::tests::corrupt_or_missing_evicted_shard_fails_closed ... ok
+test engine::warm_tests::fragmented_ram_zero_downloads_each_missing_range_once_and_retains_every_page ... ok
+test index::tests::eviction_round_trip_preserves_sparse_updates_and_bounds_resident_maps ... ok
+test index::tests::failed_spill_preserves_the_only_current_copy ... ok
+test index::tests::full_shard_payload_fits_the_bounded_decoder ... ok
+test index::tests::memory_budget_import_and_copy_on_write_are_preserved ... ok
+test index::tests::memory_range_removal_handles_holes_and_keeps_snapshot_versions ... ok
+test index::tests::paged_replacement_removal_and_snapshot_cleanup_are_consistent ... ok
+test index::tests::scratch_is_never_reopened_as_authoritative_state ... ok
+test index::tests::wrong_session_shard_and_count_are_rejected ... ok
+test page_cache::tests::versions_eviction_reopen_and_torn_payload ... ok
+test ublk::tests::completion_wakes_waiter_and_rearms_the_next_batch ... ok
+test ublk::tests::cross_thread_completion_repeatedly_survives_rearm_races ... ok
+test ublk::tests::dead_worker_fails_userspace_wait_before_stopping_kernel_queue ... ok
+test ublk::tests::early_completion_and_tag_reuse_do_not_grow_or_lose_a_batch ... ok
+test ublk::tests::first_transport_error_stops_once_and_is_returned ... ok
+test ublk::tests::flush_descriptor_does_not_decode_unused_sector_or_length ... ok
+test ublk::tests::normal_queue_shutdown_drains_workers_without_stopping_device_again ... ok
+test ublk::tests::owned_requests_preserve_fua_flush_and_read_buffer_on_success ... ok
+test ublk::tests::queue_completion_batch_keeps_buffers_and_signals_once ... ok
+test ublk::tests::queue_runtime_delivers_cross_runtime_completions ... ignored, requires Linux io_uring; run with an external 30-second timeout
+test wal::tests::aligned_capacity_and_sequences_are_checked_before_mutating_the_wal ... ok
+test wal::tests::aligned_fixed_wal_rejects_gap_before_a_later_commit ... ok
+test wal::tests::aligned_padding_and_data_corruption_fail_closed_locally_and_remotely ... ok
+test wal::tests::aligned_torn_final_record_is_discarded_but_nonfinal_tail_is_rejected ... ok
+test wal::tests::aligned_wal_roundtrip_preserves_pages_zero_ranges_and_barriers ... ok
+test wal::tests::fixed_wal_reservation_release_preserves_initialized_capacity ... ok
+test wal::tests::initialized_wal_keeps_physical_eof_and_rejects_a_hole_before_commit ... ok
+test wal::tests::packed_checkpoint_pages_roundtrip_with_complete_references ... ok
+test engine::warm_tests::range_concurrency_is_bounded_and_invalid_limits_fail_before_opening ... ok
+test wal::tests::packed_checkpoint_splits_maximum_records_and_rejects_invalid_inputs ... ok
+test wal::tests::recycling_rejects_unpublished_wrong_inode_and_hardlinked_segments ... ok
+test wal::tests::reservation_preserves_eof_recovery_and_releases_unused_blocks ... ok
+test wal::tests::tail_is_recovered_but_complete_corruption_is_rejected ... ok
+test wal::tests::recycled_wal_waits_for_readers_and_cannot_resurrect_old_pages ... ok
+test wal::tests::vectored_record_handles_short_writes_interruptions_and_zero_progress ... ok
+test wal::tests::unused_prepared_and_retired_segments_can_be_discarded_without_orphans ... ok
+test wal::tests::watermark_survives_one_torn_slot ... ok
+test wal_pool::tests::failed_recycled_preparation_discards_the_old_inode ... ok
+test wal_pool::tests::failed_preparation_stops_and_releases_its_budget_for_checked_fallback ... ok
+test wal_pool::tests::pool_is_send_sync_and_shutdown_joins_with_a_full_ready_queue ... ok
+test index::tests::dense_large_trim_keeps_one_resident_shard_and_preserves_snapshots ... ok
+test wal_pool::tests::startup_cleans_stale_pool_entries_but_rejects_unexpected_files ... ok
+test engine::warm_tests::failed_cache_fill_drains_other_started_ranges_before_releasing_volume_lock ... ok
+test wal_pool::tests::rejected_retired_offers_leave_no_orphan_and_no_counter_growth ... ok
+test wal_pool::tests::recycle_reuses_the_inode_and_keeps_disk_and_accounting_bounded ... ok
+
+test result: ok. 64 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.80s
+
+     Running unittests src/main.rs (target/debug/deps/infinidisk2-84756ed02f315b75)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/astra_engine.rs (target/debug/deps/astra_engine-0737584b48696f82)
+
+running 21 tests
+test bad_logical_cache_payload_falls_back_to_the_durable_reference ... ok
+test async_fill_saturation_is_disposable_and_local_fsync_still_recovers ... ok
+test corrupt_published_wal_cache_falls_back_without_poisoning_a_healthy_volume ... ok
+test concurrent_versions_and_paged_checkpoints_do_not_mix_request_contents ... ok
+test compact_checkpoints_publish_only_final_versions_across_repeated_generations ... ok
+test detecting_a_corrupt_unpublished_page_stops_further_durable_writes ... ok
+test detecting_a_corrupt_sealed_unpublished_page_stops_further_durable_writes ... ok
+test durability_mode_cannot_be_changed_by_reopening_or_adopting_a_volume ... ok
+test generation_cannot_recover_from_unpublished_wal_when_head_is_corrupt ... ok
+test generation_ignores_broken_or_missing_local_watermark_but_durable_mode_rejects_it ... ok
+test concurrent_packed_checkpoints_and_prepared_aligned_wal_preserve_versions ... ok
+test index_corruption_poisons_runtime_but_is_discarded_on_wal_reconstruction ... ok
+test legacy_read_detecting_a_corrupt_active_wal_stops_further_durable_writes ... ok
+test generation_restart_uses_one_complete_head_and_discards_later_flushed_writes ... ok
+test legacy_read_detecting_a_corrupt_sealed_wal_stops_further_durable_writes ... ok
+test packed_checkpoint_fencing_conflict_preserves_the_new_writer_root ... ok
+test packed_checkpoint_cas_failure_keeps_the_old_root_and_can_retry ... ok
+test sparse_large_volume_recovers_many_shards_with_one_mib_index_budget ... ok
+test paged_index_allocates_beyond_the_legacy_one_mib_page_limit ... ok
+test large_trim_with_low_resident_index_replays_wal_and_publishes_exact_shards ... ok
+test generation_lag_backpressure_waits_for_successful_publication ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.40s
+
+     Running tests/astra_regressions.rs (target/debug/deps/astra_regressions-247428c220ead9dc)
+
+running 4 tests
+test offline_warm_refuses_a_working_set_that_overflows_one_cache_partition ... ok
+test offline_warm_retains_fragmented_pages_with_online_async_fills_enabled ... ok
+test trimmed_sparse_regions_leave_no_empty_shards_in_published_head ... ok
+test empty_trim_checkpoint_clears_generation_lag_before_next_write ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.12s
+
+     Running tests/astra_warm_cli.rs (target/debug/deps/astra_warm_cli-1fd12f3ad4b6fa64)
+
+running 1 test
+test warm_cli_rejects_out_of_range_concurrency_before_opening_config ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/nbd_protocol.rs (target/debug/deps/nbd_protocol-f8c0016db1097a88)
+
+running 2 tests
+test multiple_connections_share_flush_fua_and_large_trim ... ok
+test orderly_shutdown_publishes_a_generation_after_its_lag_limit ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.37s
+

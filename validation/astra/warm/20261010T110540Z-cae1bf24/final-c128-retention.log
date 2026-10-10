@@ -1,0 +1,2 @@
+2026-10-10T11:08:24.116083Z  INFO infinidisk2::engine: offline cache warm completed pages=484370 groups=62422 concurrency=128 remote_gets=0 remote_bytes=0 max_range_inflight=0
+Warmed 484370 allocated pages

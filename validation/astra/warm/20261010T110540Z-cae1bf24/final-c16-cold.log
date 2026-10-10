@@ -1,0 +1,25 @@
+2026-10-10T11:05:46.021020Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=19108 pages_total=484370 remote_gets=2570 remote_bytes=178856384 range_inflight=16 max_range_inflight=16
+2026-10-10T11:05:51.020840Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=39470 pages_total=484370 remote_gets=5378 remote_bytes=374150976 range_inflight=16 max_range_inflight=16
+2026-10-10T11:05:56.020020Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=60651 pages_total=484370 remote_gets=7950 remote_bytes=552994688 range_inflight=16 max_range_inflight=16
+2026-10-10T11:06:01.020173Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=80678 pages_total=484370 remote_gets=10404 remote_bytes=723594688 range_inflight=16 max_range_inflight=16
+2026-10-10T11:06:06.020170Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=105883 pages_total=484370 remote_gets=13319 remote_bytes=926441504 range_inflight=16 max_range_inflight=16
+2026-10-10T11:06:11.020270Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=123062 pages_total=484370 remote_gets=15740 remote_bytes=1094821088 range_inflight=15 max_range_inflight=16
+2026-10-10T11:06:16.020256Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=142966 pages_total=484370 remote_gets=18472 remote_bytes=1284925312 range_inflight=16 max_range_inflight=16
+2026-10-10T11:06:21.020372Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=159880 pages_total=484370 remote_gets=21027 remote_bytes=1462637952 range_inflight=16 max_range_inflight=16
+2026-10-10T11:06:26.020049Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=180693 pages_total=484370 remote_gets=23751 remote_bytes=1652021696 range_inflight=16 max_range_inflight=16
+2026-10-10T11:06:31.020029Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=202564 pages_total=484370 remote_gets=26641 remote_bytes=1853150720 range_inflight=16 max_range_inflight=16
+2026-10-10T11:06:36.020837Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=221303 pages_total=484370 remote_gets=29030 remote_bytes=2019333664 range_inflight=16 max_range_inflight=16
+2026-10-10T11:06:41.020456Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=245470 pages_total=484370 remote_gets=31865 remote_bytes=2216626080 range_inflight=16 max_range_inflight=16
+2026-10-10T11:06:46.020534Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=261834 pages_total=484370 remote_gets=34157 remote_bytes=2376170272 range_inflight=16 max_range_inflight=16
+2026-10-10T11:06:51.020142Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=285004 pages_total=484370 remote_gets=37050 remote_bytes=2577278080 range_inflight=15 max_range_inflight=16
+2026-10-10T11:06:56.019973Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=316231 pages_total=484370 remote_gets=40456 remote_bytes=2814138144 range_inflight=16 max_range_inflight=16
+2026-10-10T11:07:01.019966Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=339558 pages_total=484370 remote_gets=43333 remote_bytes=3014132608 range_inflight=16 max_range_inflight=16
+2026-10-10T11:07:06.020236Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=363150 pages_total=484370 remote_gets=46414 remote_bytes=3228142912 range_inflight=16 max_range_inflight=16
+2026-10-10T11:07:11.020110Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=386414 pages_total=484370 remote_gets=49122 remote_bytes=3416454112 range_inflight=16 max_range_inflight=16
+2026-10-10T11:07:16.020628Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=411090 pages_total=484370 remote_gets=51890 remote_bytes=3608915200 range_inflight=16 max_range_inflight=16
+2026-10-10T11:07:21.020494Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=429128 pages_total=484370 remote_gets=54339 remote_bytes=3779241664 range_inflight=16 max_range_inflight=16
+2026-10-10T11:07:26.020088Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=446250 pages_total=484370 remote_gets=56748 remote_bytes=3946810784 range_inflight=16 max_range_inflight=16
+2026-10-10T11:07:31.020156Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=463895 pages_total=484370 remote_gets=59421 remote_bytes=4132774016 range_inflight=16 max_range_inflight=16
+2026-10-10T11:07:36.020451Z  INFO infinidisk2::engine: offline cache warm progress pages_completed=478110 pages_total=484370 remote_gets=61731 remote_bytes=4293317216 range_inflight=16 max_range_inflight=16
+2026-10-10T11:07:37.176989Z  INFO infinidisk2::engine: offline cache warm completed pages=484370 groups=62422 concurrency=16 remote_gets=62422 remote_bytes=4341374304 max_range_inflight=16
+Warmed 484370 allocated pages

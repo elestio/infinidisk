@@ -2,6 +2,8 @@
 
 Livraison du 9 octobre 2026. Sources principales : `src/engine.rs`, `src/wal.rs`, `src/nbd.rs`, `src/linux.rs`, `src/store.rs`, `src/cache.rs`, `src/config.rs`. Les choix ci-dessous décrivent le code livré ; les recommandations en fin de document ne sont pas présentées comme des fonctionnalités déjà implémentées.
 
+La campagne Astra du 10 octobre prolonge cette version. Les [spécifications Astra](astra-optimizations.md) décrivent les changements : index paginé, cache asynchrone, segments préparés, lectures par requête, publication des versions finales et reprise par générations. Les limitations de la version initiale ci-dessous restent un historique ; le [rapport Astra](../validation/astra/rapport.html) présente les mesures et l'état de qualification des nouveaux chemins.
+
 ## Objectif et domaine de panne
 
 Un volume bloc Linux utilisable par ext4 et une base de données, avec chemin chaud local et restauration distante cohérente. La priorité est l'intégrité, puis la performance ; un retour à une génération antérieure lors de la perte totale du stockage local est acceptable. La durabilité locale et la durabilité S3 sont deux frontières distinctes.

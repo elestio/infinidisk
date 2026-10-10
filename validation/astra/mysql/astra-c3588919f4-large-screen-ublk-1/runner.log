@@ -1,0 +1,33 @@
+host
+fio-version
+zerofs-version
+id2-version
+infinidisk2-astra-c3588919f4-large-screen-ublk-1-offline-warm
+infinidisk2-astra-c3588919f4-large-screen-ublk-1-mount
+infinidisk2-astra-c3588919f4-large-screen-ublk-1-mysql-start
+cleanup-mysql-1791625410731222905
+cleanup-ext4-1791625410805077834
+ublk-delete-1791625410808426193
+REPORT /root/infinidisk2/test-output/comparison-be4ba51a4a38/optimization-astra-c3588919f4-large-screen-ublk-1.json
+Traceback (most recent call last):
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 584, in <module>
+    start(engine,label);mysql(label,existing=True);stop();continue
+                        ~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 440, in mysql
+    ready()
+    ~~~~~^^
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 438, in ready
+    time.sleep(.5)
+    ~~~~~~~~~~^^^^
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 674, in <module>
+    try:stop()
+        ~~~~^^
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 314, in stop
+    if server.returncode:raise RuntimeError('server shutdown failure')
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: server shutdown failure

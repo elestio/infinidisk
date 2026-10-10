@@ -1,0 +1,13 @@
+[2m2026-10-10T12:41:18.853567Z[0m [32m INFO[0m [2minfinidisk2[0m[2m:[0m volume status [3mstatus[0m[2m=[0m{"volume":"63d9bdaa-1d2c-4953-b9d8-c7d9fa47dae7","size":2147483648,"sequence":5389904,"local_durable_sequence":5389904,"remote_sequence":5389904,"remote_generation":613,"pending_bytes":16781440,"allocated_pages":455858,"poisoned":false,"uptime_seconds":0,"hot_wal_bytes":0,"flush_calls":1,"flush_groups":0,"flush_wait_ns":50,"wal_sync_ns":0,"watermark_sync_ns":0,"logical_cache_hits":0,"remote_gets":0,"remote_bytes":0,"checkpoint_wal_bytes":0,"uploaded_segment_bytes":0,"index":{"paged":true,"allocated_pages":455858,"shards":122,"resident_shards":122,"resident_pages":455858,"resident_budget_bytes":63963136,"configured_budget_bytes":1073741824,"directory_budget_bytes":15616,"snapshot_budget_bytes":0,"snapshot_in_flight":false,"cache_reads":0,"cache_writes":0,"evictions":0},"wal_pool_bytes":16781440,"cache_queue_bytes":0,"cache_fills_skipped":0,"cache_fill_errors":0,"durability_mode":"local-fsync","unpublished_age_ms":0}
+
+dev id 31: nr_hw_queues 4 queue_depth 32 block size 512 dev_capacity 4194304
+	max rq size 1048576 daemon pid 350665 flags 0x26042 state LIVE
+	ublkc: 238:31 ublkb: 259:0 owner: 0:0
+	queue 0 tid: 350689 affinity(1)
+	queue 1 tid: 350690 affinity(3)
+	queue 2 tid: 350691 affinity(2)
+	queue 3 tid: 350692 affinity(0)
+	target {"dev_size":2147483648,"name":"infinidisk2-experimental","type":0}
+	target_data null
+	ublksrv_flags: 0x0
+[2m2026-10-10T12:41:24.857393Z[0m [32m INFO[0m [2minfinidisk2[0m[2m:[0m volume status [3mstatus[0m[2m=[0m{"volume":"63d9bdaa-1d2c-4953-b9d8-c7d9fa47dae7","size":2147483648,"sequence":5394327,"local_durable_sequence":5394325,"remote_sequence":5391606,"remote_generation":614,"pending_bytes":50344320,"allocated_pages":453697,"poisoned":false,"uptime_seconds":6,"hot_wal_bytes":0,"flush_calls":3045,"flush_groups":2809,"flush_wait_ns":17700909,"wal_sync_ns":584204021,"watermark_sync_ns":339063,"logical_cache_hits":14060,"remote_gets":25,"remote_bytes":1740800,"checkpoint_wal_bytes":43149504,"uploaded_segment_bytes":15048576,"index":{"paged":true,"allocated_pages":453697,"shards":122,"resident_shards":122,"resident_pages":453697,"resident_budget_bytes":63963136,"configured_budget_bytes":1073741824,"directory_budget_bytes":15616,"snapshot_budget_bytes":0,"snapshot_in_flight":false,"cache_reads":0,"cache_writes":0,"evictions":0},"wal_pool_bytes":50344320,"cache_queue_bytes":0,"cache_fills_skipped":0,"cache_fill_errors":0,"durability_mode":"local-fsync","unpublished_age_ms":1003}

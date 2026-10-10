@@ -1,0 +1,39 @@
+host
+fio-version
+zerofs-version
+id2-version
+infinidisk2-diagnostic-3b97cc836e8c-ublk-offline-warm
+infinidisk2-diagnostic-3b97cc836e8c-ublk-mount
+infinidisk2-diagnostic-3b97cc836e8c-ublk-mysql-start
+infinidisk2-diagnostic-3b97cc836e8c-ublk-mysql-settings
+infinidisk2-diagnostic-3b97cc836e8c-ublk-mysql-warm
+infinidisk2-diagnostic-3b97cc836e8c-ublk-mysql-host-pid
+infinidisk2-diagnostic-3b97cc836e8c-ublk-mysql-read_only-0
+infinidisk2-diagnostic-3b97cc836e8c-ublk-mysql-crash
+infinidisk2-diagnostic-3b97cc836e8c-ublk-mysql-restart
+infinidisk2-diagnostic-3b97cc836e8c-ublk-mysql-counts
+infinidisk2-diagnostic-3b97cc836e8c-ublk-mysql-check
+infinidisk2-diagnostic-3b97cc836e8c-ublk-mysql-stop
+infinidisk2-diagnostic-3b97cc836e8c-ublk-mysql-remove
+infinidisk2-diagnostic-3b97cc836e8c-ublk-mysql-unmount
+ublk-delete-1791627372130367498
+REPORT /root/infinidisk2/test-output/comparison-be4ba51a4a38/optimization-diagnostic-3b97cc836e8c-ublk.json
+Traceback (most recent call last):
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 632, in <module>
+    start(engine,label);mysql(label,existing=True);stop();continue
+                                                   ~~~~^^
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 362, in stop
+    if server.returncode:raise RuntimeError('server shutdown failure')
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: server shutdown failure
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 723, in <module>
+    try:stop()
+        ~~~~^^
+  File "/root/infinidisk2/scripts/compare_zerofs.py", line 362, in stop
+    if server.returncode:raise RuntimeError('server shutdown failure')
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: server shutdown failure

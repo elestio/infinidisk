@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use infinidisk2::{config::Config, engine::Engine, nbd};
 use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
@@ -119,5 +119,63 @@ async fn multiple_connections_share_flush_fua_and_large_trim() -> Result<()> {
     drop(e);
     let e = Engine::open(c).await?;
     assert_eq!(e.read(0, 12288).await?, vec![0; 12288]);
+    Ok(())
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn orderly_shutdown_publishes_a_generation_after_its_lag_limit() -> Result<()> {
+    use std::{process::Stdio, time::Duration};
+
+    let t = tempfile::tempdir()?;
+    let listener = std::net::TcpListener::bind("127.0.0.1:0")?;
+    let listen = listener.local_addr()?;
+    drop(listener);
+    let remote = t.path().join("remote");
+    let c = Config {
+        local_dir: t.path().join("local"),
+        store: format!("file://{}", remote.display()),
+        listen,
+        generation_mode: true,
+        checkpoint_seconds: 2,
+        generation_max_lag_seconds: 2,
+        ..Config::default()
+    };
+    Engine::init(&c, c_size()).await?;
+    let config = t.path().join("config.toml");
+    std::fs::write(&config, toml::to_string(&c)?)?;
+    // Block object publication without changing HEAD or relying on permissions
+    // (the tests also run as root). Opening this prefix as a directory fails.
+    let obstruction = remote.join("segments");
+    std::fs::write(&obstruction, "temporarily unavailable object prefix")?;
+    let log_path = t.path().join("server.log");
+    let log = std::fs::File::create(&log_path)?;
+    let mut child = tokio::process::Command::new(env!("CARGO_BIN_EXE_infinidisk2"))
+        .arg("-c")
+        .arg(&config)
+        .arg("serve")
+        .env("RUST_LOG", "infinidisk2=info")
+        .stdout(Stdio::from(log.try_clone()?))
+        .stderr(Stdio::from(log))
+        .kill_on_drop(true)
+        .spawn()?;
+    let mut socket = connect(&c).await?;
+    let payload = [0x63; 4096];
+    assert_eq!(request(&mut socket, 1, 0, 1, 0, 4096, &payload).await?.0, 0);
+    drop(socket);
+    tokio::time::sleep(Duration::from_millis(2300)).await;
+    assert_eq!(Engine::inspect(&c).await?.seq, 0);
+    assert!(std::fs::read_to_string(&log_path)?.contains("S3 checkpoint failed"));
+    std::fs::remove_file(&obstruction)?;
+    // Shutdown stops the periodic publisher. The final publication must not
+    // first wait on the lag admission barrier, which only publication can clear.
+    let pid = child.id().context("server exited before SIGTERM")? as libc::pid_t;
+    assert_eq!(unsafe { libc::kill(pid, libc::SIGTERM) }, 0);
+    let exit = tokio::time::timeout(Duration::from_secs(3), child.wait())
+        .await
+        .context("shutdown waited on generation backpressure instead of publishing")??;
+    assert!(exit.success(), "{}", std::fs::read_to_string(&log_path)?);
+    assert_eq!(Engine::inspect(&c).await?.seq, 1);
+    let reopened = Engine::open(c).await?;
+    assert_eq!(reopened.read(0, payload.len()).await?, payload);
     Ok(())
 }

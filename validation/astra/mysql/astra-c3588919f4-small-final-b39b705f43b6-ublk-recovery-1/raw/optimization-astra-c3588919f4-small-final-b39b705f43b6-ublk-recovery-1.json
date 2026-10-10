@@ -1,0 +1,600 @@
+{
+  "utc": "2026-10-09T21:43:50.077899+00:00",
+  "work": "/root/infinidisk2/test-output/comparison-323bb1097b47",
+  "device": "/dev/nbd31",
+  "size_bytes": 268435456,
+  "duration_seconds": 15,
+  "connections": 8,
+  "memory_mib": 1024,
+  "cold_disk_mib": 128,
+  "warm_disk_mib": 512,
+  "runs": {},
+  "contracts": {
+    "infinidisk2": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog",
+    "zerofs": "ignore_fsync=false: explicit FLUSH/FUA seals extents and flushes metadata to S3",
+    "zerofs-async": "FLUSH/FUA ignored by ZeroFS, unsafe DB durability mode",
+    "zerofs-durable": "ZeroFS FLUSH/FUA publishes S3",
+    "native": "native VM ext4 disk; MySQL fsync honored",
+    "infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog",
+    "infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1-local-recovery": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+  },
+  "disk_mib": 4096,
+  "executions": [
+    {
+      "phase": "raw",
+      "utc": "2026-10-09T21:43:50.077930+00:00",
+      "script_sha256": "b607dcc9fe02e2f4176f61d0e13cc6ec477380ebf28134e0e8cab4a1fc953012",
+      "load_start": [
+        1.00634765625,
+        1.16455078125,
+        1.48291015625
+      ]
+    },
+    {
+      "phase": "mysql-storage-crash",
+      "utc": "2026-10-10T12:41:17.799402+00:00",
+      "script_sha256": "c37aa66e5917578c2584553b115168572188ef06c51703af26cae6ed6ad5d00a",
+      "load_start": [
+        6.51953125,
+        4.66650390625,
+        3.25244140625
+      ],
+      "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "engine_options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 1024,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": true,
+        "selective_sync": true,
+        "ublk_fast_path": true,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": true,
+        "compact_checkpoints": true,
+        "aligned_wal": false
+      },
+      "legacy_config": false,
+      "mysql_percentile": 99,
+      "mysql_cpu_limit": 1.0,
+      "warm_concurrency": null
+    }
+  ],
+  "binary_sha256": {
+    "infinidisk2": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+    "zerofs": "91651cb1894f77f6892d224bc119ac4a9bccabf1207d739f4ec71ff8c4e99e21"
+  },
+  "host": "Linux wordpress-ovh-u3 7.0.0-38-generic #38-Ubuntu SMP PREEMPT_DYNAMIC Fri Sep  4 09:10:14 UTC 2026 x86_64 GNU/Linux",
+  "logical_cpus": 4,
+  "load_start": [
+    6.51953125,
+    4.66650390625,
+    3.25244140625
+  ],
+  "fio_version": "fio-3.41",
+  "zerofs_version": "zerofs 2.3.5",
+  "infinidisk2_version": "infinidisk2 0.1.0",
+  "prefixes": {
+    "zerofs": "s3://testperf-6czebk/infinidisk2-comparison-323bb1097b47/zerofs",
+    "infinidisk2": "s3://testperf-6czebk/infinidisk2-comparison-323bb1097b47/infinidisk2"
+  },
+  "mysql": {
+    "zerofs-async": {
+      "settings": [
+        "1",
+        "1",
+        "ON",
+        "O_DIRECT",
+        "268435456",
+        "8.0.46",
+        "1"
+      ],
+      "tables": 4,
+      "rows_per_table": 25000,
+      "threads": 8,
+      "cpu_limit": 1,
+      "memory_mib": 1024,
+      "samples": {
+        "read_write": [
+          {
+            "tps": 515.79,
+            "avg_ms": 15.5,
+            "p95_ms": 16.41,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 538.59,
+            "avg_ms": 14.85,
+            "p95_ms": 16.12,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 668.08,
+            "avg_ms": 11.97,
+            "p95_ms": 13.46,
+            "ignored_errors": 0
+          }
+        ],
+        "read_only": [
+          {
+            "tps": 2348.82,
+            "avg_ms": 3.4,
+            "p95_ms": 3.19,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 2291.16,
+            "avg_ms": 3.49,
+            "p95_ms": 2.0,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 2137.08,
+            "avg_ms": 3.74,
+            "p95_ms": 2.39,
+            "ignored_errors": 0
+          }
+        ],
+        "write_only": [
+          {
+            "tps": 848.68,
+            "avg_ms": 9.42,
+            "p95_ms": 11.04,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 655.2,
+            "avg_ms": 12.2,
+            "p95_ms": 12.3,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 591.28,
+            "avg_ms": 13.52,
+            "p95_ms": 10.84,
+            "ignored_errors": 0
+          }
+        ]
+      },
+      "database_SIGKILL_recovery": "passed"
+    },
+    "zerofs-durable": {
+      "settings": [
+        "1",
+        "1",
+        "ON",
+        "O_DIRECT",
+        "268435456",
+        "8.0.46",
+        "1"
+      ],
+      "tables": 4,
+      "rows_per_table": 25000,
+      "threads": 8,
+      "cpu_limit": 1,
+      "memory_mib": 1024,
+      "samples": {
+        "read_write": [
+          {
+            "tps": 1.13,
+            "avg_ms": 6280.63,
+            "p95_ms": 12163.09,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 1.79,
+            "avg_ms": 4242.15,
+            "p95_ms": 5124.81,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 1.3,
+            "avg_ms": 5629.9,
+            "p95_ms": 9284.15,
+            "ignored_errors": 0
+          }
+        ],
+        "read_only": [
+          {
+            "tps": 2542.33,
+            "avg_ms": 3.15,
+            "p95_ms": 2.07,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 2148.61,
+            "avg_ms": 3.57,
+            "p95_ms": 1.96,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 2376.36,
+            "avg_ms": 3.29,
+            "p95_ms": 1.86,
+            "ignored_errors": 0
+          }
+        ],
+        "write_only": [
+          {
+            "tps": 1.74,
+            "avg_ms": 4224.22,
+            "p95_ms": 4683.57,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 1.55,
+            "avg_ms": 5143.81,
+            "p95_ms": 7215.39,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 1.28,
+            "avg_ms": 6041.15,
+            "p95_ms": 12838.21,
+            "ignored_errors": 0
+          }
+        ]
+      },
+      "database_SIGKILL_recovery": "passed"
+    },
+    "infinidisk2": {
+      "settings": [
+        "1",
+        "1",
+        "ON",
+        "O_DIRECT",
+        "268435456",
+        "8.0.46",
+        "1"
+      ],
+      "tables": 4,
+      "rows_per_table": 25000,
+      "threads": 8,
+      "cpu_limit": 1,
+      "memory_mib": 1024,
+      "samples": {
+        "read_write": [
+          {
+            "tps": 697.14,
+            "avg_ms": 11.47,
+            "p95_ms": 17.95,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 729.68,
+            "avg_ms": 10.96,
+            "p95_ms": 17.32,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 711.78,
+            "avg_ms": 11.23,
+            "p95_ms": 17.01,
+            "ignored_errors": 0
+          }
+        ],
+        "read_only": [
+          {
+            "tps": 2225.78,
+            "avg_ms": 3.59,
+            "p95_ms": 2.71,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 2523.53,
+            "avg_ms": 3.17,
+            "p95_ms": 1.76,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 2128.9,
+            "avg_ms": 3.75,
+            "p95_ms": 2.0,
+            "ignored_errors": 0
+          }
+        ],
+        "write_only": [
+          {
+            "tps": 872.4,
+            "avg_ms": 9.16,
+            "p95_ms": 14.73,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 807.32,
+            "avg_ms": 9.91,
+            "p95_ms": 16.12,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 846.96,
+            "avg_ms": 9.44,
+            "p95_ms": 15.0,
+            "ignored_errors": 0
+          }
+        ]
+      },
+      "database_SIGKILL_recovery": "passed"
+    },
+    "native": {
+      "settings": [
+        "1",
+        "1",
+        "ON",
+        "O_DIRECT",
+        "268435456",
+        "8.0.46",
+        "1"
+      ],
+      "tables": 4,
+      "rows_per_table": 25000,
+      "threads": 8,
+      "cpu_limit": 1,
+      "memory_mib": 1024,
+      "samples": {
+        "read_write": [
+          {
+            "tps": 1210.09,
+            "avg_ms": 6.61,
+            "p95_ms": 49.21,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 1237.43,
+            "avg_ms": 6.46,
+            "p95_ms": 45.79,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 1202.31,
+            "avg_ms": 6.63,
+            "p95_ms": 54.83,
+            "ignored_errors": 0
+          }
+        ],
+        "read_only": [
+          {
+            "tps": 2403.02,
+            "avg_ms": 3.33,
+            "p95_ms": 1.86,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 2552.77,
+            "avg_ms": 3.13,
+            "p95_ms": 2.18,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 2233.5,
+            "avg_ms": 3.58,
+            "p95_ms": 1.89,
+            "ignored_errors": 0
+          }
+        ],
+        "write_only": [
+          {
+            "tps": 3624.92,
+            "avg_ms": 2.21,
+            "p95_ms": 3.07,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 3543.56,
+            "avg_ms": 2.26,
+            "p95_ms": 3.36,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 3615.61,
+            "avg_ms": 2.21,
+            "p95_ms": 3.49,
+            "ignored_errors": 0
+          }
+        ]
+      },
+      "database_SIGKILL_recovery": "passed"
+    },
+    "infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1": {
+      "settings": [
+        "1",
+        "1",
+        "ON",
+        "O_DIRECT",
+        "268435456",
+        "8.0.46",
+        "1"
+      ],
+      "tables": 4,
+      "rows_per_table": 25000,
+      "threads": 8,
+      "cpu_limit": 1.0,
+      "memory_mib": 1024,
+      "samples": {},
+      "sample_count": 1,
+      "sample_seconds": 30,
+      "latency_percentile": 99,
+      "trace_engine": false,
+      "transport": "ublk",
+      "warmup_seconds": 10,
+      "startup_seconds": 2.3856404350008233,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+        "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1-config.toml",
+        "config_sha256": "3c0e2b694adf2d5c6e276fd8994c2604ca9a7b1eb8d0d520e29112a1a10db6ae",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": true,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": true,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 1024,
+          "paged_index": true,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "resource_window_note": "/proc snapshots bracket each sysbench process including its setup/exit; process CPU includes all threads; peak RSS is lifetime high water, not the isolated window maximum",
+      "table_file_bytes": 62914560,
+      "random_distribution": "special",
+      "database_recovery_seconds": 2.1411653850009316,
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": "passed"
+    }
+  },
+  "complete": true,
+  "binary_path": {
+    "infinidisk2": "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+    "zerofs": "/usr/local/bin/zerofs"
+  },
+  "requested_engine_options": {
+    "logical_cache": true,
+    "wal_fixed_size": true,
+    "wal_commit_records": true,
+    "sync_data_only": true,
+    "wal_preallocate": false,
+    "wal_writev": true,
+    "flush_batch_us": 0,
+    "checkpoint_seconds": 5,
+    "segment_mib": 8,
+    "max_pending_mib": 1024,
+    "hot_wal_mib": 0,
+    "max_inflight": 128,
+    "max_index_mib": 1024,
+    "memory_cache_mib": 1024,
+    "disk_cache_mib": 4096,
+    "read_extent_kib": 64,
+    "async_cache": true,
+    "cache_queue_mib": 16,
+    "fast_local_reads": true,
+    "checkpoint_pipeline": true,
+    "selective_sync": true,
+    "ublk_fast_path": true,
+    "generation_mode": false,
+    "generation_max_lag_seconds": 30,
+    "paged_index": true,
+    "compact_checkpoints": true,
+    "aligned_wal": false
+  },
+  "legacy_config": false,
+  "requested_engine_options_sha256": "e199ba07d99e2b5c58353ce98f388f1d5952bdc1d54802d61541344b89f8e55b",
+  "engine_starts": {
+    "infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1": {
+      "engine": "infinidisk2",
+      "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1-config.toml",
+      "config_sha256": "3c0e2b694adf2d5c6e276fd8994c2604ca9a7b1eb8d0d520e29112a1a10db6ae",
+      "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1-config.toml",
+      "legacy_config": false,
+      "options": {
+        "aligned_wal": false,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "checkpoint_pipeline": true,
+        "checkpoint_seconds": 5,
+        "compact_checkpoints": true,
+        "disk_cache_mib": 4096,
+        "fast_local_reads": true,
+        "flush_batch_us": 0,
+        "generation_max_lag_seconds": 30,
+        "generation_mode": false,
+        "hot_wal_mib": 0,
+        "logical_cache": true,
+        "max_index_mib": 1024,
+        "max_inflight": 128,
+        "max_pending_mib": 1024,
+        "memory_cache_mib": 1024,
+        "paged_index": true,
+        "read_extent_kib": 64,
+        "segment_mib": 8,
+        "selective_sync": true,
+        "sync_data_only": true,
+        "ublk_fast_path": true,
+        "wal_commit_records": true,
+        "wal_fixed_size": true,
+        "wal_preallocate": false,
+        "wal_writev": true
+      },
+      "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+    },
+    "infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1-local-recovery": {
+      "engine": "infinidisk2",
+      "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1-config.toml",
+      "config_sha256": "52bdb005d26482bb07e9156d5cb1d10efc13d2bfd7e2f75a2885547332877f5b",
+      "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1-local-recovery-config.toml",
+      "legacy_config": false,
+      "options": {
+        "aligned_wal": false,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "checkpoint_pipeline": true,
+        "checkpoint_seconds": 5,
+        "compact_checkpoints": true,
+        "disk_cache_mib": 4096,
+        "fast_local_reads": true,
+        "flush_batch_us": 0,
+        "generation_max_lag_seconds": 30,
+        "generation_mode": false,
+        "hot_wal_mib": 0,
+        "logical_cache": true,
+        "max_index_mib": 1024,
+        "max_inflight": 128,
+        "max_pending_mib": 1024,
+        "memory_cache_mib": 1024,
+        "paged_index": true,
+        "read_extent_kib": 64,
+        "segment_mib": 8,
+        "selective_sync": true,
+        "sync_data_only": true,
+        "ublk_fast_path": true,
+        "wal_commit_records": true,
+        "wal_fixed_size": true,
+        "wal_preallocate": false,
+        "wal_writev": true
+      },
+      "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+    }
+  }
+}

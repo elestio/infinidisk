@@ -1,0 +1,20 @@
+host
+fio-version
+zerofs-version
+id2-version
+infinidisk2-astra-c3588919f4-small-screen-core-2-mount
+infinidisk2-astra-c3588919f4-small-screen-core-2-mysql-start
+infinidisk2-astra-c3588919f4-small-screen-core-2-mysql-settings
+infinidisk2-astra-c3588919f4-small-screen-core-2-mysql-warm
+infinidisk2-astra-c3588919f4-small-screen-core-2-mysql-host-pid
+infinidisk2-astra-c3588919f4-small-screen-core-2-mysql-write_only-0
+infinidisk2-astra-c3588919f4-small-screen-core-2-mysql-read_write-0
+infinidisk2-astra-c3588919f4-small-screen-core-2-mysql-crash
+infinidisk2-astra-c3588919f4-small-screen-core-2-mysql-restart
+infinidisk2-astra-c3588919f4-small-screen-core-2-mysql-counts
+infinidisk2-astra-c3588919f4-small-screen-core-2-mysql-check
+infinidisk2-astra-c3588919f4-small-screen-core-2-mysql-stop
+infinidisk2-astra-c3588919f4-small-screen-core-2-mysql-remove
+infinidisk2-astra-c3588919f4-small-screen-core-2-mysql-unmount
+detach-1791622817887462768
+REPORT /root/infinidisk2/test-output/comparison-323bb1097b47/optimization-astra-c3588919f4-small-screen-core-2.json

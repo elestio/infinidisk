@@ -1,6 +1,7 @@
 pub mod cache;
 pub mod config;
 pub mod engine;
+pub mod index;
 pub mod linux;
 pub mod nbd;
 pub mod page_cache;
@@ -8,3 +9,4 @@ pub mod store;
 #[cfg(feature = "ublk")]
 pub mod ublk;
 pub mod wal;
+pub mod wal_pool;

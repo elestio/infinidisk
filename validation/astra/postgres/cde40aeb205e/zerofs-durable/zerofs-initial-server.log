@@ -1,0 +1,133 @@
+
+⠀⠀⠀⠀⠀⣠⣴⣶⣿⣿⣿⣿⣿⣷⣶⣤⣄
+⠀⠀⢀⣴⣿⣿⣿⠿⠛⠛⠋⠉⠙⠻⠿⣿⣿⣿⣦⡀
+⠀⣠⣿⣿⡿⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⡄
+⢰⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢿⣿⣿⡄⠀⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⠀⠀⢠⣶⣿⣿⣿⣿⣶⡆
+⣾⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀⣠⣾⣿⠟⠁⠀⠀⣠⣴⣶⣶⣶⣤⡀⠀⠀⣶⣶⣆⣤⣶⣶⠀⢀⣤⣶⣶⣶⣦⣄⠀⠀⠀⣿⣿⡇⠀⠀⠀⠀⠀⠀⣿⣿⣏⠀⠀⠈⠉⠃
+⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣼⣿⡟⠁⠀⠀⠀⣼⣿⣟⣁⣀⣙⣿⣿⡀⠀⣿⣿⣿⠋⠉⠙⢠⣿⣿⠏⠀⠈⢻⣿⣧⠀⠀⣿⣿⣿⣿⣿⣿⡇⠀⠀⠘⠻⠿⣿⣿⣶⣦⣄
+⢿⢿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⡿⠀⠀⠀⢀⣴⣿⡿⠋⠀⠀⠀⠀⠀⢿⣿⣟⠛⠛⠛⠛⠛⠃⠀⣿⣿⡇⠀⠀⠀⠸⣿⣿⡄⠀⠀⣸⣿⡿⠀⠀⣿⣿⡇⠀⠀⠀⠀⠀⠀⣄⣀⠀⠀⠀⣹⣿⣿
+⠈⠈⢿⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣾⣿⣿⠃⠀⠀⠀⣾⣿⣿⣿⣿⣿⣿⣿⣿⠀⠈⠻⢿⣷⣶⣶⣶⠿⠀⠀⣿⣿⡇⠀⠀⠀⠀⠙⠿⣿⣶⣾⡿⠟⠁⠀⠀⣿⣿⡇⠀⠀⠀⠀⠀⠀⠻⠿⣿⣿⣿⣿⠿⠋
+⠀⠀⠀⠻⣷⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢐⣽⣿⣿⠋
+⠀⠀⠀⠀⠙⢿⣿⣶⣤⣀⣀⣀⣀⣤⣤⣶⣿⣿⠟⠁
+⠀⠀⠀⠀⠀⠀⠉⠛⠿⢿⣿⣿⣿⣿⠿⠟⠋
+
+[2m2026-10-10T12:21:14.386188Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m ZeroFS v2.3.5
+[2m2026-10-10T12:21:14.390338Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m Starting ZeroFS server with AmazonS3(testperf-6czebk) backend
+[2m2026-10-10T12:21:14.390352Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m DB Path: infinidisk2-comparison-a7d403575484/zerofs
+[2m2026-10-10T12:21:14.390353Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m Base Cache Directory: /root/infinidisk2/test-output/comparison-a7d403575484/initial-zerofs-cache
+[2m2026-10-10T12:21:14.390356Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m Cache Size: 0.125 GB
+[2m2026-10-10T12:21:14.390359Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m Checking bucket identity...
+[2m2026-10-10T12:21:14.812795Z[0m [32m INFO[0m [2mzerofs::bucket_identity[0m[2m:[0m Creating new bucket ID: fec1a13e-914c-4e9f-9b9c-eef09af59a41
+[2m2026-10-10T12:21:14.812844Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m Bucket ID: fec1a13e-914c-4e9f-9b9c-eef09af59a41, Cache directory: /root/infinidisk2/test-output/comparison-a7d403575484/initial-zerofs-cache/bucket_fec1a13e
+[2m2026-10-10T12:21:14.829662Z[0m [32m INFO[0m [2mzerofs::storage_compatibility[0m[2m:[0m Checking storage provider compatibility...
+[2m2026-10-10T12:21:14.914564Z[0m [32m INFO[0m [2mzerofs::storage_compatibility[0m[2m:[0m Storage provider compatibility check passed
+[2m2026-10-10T12:21:14.914578Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m Loading or initializing encryption key from object store
+[2m2026-10-10T12:21:15.290936Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Cache allocation - Disk: 0.12GB total (1073 MB decoded-blocks + 1073 MB raw-parts), Memory: 0.06GB total (33 MB decoded-blocks + 33 MB raw-parts)
+[2m2026-10-10T12:21:15.292540Z[0m [32m INFO[0m [2mfoyer_storage::engine::block::recover[0m[2m:[0m Recovers 0 blocks with data, 16 clean blocks, 0 total entries with max sequence as 0..
+[2m2026-10-10T12:21:15.292550Z[0m [32m INFO[0m [2mfoyer_storage::engine::block::recover[0m[2m:[0m [recover] finish in 1.074978ms
+[2m2026-10-10T12:21:15.292944Z[0m [32m INFO[0m [2mfoyer_storage::engine::block::recover[0m[2m:[0m Recovers 0 blocks with data, 16 clean blocks, 0 total entries with max sequence as 0..
+[2m2026-10-10T12:21:15.292948Z[0m [32m INFO[0m [2mfoyer_storage::engine::block::recover[0m[2m:[0m [recover] finish in 138.226µs
+[2m2026-10-10T12:21:15.293032Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Opening database in read-write mode
+[2m2026-10-10T12:21:19.092190Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Created .nbd directory for NBD device management
+[2m2026-10-10T12:21:19.092263Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Starting NFS server on 127.0.0.1:12991
+[2m2026-10-10T12:21:19.092270Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Starting NBD server on 127.0.0.1:11991 (devices dynamically discovered from .nbd/)
+[2m2026-10-10T12:21:19.093001Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD server listening on 127.0.0.1:11991
+[2m2026-10-10T12:21:19.093016Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Starting periodic flush task (flushes every 5 seconds)
+[2m2026-10-10T12:21:19.093002Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Starting stats reporting task (reports to debug every 5 seconds)
+[2m2026-10-10T12:21:19.093033Z[0m [32m INFO[0m [2mzerofs_nfsserve::tcp[0m[2m:[0m Listening on 127.0.0.1:12991
+[2m2026-10-10T12:21:19.093040Z[0m [32m INFO[0m [2mzerofs::nfs[0m[2m:[0m NFS server listening on 127.0.0.1:12991
+[2m2026-10-10T12:21:19.093921Z[0m [32m INFO[0m [2mzerofs::db[0m[2m:[0m metadata cache warm: 1 SSTs (0 failed)
+[2m2026-10-10T12:21:19.093916Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::driver[0m[2m:[0m Starting activity-driven segment reclamation task (4 concurrent repack job(s), 256 MiB/job nominal gather budget, 5s activity coalescing)
+[2m2026-10-10T12:21:19.093970Z[0m [32m INFO[0m [2mzerofs::fs::tombstone_cleanup[0m[2m:[0m Starting tombstone cleanup task
+[2m2026-10-10T12:21:19.194851Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:51830
+[2m2026-10-10T12:21:19.195000Z[0m [31mERROR[0m [2mzerofs::nbd::server[0m[2m:[0m Error handling NBD client 127.0.0.1:51830: IO error: early eof
+[2m2026-10-10T12:21:19.201937Z[0m [32m INFO[0m [2mzerofs_nfsserve::tcp[0m[2m:[0m Accepting connection from 127.0.0.1:992
+[2m2026-10-10T12:21:19.202268Z[0m [32m INFO[0m [2mzerofs_nfsserve::tcp[0m[2m:[0m Accepting connection from 127.0.0.1:768
+[2m2026-10-10T12:21:19.888657Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:51840
+[2m2026-10-10T12:21:19.888877Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-10T12:21:19.888919Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:51842
+[2m2026-10-10T12:21:19.888988Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-10T12:21:19.889023Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:51848
+[2m2026-10-10T12:21:19.889106Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-10T12:21:19.889148Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:51858
+[2m2026-10-10T12:21:19.889236Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-10T12:21:19.889270Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:51872
+[2m2026-10-10T12:21:19.889350Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-10T12:21:19.889386Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:51884
+[2m2026-10-10T12:21:19.889447Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-10T12:21:19.889488Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:51892
+[2m2026-10-10T12:21:19.889556Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-10T12:21:19.889596Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:51894
+[2m2026-10-10T12:21:19.895995Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-10T12:21:20.145484Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 0 segments, 0 B appended (0 B live, ~0 B reclaimable, 0% dead); idle
+[2m2026-10-10T12:21:21.041303Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m orphan sweep: scanned 0 segment objects, reclaimed 0 orphan(s)
+[2m2026-10-10T12:21:27.419084Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::repack[0m[2m:[0m segment repack: gathered 1019 live frames (7.1 MiB) from 5 of 5 source segment(s)
+[2m2026-10-10T12:21:27.918144Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::repack[0m[2m:[0m segment repack: packed Segid { epoch: 1, counter: 12 }: 1019 frames, 1019 repointed, 0 discarded to concurrent writes
+[2m2026-10-10T12:21:27.918210Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 7 segments, 8.1 MiB appended (7.1 MiB live, ~923.7 KiB reclaimable, 11% dead); deleted 0 dead (~0 B), repacked 5 of 5 candidates in 1 job(s) (1019 frames), 2 pending deletion (~3.8 KiB)
+[2m2026-10-10T12:21:33.782344Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 15 segments, 15.2 MiB appended (7.2 MiB live, ~8.1 MiB reclaimable, 53% dead); deleted 0 dead (~0 B), repacked 0 of 3 candidates in 0 job(s) (0 frames), 11 pending deletion (~8.1 MiB)
+[2m2026-10-10T12:21:39.522129Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 22 segments, 15.3 MiB appended (7.2 MiB live, ~8.1 MiB reclaimable, 53% dead); deleted 0 dead (~0 B), repacked 0 of 6 candidates in 0 job(s) (0 frames), 15 pending deletion (~8.1 MiB)
+[2m2026-10-10T12:21:46.058644Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 28 segments, 15.3 MiB appended (7.2 MiB live, ~8.1 MiB reclaimable, 53% dead); deleted 0 dead (~0 B), repacked 0 of 10 candidates in 0 job(s) (0 frames), 17 pending deletion (~8.1 MiB)
+[2m2026-10-10T12:21:51.638696Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 34 segments, 15.3 MiB appended (7.2 MiB live, ~8.1 MiB reclaimable, 53% dead); deleted 0 dead (~0 B), repacked 0 of 13 candidates in 0 job(s) (0 frames), 20 pending deletion (~8.1 MiB)
+[2m2026-10-10T12:21:56.968325Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 39 segments, 15.4 MiB appended (7.2 MiB live, ~8.2 MiB reclaimable, 53% dead); deleted 0 dead (~0 B), repacked 0 of 14 candidates in 0 job(s) (0 frames), 24 pending deletion (~8.1 MiB)
+[2m2026-10-10T12:22:02.694239Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 46 segments, 15.4 MiB appended (7.2 MiB live, ~8.2 MiB reclaimable, 53% dead); deleted 0 dead (~0 B), repacked 0 of 15 candidates in 0 job(s) (0 frames), 30 pending deletion (~8.1 MiB)
+[2m2026-10-10T12:22:08.764437Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 52 segments, 15.5 MiB appended (7.3 MiB live, ~8.2 MiB reclaimable, 52% dead); deleted 0 dead (~0 B), repacked 0 of 18 candidates in 0 job(s) (0 frames), 33 pending deletion (~8.1 MiB)
+[2m2026-10-10T12:22:14.901482Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 58 segments, 16.1 MiB appended (7.8 MiB live, ~8.2 MiB reclaimable, 51% dead); deleted 0 dead (~0 B), repacked 0 of 22 candidates in 0 job(s) (0 frames), 35 pending deletion (~8.1 MiB)
+[2m2026-10-10T12:22:19.094695Z[0m [32m INFO[0m [2mzerofs::metadata_digest[0m[2m:[0m metadata compaction: 24.9 KiB compacted into 10 SSTs over the last 60s; L0 0/256
+[2m2026-10-10T12:22:21.043088Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::repack[0m[2m:[0m segment repack: gathered 714 live frames (1.5 MiB) from 26 of 26 source segment(s)
+[2m2026-10-10T12:22:21.508216Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::repack[0m[2m:[0m segment repack: packed Segid { epoch: 1, counter: 78 }: 714 frames, 714 repointed, 0 discarded to concurrent writes
+[2m2026-10-10T12:22:21.508251Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 64 segments, 16.8 MiB appended (8.6 MiB live, ~8.2 MiB reclaimable, 48% dead); deleted 0 dead (~0 B), repacked 26 of 26 candidates in 1 job(s) (714 frames), 37 pending deletion (~8.1 MiB)
+[2m2026-10-10T12:22:28.212011Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: deleted dead segment Segid { epoch: 1, counter: 6 } at segments/06/0000000000000001/0000000000000006 (~2.9 KiB)
+[2m2026-10-10T12:22:28.214531Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: deleted dead segment Segid { epoch: 1, counter: 3 } at segments/03/0000000000000001/0000000000000003 (~949 B)
+[2m2026-10-10T12:22:28.995165Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 74 segments, 18.4 MiB appended (8.6 MiB live, ~9.8 MiB reclaimable, 53% dead); deleted 2 dead (~3.8 KiB), repacked 0 of 6 candidates in 0 job(s) (0 frames), 63 pending deletion (~9.7 MiB)
+[2m2026-10-10T12:22:35.276474Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 78 segments, 21.5 MiB appended (11.8 MiB live, ~9.8 MiB reclaimable, 45% dead); deleted 0 dead (~0 B), repacked 0 of 8 candidates in 0 job(s) (0 frames), 66 pending deletion (~9.7 MiB)
+[2m2026-10-10T12:22:41.420220Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 84 segments, 21.6 MiB appended (11.9 MiB live, ~9.8 MiB reclaimable, 45% dead); deleted 0 dead (~0 B), repacked 0 of 12 candidates in 0 job(s) (0 frames), 68 pending deletion (~9.7 MiB)
+[2m2026-10-10T12:22:47.512256Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::repack[0m[2m:[0m segment repack: gathered 383 live frames (1.1 MiB) from 17 of 17 source segment(s)
+[2m2026-10-10T12:22:48.030547Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::repack[0m[2m:[0m segment repack: packed Segid { epoch: 1, counter: 110 }: 383 frames, 383 repointed, 0 discarded to concurrent writes
+[2m2026-10-10T12:22:48.030584Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 90 segments, 22.7 MiB appended (12.8 MiB live, ~9.9 MiB reclaimable, 43% dead); deleted 0 dead (~0 B), repacked 17 of 17 candidates in 1 job(s) (383 frames), 69 pending deletion (~9.7 MiB)
+[2m2026-10-10T12:22:53.507696Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 97 segments, 23.9 MiB appended (12.8 MiB live, ~11.0 MiB reclaimable, 46% dead); deleted 0 dead (~0 B), repacked 0 of 3 candidates in 0 job(s) (0 frames), 89 pending deletion (~10.9 MiB)
+[2m2026-10-10T12:23:00.713972Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 104 segments, 23.9 MiB appended (12.9 MiB live, ~11.1 MiB reclaimable, 46% dead); deleted 0 dead (~0 B), repacked 0 of 7 candidates in 0 job(s) (0 frames), 92 pending deletion (~11.0 MiB)
+[2m2026-10-10T12:23:07.142370Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 112 segments, 24.0 MiB appended (12.9 MiB live, ~11.2 MiB reclaimable, 46% dead); deleted 0 dead (~0 B), repacked 0 of 15 candidates in 0 job(s) (0 frames), 92 pending deletion (~11.0 MiB)
+[2m2026-10-10T12:23:13.718721Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 119 segments, 24.1 MiB appended (12.9 MiB live, ~11.2 MiB reclaimable, 46% dead); deleted 0 dead (~0 B), repacked 0 of 16 candidates in 0 job(s) (0 frames), 97 pending deletion (~11.0 MiB)
+[2m2026-10-10T12:23:19.095207Z[0m [32m INFO[0m [2mzerofs::metadata_digest[0m[2m:[0m metadata compaction: 98.9 KiB compacted into 13 SSTs over the last 60s; L0 0/256
+[2m2026-10-10T12:23:20.547032Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 127 segments, 24.2 MiB appended (12.9 MiB live, ~11.3 MiB reclaimable, 46% dead); deleted 0 dead (~0 B), repacked 0 of 18 candidates in 0 job(s) (0 frames), 104 pending deletion (~11.1 MiB)
+[2m2026-10-10T12:23:26.330309Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 133 segments, 24.2 MiB appended (12.9 MiB live, ~11.3 MiB reclaimable, 46% dead); deleted 0 dead (~0 B), repacked 0 of 19 candidates in 0 job(s) (0 frames), 109 pending deletion (~11.1 MiB)
+[2m2026-10-10T12:23:31.705297Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 138 segments, 24.3 MiB appended (12.9 MiB live, ~11.4 MiB reclaimable, 46% dead); deleted 0 dead (~0 B), repacked 0 of 19 candidates in 0 job(s) (0 frames), 114 pending deletion (~11.2 MiB)
+[2m2026-10-10T12:23:37.461969Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 145 segments, 24.3 MiB appended (12.9 MiB live, ~11.4 MiB reclaimable, 46% dead); deleted 0 dead (~0 B), repacked 0 of 22 candidates in 0 job(s) (0 frames), 118 pending deletion (~11.2 MiB)
+[2m2026-10-10T12:23:43.421262Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 151 segments, 24.4 MiB appended (12.9 MiB live, ~11.5 MiB reclaimable, 47% dead); deleted 0 dead (~0 B), repacked 0 of 24 candidates in 0 job(s) (0 frames), 122 pending deletion (~11.2 MiB)
+[2m2026-10-10T12:23:49.323682Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 158 segments, 24.4 MiB appended (12.9 MiB live, ~11.5 MiB reclaimable, 47% dead); deleted 0 dead (~0 B), repacked 0 of 25 candidates in 0 job(s) (0 frames), 128 pending deletion (~11.3 MiB)
+[2m2026-10-10T12:23:54.646128Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 163 segments, 24.4 MiB appended (12.9 MiB live, ~11.5 MiB reclaimable, 47% dead); deleted 0 dead (~0 B), repacked 0 of 28 candidates in 0 job(s) (0 frames), 130 pending deletion (~11.3 MiB)
+[2m2026-10-10T12:24:00.337173Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 170 segments, 24.4 MiB appended (12.9 MiB live, ~11.5 MiB reclaimable, 47% dead); deleted 0 dead (~0 B), repacked 0 of 29 candidates in 0 job(s) (0 frames), 136 pending deletion (~11.3 MiB)
+[2m2026-10-10T12:24:06.306248Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 176 segments, 24.5 MiB appended (12.9 MiB live, ~11.5 MiB reclaimable, 47% dead); deleted 0 dead (~0 B), repacked 0 of 32 candidates in 0 job(s) (0 frames), 139 pending deletion (~11.3 MiB)
+[2m2026-10-10T12:24:12.451944Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 182 segments, 24.5 MiB appended (12.9 MiB live, ~11.6 MiB reclaimable, 47% dead); deleted 0 dead (~0 B), repacked 0 of 33 candidates in 0 job(s) (0 frames), 144 pending deletion (~11.3 MiB)
+[2m2026-10-10T12:24:19.096711Z[0m [32m INFO[0m [2mzerofs::metadata_digest[0m[2m:[0m metadata compaction: 8.5 KiB compacted into 13 SSTs over the last 60s; L0 0/256
+[2m2026-10-10T12:24:19.606338Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::repack[0m[2m:[0m segment repack: gathered 1118 live frames (4.3 MiB) from 36 of 36 source segment(s)
+[2m2026-10-10T12:24:21.045030Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::repack[0m[2m:[0m segment repack: packed Segid { epoch: 1, counter: 223 }: 1118 frames, 1118 repointed, 0 discarded to concurrent writes
+[2m2026-10-10T12:24:21.045092Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 188 segments, 28.8 MiB appended (14.1 MiB live, ~14.7 MiB reclaimable, 50% dead); deleted 0 dead (~0 B), repacked 36 of 36 candidates in 1 job(s) (1118 frames), 149 pending deletion (~11.4 MiB)
+[2m2026-10-10T12:24:26.915756Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 195 segments, 33.2 MiB appended (14.2 MiB live, ~19.0 MiB reclaimable, 57% dead); deleted 0 dead (~0 B), repacked 0 of 6 candidates in 0 job(s) (0 frames), 185 pending deletion (~18.6 MiB)
+[2m2026-10-10T12:24:32.506910Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 201 segments, 33.2 MiB appended (14.2 MiB live, ~19.0 MiB reclaimable, 57% dead); deleted 0 dead (~0 B), repacked 0 of 8 candidates in 0 job(s) (0 frames), 189 pending deletion (~18.7 MiB)
+[2m2026-10-10T12:24:40.202077Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 209 segments, 33.3 MiB appended (14.2 MiB live, ~19.1 MiB reclaimable, 57% dead); deleted 0 dead (~0 B), repacked 0 of 10 candidates in 0 job(s) (0 frames), 195 pending deletion (~18.7 MiB)
+[2m2026-10-10T12:24:45.608958Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 214 segments, 33.4 MiB appended (14.2 MiB live, ~19.2 MiB reclaimable, 57% dead); deleted 0 dead (~0 B), repacked 0 of 12 candidates in 0 job(s) (0 frames), 198 pending deletion (~18.7 MiB)
+[2m2026-10-10T12:24:51.256967Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 220 segments, 33.7 MiB appended (14.3 MiB live, ~19.4 MiB reclaimable, 57% dead); deleted 0 dead (~0 B), repacked 0 of 16 candidates in 0 job(s) (0 frames), 200 pending deletion (~18.7 MiB)
+[2m2026-10-10T12:24:58.181712Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 227 segments, 33.8 MiB appended (14.3 MiB live, ~19.5 MiB reclaimable, 57% dead); deleted 0 dead (~0 B), repacked 0 of 19 candidates in 0 job(s) (0 frames), 204 pending deletion (~18.7 MiB)
+[2m2026-10-10T12:25:04.535088Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 234 segments, 33.8 MiB appended (14.3 MiB live, ~19.5 MiB reclaimable, 57% dead); deleted 0 dead (~0 B), repacked 0 of 22 candidates in 0 job(s) (0 frames), 208 pending deletion (~18.7 MiB)
+[2m2026-10-10T12:25:08.213684Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-10T12:25:08.213770Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-10T12:25:08.213833Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-10T12:25:08.213851Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-10T12:25:08.213878Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-10T12:25:08.213896Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-10T12:25:08.213934Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-10T12:25:08.213948Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-10T12:25:08.217703Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Received SIGTERM, initiating graceful shutdown...
+[2m2026-10-10T12:25:08.217722Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Cancelling all servers and background tasks...
+[2m2026-10-10T12:25:08.217844Z[0m [32m INFO[0m [2mzerofs_nfsserve::tcp[0m[2m:[0m NFS TCP server shutting down on 127.0.0.1:12991
+[2m2026-10-10T12:25:08.217909Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Waiting for servers to exit...
+[2m2026-10-10T12:25:08.217923Z[0m [32m INFO[0m [2mzerofs::fs::tombstone_cleanup[0m[2m:[0m Tombstone cleanup task shutting down
+[2m2026-10-10T12:25:08.217937Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Stats reporting task shutting down
+[2m2026-10-10T12:25:08.217925Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD TCP server shutting down on 127.0.0.1:11991
+[2m2026-10-10T12:25:08.217953Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Periodic flush task shutting down
+[2m2026-10-10T12:25:08.217989Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Waiting for background tasks to exit...
+[2m2026-10-10T12:25:08.218004Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Waiting for deferred orphan reclaims to finish...
+[2m2026-10-10T12:25:08.218024Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Performing final flush and closing database...
+[2m2026-10-10T12:25:09.240963Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Shutdown complete
+[2m2026-10-10T12:25:09.241369Z[0m [32m INFO[0m [2mfoyer::hybrid::cache[0m[2m:[0m [hybrid]: flush all in-memory cached entries to disk on close [3mbytes[0m[2m=[0m1570250

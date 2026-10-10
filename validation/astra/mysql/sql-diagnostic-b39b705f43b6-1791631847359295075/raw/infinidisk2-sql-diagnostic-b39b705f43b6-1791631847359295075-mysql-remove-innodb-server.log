@@ -1,0 +1,120 @@
+2026-10-10T11:30:48.876912000Z 2026-10-10 11:30:48+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.46-1.el9 started.
+2026-10-10T11:30:49.011791000Z 2026-10-10 11:30:49+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2026-10-10T11:30:49.018350000Z 2026-10-10 11:30:49+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.46-1.el9 started.
+2026-10-10T11:30:49.351898000Z 2026-10-10T11:30:49.348840Z 0 [Warning] [MY-011068] [Server] The syntax '--skip-host-cache' is deprecated and will be removed in a future release. Please use SET GLOBAL host_cache_size=0 instead.
+2026-10-10T11:30:49.352038000Z 2026-10-10T11:30:49.349806Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.46) starting as process 1
+2026-10-10T11:30:49.356094000Z 2026-10-10T11:30:49.355954Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-10T11:30:49.525929000Z 2026-10-10T11:30:49.525631Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-10T11:30:50.012331000Z 2026-10-10T11:30:50.012072Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-10-10T11:30:50.012677000Z 2026-10-10T11:30:50.012134Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-10-10T11:30:50.014931000Z 2026-10-10T11:30:50.014781Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2026-10-10T11:30:50.741971000Z 2026-10-10T11:30:50.741636Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+2026-10-10T11:30:50.742194000Z 2026-10-10T11:30:50.741691Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.46'  socket: '/var/lib/mysql/mysql.sock'  port: 3306  MySQL Community Server - GPL.
+2026-10-10T11:32:48.406393000Z TRANSACTION 3839039, ACTIVE 0 sec starting index read
+2026-10-10T11:32:48.407452000Z mysql tables in use 1, locked 1
+2026-10-10T11:32:48.407587000Z LOCK WAIT 4 lock struct(s), heap size 1128, 2 row lock(s), undo log entries 1
+2026-10-10T11:32:48.407618000Z MySQL thread id 77, OS thread handle 126359084942912, query id 2412462 localhost root updating
+2026-10-10T11:32:48.407684000Z UPDATE sbtest2 SET c='16751041904-62637933781-18160629835-89781892454-23684196154-46941344443-60111233739-80710542381-83986920512-55249932058' WHERE id=12588
+2026-10-10T11:32:48.407732000Z RECORD LOCKS space id 4 page no 203 n bits 144 index PRIMARY of table `bench`.`sbtest4` trx id 3839039 lock_mode X locks rec but not gap
+2026-10-10T11:32:48.407773000Z Record lock, heap no 29 PHYSICAL RECORD: n_fields 6; compact format; info bits 0
+2026-10-10T11:32:48.407814000Z  0: len 4; hex 800030ba; asc   0 ;;
+2026-10-10T11:32:48.407845000Z  1: len 6; hex 0000003a943f; asc    : ?;;
+2026-10-10T11:32:48.407892000Z  2: len 7; hex 020000023e0423; asc     > #;;
+2026-10-10T11:32:48.407921000Z  3: len 4; hex 800030be; asc   0 ;;
+2026-10-10T11:32:48.407955000Z  4: len 30; hex 34323234303332333738372d31343238363737343635322d303630393135; asc 42240323787-14286774652-060915; (total 120 bytes);
+2026-10-10T11:32:48.407985000Z  5: len 30; hex 37333531383739303635382d31323738333333313331382d383433333336; asc 73518790658-12783331318-843336; (total 60 bytes);
+2026-10-10T11:32:48.408016000Z 
+2026-10-10T11:32:48.408047000Z RECORD LOCKS space id 5 page no 204 n bits 144 index PRIMARY of table `bench`.`sbtest2` trx id 3839039 lock_mode X locks rec but not gap waiting
+2026-10-10T11:32:48.408076000Z Record lock, heap no 70 PHYSICAL RECORD: n_fields 6; compact format; info bits 0
+2026-10-10T11:32:48.408135000Z  0: len 4; hex 8000312c; asc   1,;;
+2026-10-10T11:32:48.408219000Z  1: len 6; hex 0000003a9445; asc    : E;;
+2026-10-10T11:32:48.408250000Z  2: len 7; hex 02000001a52513; asc      % ;;
+2026-10-10T11:32:48.408282000Z  3: len 4; hex 800030f0; asc   0 ;;
+2026-10-10T11:32:48.408316000Z  4: len 30; hex 34343536323338373336332d38333130303039363739322d383935303430; asc 44562387363-83100096792-895040; (total 120 bytes);
+2026-10-10T11:32:48.408347000Z  5: len 30; hex 37333237373039353734352d32303032363238333535322d303834303537; asc 73277095745-20026283552-084057; (total 60 bytes);
+2026-10-10T11:32:48.408374000Z 
+2026-10-10T11:32:48.408423000Z TRANSACTION 3839045, ACTIVE 0 sec starting index read
+2026-10-10T11:32:48.408475000Z mysql tables in use 1, locked 1
+2026-10-10T11:32:48.408501000Z LOCK WAIT 6 lock struct(s), heap size 1128, 3 row lock(s), undo log entries 2
+2026-10-10T11:32:48.408546000Z MySQL thread id 74, OS thread handle 126359214249536, query id 2412465 localhost root updating
+2026-10-10T11:32:48.408571000Z DELETE FROM sbtest4 WHERE id=12474
+2026-10-10T11:32:48.408624000Z RECORD LOCKS space id 5 page no 204 n bits 144 index PRIMARY of table `bench`.`sbtest2` trx id 3839045 lock_mode X locks rec but not gap
+2026-10-10T11:32:48.408648000Z Record lock, heap no 70 PHYSICAL RECORD: n_fields 6; compact format; info bits 0
+2026-10-10T11:32:48.408689000Z  0: len 4; hex 8000312c; asc   1,;;
+2026-10-10T11:32:48.408717000Z  1: len 6; hex 0000003a9445; asc    : E;;
+2026-10-10T11:32:48.408744000Z  2: len 7; hex 02000001a52513; asc      % ;;
+2026-10-10T11:32:48.408806000Z  3: len 4; hex 800030f0; asc   0 ;;
+2026-10-10T11:32:48.408828000Z  4: len 30; hex 34343536323338373336332d38333130303039363739322d383935303430; asc 44562387363-83100096792-895040; (total 120 bytes);
+2026-10-10T11:32:48.408853000Z  5: len 30; hex 37333237373039353734352d32303032363238333535322d303834303537; asc 73277095745-20026283552-084057; (total 60 bytes);
+2026-10-10T11:32:48.408934000Z 
+2026-10-10T11:32:48.408969000Z RECORD LOCKS space id 4 page no 203 n bits 144 index PRIMARY of table `bench`.`sbtest4` trx id 3839045 lock_mode X locks rec but not gap waiting
+2026-10-10T11:32:48.409009000Z Record lock, heap no 29 PHYSICAL RECORD: n_fields 6; compact format; info bits 0
+2026-10-10T11:32:48.409037000Z  0: len 4; hex 800030ba; asc   0 ;;
+2026-10-10T11:32:48.409067000Z  1: len 6; hex 0000003a943f; asc    : ?;;
+2026-10-10T11:32:48.409104000Z  2: len 7; hex 020000023e0423; asc     > #;;
+2026-10-10T11:32:48.409133000Z  3: len 4; hex 800030be; asc   0 ;;
+2026-10-10T11:32:48.409158000Z  4: len 30; hex 34323234303332333738372d31343238363737343635322d303630393135; asc 42240323787-14286774652-060915; (total 120 bytes);
+2026-10-10T11:32:48.409185000Z  5: len 30; hex 37333531383739303635382d31323738333333313331382d383433333336; asc 73518790658-12783331318-843336; (total 60 bytes);
+2026-10-10T11:32:48.409245000Z 
+2026-10-10T11:33:30.206203000Z TRANSACTION 4028767, ACTIVE 0 sec starting index read
+2026-10-10T11:33:30.206666000Z mysql tables in use 1, locked 1
+2026-10-10T11:33:30.206760000Z LOCK WAIT 5 lock struct(s), heap size 1128, 3 row lock(s), undo log entries 2
+2026-10-10T11:33:30.206792000Z MySQL thread id 90, OS thread handle 126359214249536, query id 2981849 localhost root updating
+2026-10-10T11:33:30.206849000Z DELETE FROM sbtest3 WHERE id=12514
+2026-10-10T11:33:30.206923000Z RECORD LOCKS space id 2 page no 203 n bits 144 index PRIMARY of table `bench`.`sbtest3` trx id 4028767 lock_mode X locks rec but not gap
+2026-10-10T11:33:30.206956000Z Record lock, heap no 14 PHYSICAL RECORD: n_fields 6; compact format; info bits 0
+2026-10-10T11:33:30.207107000Z  0: len 4; hex 800030ab; asc   0 ;;
+2026-10-10T11:33:30.207166000Z  1: len 6; hex 0000003d795f; asc    =y_;;
+2026-10-10T11:33:30.207217000Z  2: len 7; hex 02000001550453; asc     U S;;
+2026-10-10T11:33:30.207265000Z  3: len 4; hex 80003150; asc   1P;;
+2026-10-10T11:33:30.207293000Z  4: len 30; hex 37303133333032363337342d30353636383635343639342d383535363133; asc 70133026374-05668654694-855613; (total 120 bytes);
+2026-10-10T11:33:30.207358000Z  5: len 30; hex 30353237303938373433392d33393738323933363135372d323538333231; asc 05270987439-39782936157-258321; (total 60 bytes);
+2026-10-10T11:33:30.207391000Z 
+2026-10-10T11:33:30.207498000Z RECORD LOCKS space id 2 page no 203 n bits 144 index PRIMARY of table `bench`.`sbtest3` trx id 4028767 lock_mode X locks rec but not gap waiting
+2026-10-10T11:33:30.207560000Z Record lock, heap no 69 PHYSICAL RECORD: n_fields 6; compact format; info bits 0
+2026-10-10T11:33:30.207636000Z  0: len 4; hex 800030e2; asc   0 ;;
+2026-10-10T11:33:30.207666000Z  1: len 6; hex 0000003d7965; asc    =ye;;
+2026-10-10T11:33:30.207727000Z  2: len 7; hex 02000001f911ff; asc        ;;
+2026-10-10T11:33:30.207774000Z  3: len 4; hex 80003106; asc   1 ;;
+2026-10-10T11:33:30.207935000Z  4: len 30; hex 32363738333732363732352d30383936363130383230332d393935323634; asc 26783726725-08966108203-995264; (total 120 bytes);
+2026-10-10T11:33:30.208021000Z  5: len 30; hex 36363630383838343431382d30383433353132313538322d333139313331; asc 66608884418-08435121582-319131; (total 60 bytes);
+2026-10-10T11:33:30.208131000Z 
+2026-10-10T11:33:30.208161000Z TRANSACTION 4028773, ACTIVE 0 sec starting index read
+2026-10-10T11:33:30.208183000Z mysql tables in use 1, locked 1
+2026-10-10T11:33:30.208208000Z LOCK WAIT 5 lock struct(s), heap size 1128, 3 row lock(s), undo log entries 2
+2026-10-10T11:33:30.208283000Z MySQL thread id 87, OS thread handle 126359087056448, query id 2981878 localhost root updating
+2026-10-10T11:33:30.208317000Z DELETE FROM sbtest3 WHERE id=12459
+2026-10-10T11:33:30.208404000Z RECORD LOCKS space id 2 page no 203 n bits 144 index PRIMARY of table `bench`.`sbtest3` trx id 4028773 lock_mode X locks rec but not gap
+2026-10-10T11:33:30.208529000Z Record lock, heap no 69 PHYSICAL RECORD: n_fields 6; compact format; info bits 0
+2026-10-10T11:33:30.208568000Z  0: len 4; hex 800030e2; asc   0 ;;
+2026-10-10T11:33:30.208604000Z  1: len 6; hex 0000003d7965; asc    =ye;;
+2026-10-10T11:33:30.208639000Z  2: len 7; hex 02000001f911ff; asc        ;;
+2026-10-10T11:33:30.208665000Z  3: len 4; hex 80003106; asc   1 ;;
+2026-10-10T11:33:30.208705000Z  4: len 30; hex 32363738333732363732352d30383936363130383230332d393935323634; asc 26783726725-08966108203-995264; (total 120 bytes);
+2026-10-10T11:33:30.208744000Z  5: len 30; hex 36363630383838343431382d30383433353132313538322d333139313331; asc 66608884418-08435121582-319131; (total 60 bytes);
+2026-10-10T11:33:30.208788000Z 
+2026-10-10T11:33:30.208841000Z RECORD LOCKS space id 2 page no 203 n bits 144 index PRIMARY of table `bench`.`sbtest3` trx id 4028773 lock_mode X locks rec but not gap waiting
+2026-10-10T11:33:30.208931000Z Record lock, heap no 14 PHYSICAL RECORD: n_fields 6; compact format; info bits 0
+2026-10-10T11:33:30.208964000Z  0: len 4; hex 800030ab; asc   0 ;;
+2026-10-10T11:33:30.209002000Z  1: len 6; hex 0000003d795f; asc    =y_;;
+2026-10-10T11:33:30.209037000Z  2: len 7; hex 02000001550453; asc     U S;;
+2026-10-10T11:33:30.209058000Z  3: len 4; hex 80003150; asc   1P;;
+2026-10-10T11:33:30.209094000Z  4: len 30; hex 37303133333032363337342d30353636383635343639342d383535363133; asc 70133026374-05668654694-855613; (total 120 bytes);
+2026-10-10T11:33:30.209120000Z  5: len 30; hex 30353237303938373433392d33393738323933363135372d323538333231; asc 05270987439-39782936157-258321; (total 60 bytes);
+2026-10-10T11:33:30.209252000Z 
+2026-10-10T11:34:04.680996000Z 2026-10-10 11:34:04+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.46-1.el9 started.
+2026-10-10T11:34:04.809407000Z 2026-10-10 11:34:04+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2026-10-10T11:34:04.814533000Z 2026-10-10 11:34:04+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.46-1.el9 started.
+2026-10-10T11:34:05.152805000Z 2026-10-10T11:34:05.149903Z 0 [Warning] [MY-011068] [Server] The syntax '--skip-host-cache' is deprecated and will be removed in a future release. Please use SET GLOBAL host_cache_size=0 instead.
+2026-10-10T11:34:05.153219000Z 2026-10-10T11:34:05.150875Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.46) starting as process 1
+2026-10-10T11:34:05.155800000Z 2026-10-10T11:34:05.155696Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-10T11:34:06.769153000Z 2026-10-10T11:34:06.768847Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-10T11:34:08.489723000Z 2026-10-10T11:34:08.489472Z 0 [System] [MY-010229] [Server] Starting XA crash recovery...
+2026-10-10T11:34:08.494767000Z 2026-10-10T11:34:08.494601Z 0 [System] [MY-010232] [Server] XA crash recovery finished.
+2026-10-10T11:34:09.541698000Z 2026-10-10T11:34:09.541014Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-10-10T11:34:09.542205000Z 2026-10-10T11:34:09.541052Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-10-10T11:34:09.543966000Z 2026-10-10T11:34:09.543882Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2026-10-10T11:34:09.861794000Z 2026-10-10T11:34:09.861165Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+2026-10-10T11:34:09.862019000Z 2026-10-10T11:34:09.861191Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.46'  socket: '/var/lib/mysql/mysql.sock'  port: 3306  MySQL Community Server - GPL.
+2026-10-10T11:34:10.202855000Z 2026-10-10T11:34:10.202287Z 0 [System] [MY-013172] [Server] Received SHUTDOWN from user <via user signal>. Shutting down mysqld (Version: 8.0.46).
+2026-10-10T11:34:11.235895000Z 2026-10-10T11:34:11.235557Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.0.46)  MySQL Community Server - GPL.

@@ -1,0 +1,22 @@
+host
+fio-version
+zerofs-version
+id2-version
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-offline-warm
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mount
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-start
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-settings
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-warm
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-host-pid
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-read_only-0
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-read_only-1
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-read_only-2
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-crash
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-restart
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-counts
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-check
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-stop
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-remove
+infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-mysql-unmount
+detach-1791637216588190015
+REPORT /root/infinidisk2/test-output/comparison-be4ba51a4a38/optimization-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1.json

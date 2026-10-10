@@ -1,0 +1,492 @@
+{
+  "schema": "infinidisk2.astra.postgres-evidence.v1",
+  "id": "cde40aeb205e",
+  "complete": true,
+  "binary_sha256": {
+    "astra": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+    "baseline": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+    "zerofs": "91651cb1894f77f6892d224bc119ac4a9bccabf1207d739f4ec71ff8c4e99e21",
+    "helper": "c37aa66e5917578c2584553b115168572188ef06c51703af26cae6ed6ad5d00a"
+  },
+  "source_files_sha256": {
+    "scripts/compare_zerofs.py": "c37aa66e5917578c2584553b115168572188ef06c51703af26cae6ed6ad5d00a",
+    "scripts/profiles/astra-recovery-core.json": "98cdcf516d792282f3c0d3d633acb817529f2b505feed2cf29f686be039a2193",
+    "scripts/run_astra_postgres_compare.py": "bfb4d353f5940e536e52192e886f44558a37379adbe6ff97d641ba3a22855cdc",
+    "scripts/run_astra_recovery.py": "70d86fe44c9de1827557d4ed6cc97e1355ec470c6acb4c9730ac779de2e5b9ff",
+    "scripts/validate_vm.py": "28824c36832b46452c4e00e48c4a112df9efbaa0c65fa523f47f50ae177362d9",
+    "scripts/run_astra_mysql.py": "f599c525fc0fb5908636c3b0db863acfd9db3835b4d52ffc0e5bfbcc1e3d2311"
+  },
+  "files": [
+    {
+      "name": "report.json",
+      "sha256": "eb55e18301abfd3e400615aa2892e6139785ea1f2344d870f825fbc17ab590bf",
+      "bytes": 18747
+    },
+    {
+      "name": "engine-options.json",
+      "sha256": "98cdcf516d792282f3c0d3d633acb817529f2b505feed2cf29f686be039a2193",
+      "bytes": 702
+    },
+    {
+      "name": "baseline-options.json",
+      "sha256": "edc37f8654acae681d343cc4857403d63277d575798ae663a6b6ef3a99e36576",
+      "bytes": 400
+    },
+    {
+      "name": "astra-runner.log",
+      "sha256": "d1d65b824291164ede780c2ae3b8bd97ba149d893eb28732a5b3b62441835355",
+      "bytes": 468
+    },
+    {
+      "name": "baseline-runner.log",
+      "sha256": "3b8fce47d6fb3f509a3e69e536bdc0b49fa80f1e6b77ae28630413036fbd01ed",
+      "bytes": 468
+    },
+    {
+      "name": "native-amcheck.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "native-filesystem.log",
+      "sha256": "3555c7f110a3cd1c8eb10eb4ea0041b48bab57f606380709a4f737ef910f96fb",
+      "bytes": 27
+    },
+    {
+      "name": "native-init.log",
+      "sha256": "40da0ada69dc23ea1ef37125f39176649cbd7b02f23d111704f6f6b96f2416cb",
+      "bytes": 612
+    },
+    {
+      "name": "native-pgbench-0.log",
+      "sha256": "742e8ba465debacd5f17d65bc3238f6dc66bfefdaf328c6161d62cdac614c0d7",
+      "bytes": 436
+    },
+    {
+      "name": "native-pgbench-1.log",
+      "sha256": "8c80ece4902835d852e29b386272d776dcc3c21b490abb0b39ce5797dfdb7053",
+      "bytes": 436
+    },
+    {
+      "name": "native-pgbench-2.log",
+      "sha256": "eea4bb53019ef7893dcfd6b2aeee1ae56cba51868f2e09bfdeaed1f1b1e96d79",
+      "bytes": 436
+    },
+    {
+      "name": "native-ready.log",
+      "sha256": "6e168fc3b5a0662104b5e5da92e87b870e8b7c65fec827d267115b5123d18614",
+      "bytes": 49
+    },
+    {
+      "name": "native-remove.log",
+      "sha256": "47521d46c21f8d2e1e85d054683da7ff634481799705d7ebd5e8dcd4f922b9de",
+      "bytes": 33
+    },
+    {
+      "name": "native-settings.log",
+      "sha256": "5f8381f1c09f1c86071c4ed93d7e20d5866208f042461acdf51069f2bf307613",
+      "bytes": 12
+    },
+    {
+      "name": "native-start.log",
+      "sha256": "f68324ee6f358b8ae028c2d4a24246f3668c2cbe80b84441828a81c54bc7fdf0",
+      "bytes": 65
+    },
+    {
+      "name": "native-stop.log",
+      "sha256": "47521d46c21f8d2e1e85d054683da7ff634481799705d7ebd5e8dcd4f922b9de",
+      "bytes": 33
+    },
+    {
+      "name": "native-sums.log",
+      "sha256": "fe8edeeb98cc6d3b93cf2d57000254b84bd9eba34b4df7ce4b87db8b937b7703",
+      "bytes": 2
+    },
+    {
+      "name": "zerofs-durable-runner.log",
+      "sha256": "89c739a7746600f01b50bca827c8748c16e71a6c8aeb7c22c7e6d076bd58d11c",
+      "bytes": 429
+    },
+    {
+      "name": "baseline/detach-1791634821400132865.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "baseline/fio-version.log",
+      "sha256": "fb691e7d45038f556990cd7f72d3b03e40cdeb8d5fefd5356fd514b6cfce1f86",
+      "bytes": 9
+    },
+    {
+      "name": "baseline/host.log",
+      "sha256": "fbb878f16327f32ab17aa04dea898023212648d74a8036729796f0dabdcf47cc",
+      "bytes": 117
+    },
+    {
+      "name": "baseline/id2-init.log",
+      "sha256": "e6b8502429f69953c200fb7aaf9d2fdff3763565ca6b92c6026c860576a329ff",
+      "bytes": 129
+    },
+    {
+      "name": "baseline/id2-version.log",
+      "sha256": "56dd4e591f4be64c5f483c809b10c8472ded1f8a60fbbe707c0524e92d8768a4",
+      "bytes": 18
+    },
+    {
+      "name": "baseline/infinidisk2-initial-attach.log",
+      "sha256": "c33b9e3673e4fc91f866b5f3798e23543b1087dd67c578090a8aeb236da4284b",
+      "bytes": 235
+    },
+    {
+      "name": "baseline/infinidisk2-initial-server.log",
+      "sha256": "5d2a7890d63ae1bb2b2362180995d0547be045dae20ebb4fbb5453b50bea63c5",
+      "bytes": 6922
+    },
+    {
+      "name": "baseline/infinidisk2-mkfs.log",
+      "sha256": "72948656605fe5cb0158efafcebef388778cbbf71b4fd536c97c36a24677293a",
+      "bytes": 605
+    },
+    {
+      "name": "baseline/infinidisk2-mount.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "baseline/infinidisk2-pg-amcheck.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "baseline/infinidisk2-pg-crash.log",
+      "sha256": "c666cd1b5c909ec88db2a5d5f2581258aa191014e2b52c5cdbf8364b78c48981",
+      "bytes": 28
+    },
+    {
+      "name": "baseline/infinidisk2-pg-init.log",
+      "sha256": "a438bcdcfc58ce3b64664abccedf2c0808cc2e14e94f47c19a1e2e535e6e37f9",
+      "bytes": 612
+    },
+    {
+      "name": "baseline/infinidisk2-pg-ready.log",
+      "sha256": "6e168fc3b5a0662104b5e5da92e87b870e8b7c65fec827d267115b5123d18614",
+      "bytes": 49
+    },
+    {
+      "name": "baseline/infinidisk2-pg-remove.log",
+      "sha256": "c666cd1b5c909ec88db2a5d5f2581258aa191014e2b52c5cdbf8364b78c48981",
+      "bytes": 28
+    },
+    {
+      "name": "baseline/infinidisk2-pg-restart.log",
+      "sha256": "c666cd1b5c909ec88db2a5d5f2581258aa191014e2b52c5cdbf8364b78c48981",
+      "bytes": 28
+    },
+    {
+      "name": "baseline/infinidisk2-pg-settings.log",
+      "sha256": "5f8381f1c09f1c86071c4ed93d7e20d5866208f042461acdf51069f2bf307613",
+      "bytes": 12
+    },
+    {
+      "name": "baseline/infinidisk2-pg-start.log",
+      "sha256": "e92726539352f0a581b07f1a38de4e2f971fbc39c6624c4781eb237b3e2a6fd2",
+      "bytes": 65
+    },
+    {
+      "name": "baseline/infinidisk2-pg-stop.log",
+      "sha256": "c666cd1b5c909ec88db2a5d5f2581258aa191014e2b52c5cdbf8364b78c48981",
+      "bytes": 28
+    },
+    {
+      "name": "baseline/infinidisk2-pg-sums.log",
+      "sha256": "fe8edeeb98cc6d3b93cf2d57000254b84bd9eba34b4df7ce4b87db8b937b7703",
+      "bytes": 2
+    },
+    {
+      "name": "baseline/infinidisk2-pgbench-0.log",
+      "sha256": "0c48a7899bcad53cfbaf030fab021dee2096b1261ad3d9774b164c9fa0a8cff2",
+      "bytes": 436
+    },
+    {
+      "name": "baseline/infinidisk2-pgbench-1.log",
+      "sha256": "32143f750bcdfcbc81e4aa9a331bac3032adf87ea59f8dd92cd1e0e767a20527",
+      "bytes": 436
+    },
+    {
+      "name": "baseline/infinidisk2-pgbench-2.log",
+      "sha256": "46adb855b8dd7ee6ea8484dd69d75e64b01aacfa3e2f64335d6df2d020673230",
+      "bytes": 436
+    },
+    {
+      "name": "baseline/infinidisk2-unmount.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "baseline/report.json",
+      "sha256": "cb7a5c8bb0311ae073e77b62a0ed47f61fa36de3e7115c585c42669bd92ea9c5",
+      "bytes": 5157
+    },
+    {
+      "name": "baseline/zerofs-version.log",
+      "sha256": "b6b57a6fd35a274930ff1dd95ec6c834c0c0258a39ca9cb717cde3c815e42a7c",
+      "bytes": 13
+    },
+    {
+      "name": "astra/detach-1791634872461526279.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "astra/fio-version.log",
+      "sha256": "fb691e7d45038f556990cd7f72d3b03e40cdeb8d5fefd5356fd514b6cfce1f86",
+      "bytes": 9
+    },
+    {
+      "name": "astra/host.log",
+      "sha256": "fbb878f16327f32ab17aa04dea898023212648d74a8036729796f0dabdcf47cc",
+      "bytes": 117
+    },
+    {
+      "name": "astra/id2-init.log",
+      "sha256": "d2220e768591d2ee716373bbc6b53d7c5b8171463a94d88a68cc42bcf6ab5698",
+      "bytes": 129
+    },
+    {
+      "name": "astra/id2-version.log",
+      "sha256": "56dd4e591f4be64c5f483c809b10c8472ded1f8a60fbbe707c0524e92d8768a4",
+      "bytes": 18
+    },
+    {
+      "name": "astra/infinidisk2-initial-attach.log",
+      "sha256": "24a56159997208e4c92eb1d3e92cc2c1a002870088d178b34bcf6bc8caaf5bad",
+      "bytes": 235
+    },
+    {
+      "name": "astra/infinidisk2-initial-server.log",
+      "sha256": "03547be28fdd2eb311ea6a0bb239c5c8e5fc31abfff36b42c4457e51c9e08f39",
+      "bytes": 12085
+    },
+    {
+      "name": "astra/infinidisk2-mkfs.log",
+      "sha256": "16d6b29f344b667d0eb86c293fe9b287fdc7f83c8dcb71450f0e476fa0e1ca69",
+      "bytes": 605
+    },
+    {
+      "name": "astra/infinidisk2-mount.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "astra/infinidisk2-pg-amcheck.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "astra/infinidisk2-pg-crash.log",
+      "sha256": "4c39421c35e51c401c5ab539dc76fa622aa23d26eee9153bee0c3c036535b3b1",
+      "bytes": 28
+    },
+    {
+      "name": "astra/infinidisk2-pg-init.log",
+      "sha256": "1a0607a2208d84057b62f977af98be3efe6e97053d65bbe67d12712c3fd45beb",
+      "bytes": 612
+    },
+    {
+      "name": "astra/infinidisk2-pg-ready.log",
+      "sha256": "6e168fc3b5a0662104b5e5da92e87b870e8b7c65fec827d267115b5123d18614",
+      "bytes": 49
+    },
+    {
+      "name": "astra/infinidisk2-pg-remove.log",
+      "sha256": "4c39421c35e51c401c5ab539dc76fa622aa23d26eee9153bee0c3c036535b3b1",
+      "bytes": 28
+    },
+    {
+      "name": "astra/infinidisk2-pg-restart.log",
+      "sha256": "4c39421c35e51c401c5ab539dc76fa622aa23d26eee9153bee0c3c036535b3b1",
+      "bytes": 28
+    },
+    {
+      "name": "astra/infinidisk2-pg-settings.log",
+      "sha256": "5f8381f1c09f1c86071c4ed93d7e20d5866208f042461acdf51069f2bf307613",
+      "bytes": 12
+    },
+    {
+      "name": "astra/infinidisk2-pg-start.log",
+      "sha256": "74832d0a80eb0ad3c8df31072fcea4a3655226f3cabaa5548ea824231e6680e1",
+      "bytes": 65
+    },
+    {
+      "name": "astra/infinidisk2-pg-stop.log",
+      "sha256": "4c39421c35e51c401c5ab539dc76fa622aa23d26eee9153bee0c3c036535b3b1",
+      "bytes": 28
+    },
+    {
+      "name": "astra/infinidisk2-pg-sums.log",
+      "sha256": "fe8edeeb98cc6d3b93cf2d57000254b84bd9eba34b4df7ce4b87db8b937b7703",
+      "bytes": 2
+    },
+    {
+      "name": "astra/infinidisk2-pgbench-0.log",
+      "sha256": "e3ee124f4d3c60e59821348aad15671797084f59b4869788ab2adc6ca87f76de",
+      "bytes": 436
+    },
+    {
+      "name": "astra/infinidisk2-pgbench-1.log",
+      "sha256": "6671f0063584a357ed503d5574a2d44936cf8e6c360132a9a4342b0a0083014f",
+      "bytes": 436
+    },
+    {
+      "name": "astra/infinidisk2-pgbench-2.log",
+      "sha256": "3e71903e3c4b15f1985de1d294ae4243348a2944baf41986ec9827d18cfb536c",
+      "bytes": 436
+    },
+    {
+      "name": "astra/infinidisk2-unmount.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "astra/report.json",
+      "sha256": "9270fdf7bb8a880c95d18a82827642c6984e26289df2a82ad129447e445f9304",
+      "bytes": 6248
+    },
+    {
+      "name": "astra/zerofs-version.log",
+      "sha256": "b6b57a6fd35a274930ff1dd95ec6c834c0c0258a39ca9cb717cde3c815e42a7c",
+      "bytes": 13
+    },
+    {
+      "name": "zerofs-durable/detach-1791635108211334176.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "zerofs-durable/fio-version.log",
+      "sha256": "fb691e7d45038f556990cd7f72d3b03e40cdeb8d5fefd5356fd514b6cfce1f86",
+      "bytes": 9
+    },
+    {
+      "name": "zerofs-durable/host.log",
+      "sha256": "fbb878f16327f32ab17aa04dea898023212648d74a8036729796f0dabdcf47cc",
+      "bytes": 117
+    },
+    {
+      "name": "zerofs-durable/id2-version.log",
+      "sha256": "56dd4e591f4be64c5f483c809b10c8472ded1f8a60fbbe707c0524e92d8768a4",
+      "bytes": 18
+    },
+    {
+      "name": "zerofs-durable/report.json",
+      "sha256": "62ed4d20ca7b7219513b0996fcdc15fceeef26bd2b4e9bb7f8dfea20ab466653",
+      "bytes": 2872
+    },
+    {
+      "name": "zerofs-durable/zerofs-initial-attach.log",
+      "sha256": "82acad1a901be3399ef9f1649f89dbe24d2a23eaacef5bae94aed30159ade3e5",
+      "bytes": 235
+    },
+    {
+      "name": "zerofs-durable/zerofs-initial-nfs-umount.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "zerofs-durable/zerofs-initial-nfs.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "zerofs-durable/zerofs-initial-server.log",
+      "sha256": "9c6b13f98b9984567d6de55ad7f11f58f2785ff849210f02aa2b70fc8cb676b6",
+      "bytes": 25504
+    },
+    {
+      "name": "zerofs-durable/zerofs-mkfs.log",
+      "sha256": "e76cd183e1ae83c82756b3f3e88df7baffa17d88509a3eca08ccd4f4b3094894",
+      "bytes": 600
+    },
+    {
+      "name": "zerofs-durable/zerofs-mount.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "zerofs-durable/zerofs-pg-amcheck.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "zerofs-durable/zerofs-pg-crash.log",
+      "sha256": "a9b2e79958acc6eb8fe841a5db0433cc7579c93949127016e96c1d78c0c80012",
+      "bytes": 28
+    },
+    {
+      "name": "zerofs-durable/zerofs-pg-init.log",
+      "sha256": "3a51e71f4d6fc007f3dca053781d879b97ad89e4f712361958a2d0bd9e8c2f8c",
+      "bytes": 614
+    },
+    {
+      "name": "zerofs-durable/zerofs-pg-ready.log",
+      "sha256": "6e168fc3b5a0662104b5e5da92e87b870e8b7c65fec827d267115b5123d18614",
+      "bytes": 49
+    },
+    {
+      "name": "zerofs-durable/zerofs-pg-remove.log",
+      "sha256": "a9b2e79958acc6eb8fe841a5db0433cc7579c93949127016e96c1d78c0c80012",
+      "bytes": 28
+    },
+    {
+      "name": "zerofs-durable/zerofs-pg-restart.log",
+      "sha256": "a9b2e79958acc6eb8fe841a5db0433cc7579c93949127016e96c1d78c0c80012",
+      "bytes": 28
+    },
+    {
+      "name": "zerofs-durable/zerofs-pg-settings.log",
+      "sha256": "5f8381f1c09f1c86071c4ed93d7e20d5866208f042461acdf51069f2bf307613",
+      "bytes": 12
+    },
+    {
+      "name": "zerofs-durable/zerofs-pg-start.log",
+      "sha256": "191aac049c9096f5a33a6bc70e4c86cc8f5deb0ac7915dec734f847bb004eda6",
+      "bytes": 65
+    },
+    {
+      "name": "zerofs-durable/zerofs-pg-stop.log",
+      "sha256": "a9b2e79958acc6eb8fe841a5db0433cc7579c93949127016e96c1d78c0c80012",
+      "bytes": 28
+    },
+    {
+      "name": "zerofs-durable/zerofs-pg-sums.log",
+      "sha256": "fe8edeeb98cc6d3b93cf2d57000254b84bd9eba34b4df7ce4b87db8b937b7703",
+      "bytes": 2
+    },
+    {
+      "name": "zerofs-durable/zerofs-pgbench-0.log",
+      "sha256": "dfd087829541edfb17346d7c497ec480f0e821ad9ece7f8f701ff1a2db844d0c",
+      "bytes": 436
+    },
+    {
+      "name": "zerofs-durable/zerofs-pgbench-1.log",
+      "sha256": "9ea7b12d9678db4e1d15048a80c3895e569186f660e6078e354a6e8542552c8f",
+      "bytes": 433
+    },
+    {
+      "name": "zerofs-durable/zerofs-pgbench-2.log",
+      "sha256": "8f4cc07ee42d6b616a1d6d1b4fc87172fd1ee0da2e94c85fc3df6dcfd83524b3",
+      "bytes": 433
+    },
+    {
+      "name": "zerofs-durable/zerofs-unmount.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "zerofs-durable/zerofs-version.log",
+      "sha256": "b6b57a6fd35a274930ff1dd95ec6c834c0c0258a39ca9cb717cde3c815e42a7c",
+      "bytes": 13
+    }
+  ],
+  "export_policy": "Allowlisted bounded regular UTF-8 logs/JSON only; redacted credentials/signatures; no database, WAL, cache, raw config, .secret, binary, symlink, or recursive fixture copy."
+}

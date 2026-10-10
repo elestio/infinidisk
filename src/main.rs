@@ -30,7 +30,11 @@ enum Command {
     /// Serve the block device over loopback NBD.
     Serve,
     /// Offline: cache all allocated logical pages (must fit the SSD budget).
-    Warm,
+    Warm {
+        /// Maximum concurrent physical ranges (including cache probes/fills).
+        #[arg(long, default_value_t = 32, value_parser = clap::value_parser!(u16).range(1..=128))]
+        concurrency: u16,
+    },
     #[cfg(feature = "ublk")]
     /// Experimental direct userspace block transport.
     Ublk {
@@ -89,7 +93,7 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "infinidisk2=info".into()),
+                .unwrap_or_else(|_| "infinidisk2=info,libublk=warn".into()),
         )
         .init();
     let cli = Cli::parse();
@@ -140,14 +144,18 @@ async fn main() -> Result<()> {
             let _ = stop.send(true);
             background.await?;
             result?;
-            e.flush().await?;
+            // Checkpoint includes the durable barrier. The generation-mode
+            // admission barrier cannot run here: its publisher has stopped.
             e.checkpoint().await?;
         }
         #[cfg(feature = "ublk")]
         Command::UblkDelete { id } => {
             tokio::task::spawn_blocking(move || infinidisk2::ublk::delete(id)).await??;
         }
-        Command::Warm => println!("Warmed {} allocated pages", Engine::warm(c).await?),
+        Command::Warm { concurrency } => println!(
+            "Warmed {} allocated pages",
+            Engine::warm_with_concurrency(c, usize::from(concurrency)).await?
+        ),
         Command::Compact => println!("Compacted {} allocated pages", Engine::compact(c).await?),
         Command::Status => println!(
             "{}",
@@ -205,7 +213,8 @@ async fn main() -> Result<()> {
             let _ = tx.send(true);
             // Do not silently abandon an in-progress checkpoint on orderly shutdown.
             let _ = tokio::time::timeout(Duration::from_secs(60), background).await;
-            e.flush().await?;
+            // Checkpoint flushes the WAL itself and can clear generation lag.
+            // A normal generation FLUSH would wait for the stopped publisher.
             tokio::time::timeout(Duration::from_secs(60), e.checkpoint())
                 .await
                 .context("shutdown checkpoint timed out; local WAL retained")??;

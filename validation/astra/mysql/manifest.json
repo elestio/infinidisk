@@ -1,0 +1,28 @@
+{
+  "binary_sha256": {
+    "astra": "13b4b02d5037c26d99ff60b6e12b3637a66731daf694899d3c42033a83471672",
+    "baseline": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1"
+  },
+  "source_sha256": {
+    "Cargo.toml": "617935d27c00b10e4991b84f3f341d91f1e49aed14ecb9d45ea68c95a407b71b",
+    "Cargo.lock": "8ea0caf57be1dc2a3d0279484a6e21d3496f390d36b61304ce5e0975ac14ffd6",
+    "src/cache.rs": "c61e82a9e785450be742e2597d9d91998305d5ee2b75bb5412bc22afddb14d03",
+    "src/config.rs": "c9d6f81c2445919189175a83f7d28f6eb72f174e2af90129ebdd77a73af258c3",
+    "src/engine.rs": "51508fa38fd601900438ef5ace48e450e9fe619a938f5780033e899fddbef01a",
+    "src/index.rs": "f60cd3b6d367482e0060aacb6e1dca2c4a57941bded8995a7285de5beaf1bb1f",
+    "src/lib.rs": "bc1febfc7f95947eb712bf92a92da5b8ea6b41fb7524fb5c8b0510f025c15a51",
+    "src/linux.rs": "5fe98e450b80ad8de9ea94790e0ec0a062d38cca87c2b711a2e006dc25388a19",
+    "src/main.rs": "972b75683a039c5895e266e6e3981e23055723a921a7d00ae0f5ced9dfb4235b",
+    "src/nbd.rs": "2c74af990d434160d2380921e4ce351917aafa4c565aa39fa7a50cc7964be831",
+    "src/page_cache.rs": "6f9d79ea6ad08735eccaaee4e04b288ce69ff7ed5fa9d652009c2c5f4e503a6f",
+    "src/store.rs": "0ddc3870d720ccb125df06fc1b77ba58010f7c2ac4561d4f9be35790b223403f",
+    "src/ublk.rs": "c9b0ca4a080bdb34d4b6e3dbff7ced01c642b6f7b5a4044a988dc3dbcb4918ea",
+    "src/wal.rs": "46384bc3ccb9cf7db1945b3a10a60e7a52747ad76a9f74ea788e9e7a2296a1a7",
+    "src/wal_pool.rs": "e61f1d85344633f7ff5d0bad5894643d66b52b8c713403e7b9aa285c8dd73254",
+    "tests/astra_engine.rs": "c0515a8e85e541e84bed3d460e7671237e5413b5f9e3ce49238f5368d77086e6",
+    "tests/nbd_protocol.rs": "e464b55c851a9f7838f41fd62814b59cbf4865dbe29ef65ae45de3b65f7e66f9",
+    "scripts/run_astra_mysql.py": "736ef40386c4befea227b8e40a02e42dc9fe2e4fbda9d20cf844b1eb003b6753",
+    "scripts/compare_zerofs.py": "027038407466abb05b01a7d8ec03b4de3b9ad375a5935828022d46cffbfbedc8"
+  },
+  "created_utc": "2026-10-10T08:52:27.251248+00:00"
+}

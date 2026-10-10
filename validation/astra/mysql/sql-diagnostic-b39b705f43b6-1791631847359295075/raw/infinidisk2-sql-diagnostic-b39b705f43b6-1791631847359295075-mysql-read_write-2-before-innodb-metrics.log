@@ -1,0 +1,4 @@
+lock_deadlocks	0
+lock_row_lock_time	5908
+lock_row_lock_waits	2005
+lock_timeouts	0

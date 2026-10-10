@@ -1,0 +1,103 @@
+{
+  "note": "Only disposable caches renamed while the volume LOCK is held and test devices are stopped. Full warm still validates references. Preparation times are not controlled cold-cache comparisons.",
+  "events": [
+    {
+      "utc": "2026-10-10T10:31:20.535685+00:00",
+      "target_partitions": 1,
+      "actions": [
+        {
+          "operation": "preserve",
+          "from": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/logical-cache",
+          "to": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/astra-cache-bank/partitions-16",
+          "cache": {
+            "path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/logical-cache",
+            "identity": "4ec6e4f6-d57c-413e-8887-f94eda7c2d9d:1038435:16",
+            "allocated_bytes": 2034040832
+          }
+        }
+      ],
+      "complete_warm_required": true
+    },
+    {
+      "utc": "2026-10-10T11:46:27.563643+00:00",
+      "target_partitions": 16,
+      "actions": [
+        {
+          "operation": "preserve",
+          "from": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/logical-cache",
+          "to": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/astra-cache-bank/partitions-1",
+          "cache": {
+            "path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/logical-cache",
+            "identity": "4ec6e4f6-d57c-413e-8887-f94eda7c2d9d:1038435",
+            "allocated_bytes": 2028904448
+          }
+        },
+        {
+          "operation": "restore",
+          "from": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/astra-cache-bank/partitions-16",
+          "to": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/logical-cache",
+          "cache": {
+            "path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/astra-cache-bank/partitions-16",
+            "identity": "4ec6e4f6-d57c-413e-8887-f94eda7c2d9d:1038435:16",
+            "allocated_bytes": 2034040832
+          }
+        }
+      ],
+      "complete_warm_required": true
+    },
+    {
+      "utc": "2026-10-10T12:47:47.833959+00:00",
+      "target_partitions": 1,
+      "actions": [
+        {
+          "operation": "preserve",
+          "from": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/logical-cache",
+          "to": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/astra-cache-bank/partitions-16",
+          "cache": {
+            "path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/logical-cache",
+            "identity": "4ec6e4f6-d57c-413e-8887-f94eda7c2d9d:1038435:16",
+            "allocated_bytes": 2054873088
+          }
+        },
+        {
+          "operation": "restore",
+          "from": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/astra-cache-bank/partitions-1",
+          "to": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/logical-cache",
+          "cache": {
+            "path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/astra-cache-bank/partitions-1",
+            "identity": "4ec6e4f6-d57c-413e-8887-f94eda7c2d9d:1038435",
+            "allocated_bytes": 2028904448
+          }
+        }
+      ],
+      "complete_warm_required": true
+    },
+    {
+      "utc": "2026-10-10T12:57:17.657412+00:00",
+      "target_partitions": 16,
+      "actions": [
+        {
+          "operation": "preserve",
+          "from": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/logical-cache",
+          "to": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/astra-cache-bank/partitions-1",
+          "cache": {
+            "path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/logical-cache",
+            "identity": "4ec6e4f6-d57c-413e-8887-f94eda7c2d9d:1038435",
+            "allocated_bytes": 2049413120
+          }
+        },
+        {
+          "operation": "restore",
+          "from": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/astra-cache-bank/partitions-16",
+          "to": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/logical-cache",
+          "cache": {
+            "path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local/astra-cache-bank/partitions-16",
+            "identity": "4ec6e4f6-d57c-413e-8887-f94eda7c2d9d:1038435:16",
+            "allocated_bytes": 2054873088
+          }
+        }
+      ],
+      "complete_warm_required": true
+    }
+  ]
+}

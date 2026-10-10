@@ -1,6 +1,7 @@
 use crate::{
     cache::{DiskCache, EXTENT as READ_EXTENT},
     config::Config,
+    index::PageIndex,
     store::Store,
     wal::{self, MAX_IO, PAGE, Ref, Segment, Watermark},
 };
@@ -16,6 +17,7 @@ use std::{
     collections::{BTreeMap, BTreeSet, HashMap, VecDeque},
     fs::{File, OpenOptions},
     num::NonZeroUsize,
+    os::unix::fs::FileExt as UnixFileExt,
     sync::{
         Arc,
         atomic::{AtomicBool, AtomicU64, Ordering},
@@ -26,7 +28,37 @@ use tokio::sync::{Mutex, MutexGuard, Notify};
 use uuid::Uuid;
 
 const SHARD_PAGES: u64 = 4096;
+const MAX_HEAD_BYTES: u64 = 64 * 1024 * 1024;
 type ScrubGroups = BTreeMap<(Uuid, u64), (u64, Vec<(u64, u32)>)>;
+
+/// Offline warm owns each physical range until all of its logical pages land
+/// in the SSD cache. These buffers never depend on the online extent LRU.
+struct WarmGroup {
+    pages: Vec<(u64, Ref)>,
+    local: Option<Arc<File>>,
+}
+#[derive(Default)]
+struct WarmRanges {
+    active: AtomicU64,
+    peak: AtomicU64,
+}
+struct WarmRangeGuard<'a>(&'a WarmRanges);
+impl WarmRanges {
+    fn start(&self) -> WarmRangeGuard<'_> {
+        let active = self.active.fetch_add(1, Ordering::Relaxed) + 1;
+        self.peak.fetch_max(active, Ordering::Relaxed);
+        WarmRangeGuard(self)
+    }
+}
+impl Drop for WarmRangeGuard<'_> {
+    fn drop(&mut self) {
+        self.0.active.fetch_sub(1, Ordering::Relaxed);
+    }
+}
+struct WarmResult {
+    pages: usize,
+    range_peak: u64,
+}
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Identity {
     pub volume: Uuid,
@@ -55,14 +87,22 @@ struct Remote {
 struct State {
     seq: u64,
     durable: u64,
-    index: BTreeMap<u64, Ref>,
+    index: PageIndex,
     dirty: BTreeSet<u64>,
     active: Segment,
     sealed: Vec<Segment>,
     local: HashMap<Uuid, Arc<File>>,
+    sealed_lengths: HashMap<Uuid, u64>,
     pending: u64,
     resident: VecDeque<Segment>,
     resident_bytes: u64,
+}
+impl State {
+    fn reference(&mut self, page: u64) -> Result<Option<Ref>> {
+        // A sealed local WAL is still the only authority until its object has
+        // been uploaded. Checkpoint publication installs bounded remote refs.
+        self.index.get(&page)
+    }
 }
 #[derive(Serialize)]
 pub struct Status {
@@ -85,6 +125,15 @@ pub struct Status {
     pub logical_cache_hits: u64,
     pub remote_gets: u64,
     pub remote_bytes: u64,
+    pub checkpoint_wal_bytes: u64,
+    pub uploaded_segment_bytes: u64,
+    pub index: crate::index::IndexStats,
+    pub wal_pool_bytes: u64,
+    pub cache_queue_bytes: usize,
+    pub cache_fills_skipped: u64,
+    pub cache_fill_errors: u64,
+    pub durability_mode: &'static str,
+    pub unpublished_age_ms: u64,
 }
 #[derive(Default)]
 struct FlushMetrics {
@@ -96,6 +145,8 @@ struct FlushMetrics {
     page_hits: AtomicU64,
     remote_gets: AtomicU64,
     remote_bytes: AtomicU64,
+    checkpoint_wal_bytes: AtomicU64,
+    uploaded_segment_bytes: AtomicU64,
 }
 pub struct Engine {
     pub config: Config,
@@ -110,13 +161,20 @@ pub struct Engine {
     fetch_locks: Vec<Mutex<()>>,
     disk_cache: DiskCache,
     page_cache: Option<Arc<crate::page_cache::PageCache>>,
+    cache_writer: Option<crate::page_cache::CacheWriter>,
+    wal_pool: Option<crate::wal_pool::WalPool>,
     space_available: Notify,
     poisoned: AtomicBool,
     _lock: File,
     started: Instant,
     flush_metrics: FlushMetrics,
+    unpublished_since_ns: AtomicU64,
 }
 fn encode(h: &Head) -> Result<Bytes> {
+    ensure!(
+        bincode::serialized_size(h)? <= MAX_HEAD_BYTES - 40,
+        "remote HEAD exceeds the supported metadata size; publication refused"
+    );
     let payload = bincode::serialize(h)?;
     let mut b = Vec::with_capacity(payload.len() + 40);
     b.extend_from_slice(b"IDHEAD01");
@@ -126,7 +184,7 @@ fn encode(h: &Head) -> Result<Bytes> {
 }
 fn decode(b: &[u8]) -> Result<Head> {
     ensure!(
-        b.len() >= 40 && b.len() <= 64 * 1024 * 1024 && &b[..8] == b"IDHEAD01",
+        b.len() >= 40 && b.len() as u64 <= MAX_HEAD_BYTES && &b[..8] == b"IDHEAD01",
         "invalid remote HEAD"
     );
     ensure!(
@@ -135,7 +193,7 @@ fn decode(b: &[u8]) -> Result<Head> {
     );
     let h: Head = bincode::deserialize(&b[40..])?;
     ensure!(
-        h.format == 1 && h.size > 0 && h.size.is_multiple_of(PAGE as u64),
+        (h.format == 1 || h.format == 2) && h.size > 0 && h.size.is_multiple_of(PAGE as u64),
         "unsupported/invalid volume format"
     );
     Ok(h)
@@ -178,7 +236,7 @@ impl Engine {
             size,
         };
         let h = Head {
-            format: 1,
+            format: if c.generation_mode { 2 } else { 1 },
             volume: i.volume,
             size,
             writer: Some(i.writer),
@@ -211,6 +269,10 @@ impl Engine {
         let (b, v) = store.head().await?.context("no remote volume")?;
         let mut h = decode(&b)?;
         ensure!(
+            (h.format == 2) == c.generation_mode,
+            "generation mode must match the volume format"
+        );
+        ensure!(
             h.writer != Some(Uuid::nil()),
             "remote volume is under GC maintenance; resume gc --apply on its original host"
         );
@@ -219,7 +281,7 @@ impl Engine {
             "remote writer exists; fence its host, then pass --takeover"
         );
         // Validate the complete remote index before changing ownership.
-        Self::load_index(&store, &h, c.max_index_mib).await?;
+        Self::load_index(&store, &h, c).await?;
         let i = Identity {
             volume: h.volume,
             writer: Uuid::new_v4(),
@@ -236,7 +298,7 @@ impl Engine {
         )?;
         Ok(i)
     }
-    async fn load_index(store: &Store, h: &Head, max_mib: usize) -> Result<BTreeMap<u64, Ref>> {
+    async fn load_index(store: &Store, h: &Head, c: &Config) -> Result<PageIndex> {
         let mut parts = stream::iter(h.shards.iter().map(|(&id, s)| async move {
             let b = store.get(&s.key).await?;
             ensure!(
@@ -255,16 +317,19 @@ impl Engine {
                     "invalid index reference"
                 );
             }
-            Ok::<_, anyhow::Error>(map)
+            Ok::<_, anyhow::Error>((id, map))
         }))
         .buffer_unordered(16);
-        let mut index = BTreeMap::new();
-        while let Some(part) = parts.try_next().await? {
-            ensure!(
-                index.len() + part.len() <= max_mib * 1024 * 1024 / 128,
-                "page index exceeds max_index_mib; increase it or migrate to a larger-memory host"
-            );
-            index.extend(part);
+        let mut index = if c.paged_index {
+            PageIndex::paged(
+                &c.local_dir.join("index-scratch"),
+                c.max_index_mib * 1024 * 1024,
+            )?
+        } else {
+            PageIndex::memory(c.max_index_mib * 1024 * 1024)
+        };
+        while let Some((id, part)) = parts.try_next().await? {
+            index.replace_shard(id, part)?;
         }
         Ok(index)
     }
@@ -277,6 +342,10 @@ impl Engine {
         let (b, version) = store.head().await?.context("remote HEAD is missing")?;
         let head = decode(&b)?;
         ensure!(
+            (head.format == 2) == c.generation_mode,
+            "generation mode must match the volume format; changing durability in place is forbidden"
+        );
+        ensure!(
             head.volume == identity.volume && head.size == identity.size,
             "local/remote identity mismatch"
         );
@@ -284,8 +353,7 @@ impl Engine {
             head.writer == Some(identity.writer),
             "writer has been fenced; refusing to serve old local state"
         );
-        let mut index = Self::load_index(&store, &head, c.max_index_mib).await?;
-        let wm = Watermark::open(&c.local_dir.join("durable"))?;
+        let mut index = Self::load_index(&store, &head, &c).await?;
         let mut paths: Vec<_> = std::fs::read_dir(c.local_dir.join("wal"))?
             .map(|e| e.map(|e| e.path()))
             .collect::<std::io::Result<_>>()?;
@@ -296,8 +364,38 @@ impl Engine {
             "unexpected file in WAL directory"
         );
         paths.sort();
+        if c.generation_mode {
+            // The verified HEAD is the ONLY recovery root for this format.
+            // Never replay a subset of a later generation, even if it looks valid.
+            for path in &paths {
+                std::fs::remove_file(path)?;
+            }
+            wal::sync_dir(&c.local_dir.join("wal"))?;
+            paths.clear();
+            tracing::warn!(
+                sequence = head.seq,
+                "generation mode: recovered complete remote generation; applications must restart"
+            );
+        }
+        let watermark_path = c.local_dir.join("durable");
+        let wm = if c.generation_mode {
+            // This local marker is not a recovery authority for format 2.
+            // A torn or missing marker must not prevent verified HEAD recovery.
+            match std::fs::remove_file(&watermark_path) {
+                Ok(()) => {}
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+                Err(error) => return Err(error.into()),
+            }
+            Watermark::create(&watermark_path)?
+        } else {
+            Watermark::open(&watermark_path)?
+        };
         let mut seq = head.seq;
-        let mut committed = head.seq.max(wm.seq);
+        let mut committed = if c.generation_mode {
+            head.seq
+        } else {
+            head.seq.max(wm.seq)
+        };
         let mut sealed = Vec::new();
         let mut local = HashMap::new();
         let mut dirty = BTreeSet::new();
@@ -344,29 +442,18 @@ impl Engine {
                     row.seq
                 );
                 if row.zero_count > 0 {
-                    let removed: Vec<_> = index
-                        .range(row.first..row.first + row.zero_count)
-                        .map(|(p, _)| *p)
-                        .collect();
-                    for p in removed {
-                        index.remove(&p);
-                        dirty.insert(p / SHARD_PAGES);
-                    }
+                    dirty.extend(index.remove_range(row.first..row.first + row.zero_count)?);
                 }
                 for (j, (r, zero)) in row.pages.into_iter().enumerate() {
                     let p = row.first + j as u64;
                     if zero {
-                        index.remove(&p);
+                        index.remove(&p)?;
                     } else {
-                        index.insert(p, r);
+                        index.insert(p, r)?;
                     }
                     dirty.insert(p / SHARD_PAGES);
                 }
                 seq = row.seq;
-                ensure!(
-                    index.len() <= c.max_index_mib * 1024 * 1024 / 128,
-                    "recovered page index exceeds max_index_mib"
-                );
             }
             local.insert(s.id, Arc::new(s.file.try_clone()?));
             if s.last_seq <= head.seq {
@@ -399,7 +486,7 @@ impl Engine {
                 }
             }
         }
-        let mut active = Segment::create_with_options(
+        let mut active = Segment::create_with_format(
             &c.local_dir.join("wal"),
             identity.volume,
             seq + 1,
@@ -409,11 +496,10 @@ impl Engine {
                 0
             },
             c.wal_writev,
+            crate::wal_pool::format(&c),
         )?;
         if c.wal_fixed_size {
-            active.initialize_capacity(
-                c.segment_mib * 1024 * 1024 + MAX_IO as u64 + PAGE as u64 + 128,
-            )?;
+            active.initialize_capacity(crate::wal_pool::capacity(&c))?;
         }
         local.insert(active.id, Arc::new(active.file.try_clone()?));
         let cache = LruCache::new(
@@ -433,11 +519,35 @@ impl Engine {
             c.read_extent_kib * 1024,
         )?;
         let page_cache = if c.logical_cache {
-            Some(Arc::new(crate::page_cache::PageCache::open(
+            Some(Arc::new(crate::page_cache::PageCache::open_partitioned(
                 &c.local_dir.join("logical-cache"),
                 identity.volume,
                 c.disk_cache_mib * 1024 * 1024,
+                if c.fast_local_reads { 16 } else { 1 },
             )?))
+        } else {
+            None
+        };
+        let cache_writer = if c.async_cache {
+            page_cache
+                .as_ref()
+                .map(|cache| {
+                    crate::page_cache::CacheWriter::start(
+                        cache.clone(),
+                        c.cache_queue_mib * 1024 * 1024,
+                    )
+                })
+                .transpose()?
+        } else {
+            None
+        };
+        let sealed_lengths = sealed
+            .iter()
+            .chain(resident.iter())
+            .map(|s| (s.id, s.len))
+            .collect();
+        let wal_pool = if c.checkpoint_pipeline && c.wal_fixed_size {
+            Some(crate::wal_pool::WalPool::start(&c)?)
         } else {
             None
         };
@@ -453,6 +563,7 @@ impl Engine {
                 active,
                 sealed,
                 local,
+                sealed_lengths,
                 pending,
                 resident,
                 resident_bytes,
@@ -465,11 +576,14 @@ impl Engine {
             fetch_locks: (0..256).map(|_| Mutex::new(())).collect(),
             disk_cache,
             page_cache,
+            cache_writer,
+            wal_pool,
             space_available: Notify::new(),
             poisoned: AtomicBool::new(false),
             _lock: lock,
             started: Instant::now(),
             flush_metrics: FlushMetrics::default(),
+            unpublished_since_ns: AtomicU64::new(0),
         }))
     }
     fn healthy(&self) -> Result<()> {
@@ -482,6 +596,20 @@ impl Engine {
     fn fail_closed(&self) {
         self.poisoned.store(true, Ordering::Release);
         self.space_available.notify_waiters();
+    }
+    fn mark_unpublished(&self) {
+        let now = (self.started.elapsed().as_nanos() as u64).max(1);
+        let _ =
+            self.unpublished_since_ns
+                .compare_exchange(0, now, Ordering::AcqRel, Ordering::Acquire);
+    }
+    fn unpublished_age_ns(&self) -> u64 {
+        let start = self.unpublished_since_ns.load(Ordering::Acquire);
+        if start == 0 {
+            0
+        } else {
+            (self.started.elapsed().as_nanos() as u64).saturating_sub(start)
+        }
     }
     async fn writable_state(&self, additional: u64) -> Result<MutexGuard<'_, State>> {
         let deadline = tokio::time::Instant::now() + std::time::Duration::from_secs(50);
@@ -497,7 +625,11 @@ impl Engine {
             } else {
                 s.pending + s.active.len + additional
             };
-            if required <= self.config.max_pending_mib * 1024 * 1024 {
+            let lag_ok = !self.config.generation_mode
+                || self.unpublished_age_ns()
+                    < self.config.generation_max_lag_seconds * 1_000_000_000;
+            let pool_reserve = self.wal_pool.as_ref().map(|p| p.reserve_bytes).unwrap_or(0);
+            if required + pool_reserve <= self.config.max_pending_mib * 1024 * 1024 && lag_ok {
                 return Ok(s);
             }
             drop(s);
@@ -517,6 +649,15 @@ impl Engine {
         Ok(())
     }
     async fn page(&self, page: u64, r: Option<Ref>, local: Option<Arc<File>>) -> Result<Bytes> {
+        self.page_with_fill(page, r, local, false).await
+    }
+    async fn page_with_fill(
+        &self,
+        page: u64,
+        r: Option<Ref>,
+        local: Option<Arc<File>>,
+        fill_must_succeed: bool,
+    ) -> Result<Bytes> {
         let version = r.clone();
         if let (Some(cache), Some(version)) = (&self.page_cache, &version) {
             let cache = cache.clone();
@@ -528,11 +669,20 @@ impl Engine {
         }
         let b = self.extent_page(r, local).await?;
         if let (Some(cache), Some(version)) = (&self.page_cache, version) {
+            if let Some(writer) = &self.cache_writer {
+                // Extent slices may retain up to 260 KiB for a 4 KiB page.
+                // Own exactly the charged payload before queueing the fill.
+                writer.enqueue(page, vec![(page, version)], Bytes::copy_from_slice(&b));
+                return Ok(b);
+            }
             let cache = cache.clone();
             let data = b.clone();
             if let Err(err) =
                 tokio::task::spawn_blocking(move || cache.put(page, &version, &data)).await?
             {
+                if fill_must_succeed {
+                    return Err(err.context("offline cache warm fill failed"));
+                }
                 tracing::warn!(error=%err,"disposable page cache fill failed");
             }
         }
@@ -545,11 +695,18 @@ impl Engine {
         if let Some(f) = local {
             match Segment::read(&f, &r) {
                 Ok(b) => return Ok(b.into()),
-                Err(err) if r.segment_len == 0 => return Err(err),
+                Err(err) if r.segment_len == 0 => {
+                    self.fail_closed();
+                    return Err(err);
+                }
                 Err(err) => {
                     tracing::warn!(error=%err,segment=%r.segment,"sealed local page damaged; attempting verified remote copy")
                 }
             }
+        }
+        if r.segment_len == 0 {
+            self.fail_closed();
+            anyhow::bail!("unpublished local page is missing");
         }
         let extent = self.config.read_extent_kib * 1024;
         let start = r.offset / extent * extent;
@@ -596,17 +753,21 @@ impl Engine {
         if len == 0 {
             return Ok(Vec::new());
         }
+        if self.config.fast_local_reads {
+            return self.read_buffer(offset, len, vec![0; len]).await;
+        }
         let first = offset / PAGE as u64;
         let end = (offset + len as u64).div_ceil(PAGE as u64);
         let refs: Vec<_> = {
-            let s = self.state.lock().await;
+            let mut s = self.state.lock().await;
             (first..end)
                 .map(|p| {
-                    let r = s.index.get(&p).cloned();
+                    let r = s.reference(p)?;
                     let f = r.as_ref().and_then(|r| s.local.get(&r.segment)).cloned();
-                    (p, r, f)
+                    Ok::<_, anyhow::Error>((p, r, f))
                 })
-                .collect()
+                .collect::<Result<Vec<_>>>()
+                .inspect_err(|_| self.fail_closed())?
         };
         let pages: Vec<Bytes> = stream::iter(refs.into_iter().map(|(p, r, f)| self.page(p, r, f)))
             .buffered(32)
@@ -619,6 +780,104 @@ impl Engine {
         let start = (offset % PAGE as u64) as usize;
         Ok(output[start..start + len].to_vec())
     }
+    /// Owned buffer crosses the local I/O worker once, including ublk buffers.
+    /// Only partial edge pages need a scratch page; full pages go to the caller.
+    pub async fn read_buffer<B: AsMut<[u8]> + Send + 'static>(
+        &self,
+        offset: u64,
+        len: usize,
+        mut output: B,
+    ) -> Result<B> {
+        self.healthy()?;
+        self.bounds(offset, len)?;
+        ensure!(output.as_mut().len() >= len, "read output buffer too short");
+        if len == 0 {
+            return Ok(output);
+        }
+        let first = offset / PAGE as u64;
+        let end = (offset + len as u64).div_ceil(PAGE as u64);
+        let refs: Vec<_> = {
+            let mut s = self.state.lock().await;
+            (first..end)
+                .map(|p| {
+                    let r = s.reference(p)?;
+                    let file = r.as_ref().and_then(|r| s.local.get(&r.segment)).cloned();
+                    Ok::<_, anyhow::Error>((p, r, file))
+                })
+                .collect::<Result<Vec<_>>>()
+                .inspect_err(|_| self.fail_closed())?
+        };
+        let cache = self.page_cache.clone();
+        let (mut output, misses, hits) = tokio::task::spawn_blocking(move || {
+            let mut misses = Vec::new();
+            let mut hits = 0_u64;
+            let mut scratch = [0; PAGE];
+            for (p, r, file) in refs {
+                let page_start = p * PAGE as u64;
+                let begin = page_start.max(offset);
+                let finish = (page_start + PAGE as u64).min(offset + len as u64);
+                let dest_start = (begin - offset) as usize;
+                let count = (finish - begin) as usize;
+                let partial = count != PAGE;
+                let dest = if partial {
+                    &mut scratch[..]
+                } else {
+                    &mut output.as_mut()[dest_start..dest_start + PAGE]
+                };
+                let found = if let Some(version) = &r {
+                    if cache
+                        .as_ref()
+                        .is_some_and(|cache| cache.get_into(p, version, dest))
+                    {
+                        hits += 1;
+                        true
+                    } else if let Some(file) = &file {
+                        if file.read_exact_at(dest, version.offset).is_ok()
+                            && crc32fast::hash(dest) == version.crc
+                        {
+                            true
+                        } else if version.segment_len == 0 {
+                            anyhow::bail!("unpublished local page damaged");
+                        } else {
+                            false
+                        }
+                    } else {
+                        false
+                    }
+                } else {
+                    dest.fill(0);
+                    true
+                };
+                if found && partial {
+                    let source = (begin - page_start) as usize;
+                    output.as_mut()[dest_start..dest_start + count]
+                        .copy_from_slice(&scratch[source..source + count]);
+                }
+                if !found {
+                    misses.push((p, r, file));
+                }
+            }
+            Ok::<_, anyhow::Error>((output, misses, hits))
+        })
+        .await
+        .inspect_err(|_| self.fail_closed())?
+        .inspect_err(|_| self.fail_closed())?;
+        self.flush_metrics
+            .page_hits
+            .fetch_add(hits, Ordering::Relaxed);
+        let mut fetched = stream::iter(misses.into_iter().map(|(p, r, f)| async move {
+            Ok::<_, anyhow::Error>((p, self.page(p, r, f).await?))
+        }))
+        .buffer_unordered(32);
+        while let Some((p, bytes)) = fetched.try_next().await? {
+            let start = (p * PAGE as u64).max(offset);
+            let end = ((p + 1) * PAGE as u64).min(offset + len as u64);
+            let source = (start - p * PAGE as u64) as usize;
+            output.as_mut()[(start - offset) as usize..(end - offset) as usize]
+                .copy_from_slice(&bytes[source..source + (end - start) as usize]);
+        }
+        Ok(output)
+    }
     pub async fn write(&self, offset: u64, data: &[u8]) -> Result<()> {
         self.healthy()?;
         self.bounds(offset, data.len())?;
@@ -628,13 +887,16 @@ impl Engine {
         let first = offset / PAGE as u64;
         let end = (offset + data.len() as u64).div_ceil(PAGE as u64);
         let mut s = self
-            .writable_state((end - first) * PAGE as u64 + 32)
+            .writable_state(
+                (end - first) * PAGE as u64
+                    + crate::wal_pool::format(&self.config).record_overhead() as u64,
+            )
             .await?;
         let mut pages = vec![0; (end - first) as usize * PAGE];
         let start = (offset % PAGE as u64) as usize;
         if start != 0 || !data.len().is_multiple_of(PAGE) {
             for p in [first, end - 1] {
-                let r = s.index.get(&p).cloned();
+                let r = s.reference(p)?;
                 let f = r.as_ref().and_then(|r| s.local.get(&r.segment)).cloned();
                 let b = self.page(p, r, f).await?;
                 let dest = (p - first) as usize * PAGE;
@@ -642,19 +904,18 @@ impl Engine {
             }
         }
         pages[start..start + data.len()].copy_from_slice(data);
-        let added = pages
-            .as_chunks::<PAGE>()
-            .0
-            .iter()
-            .enumerate()
-            .filter(|(j, b)| {
-                !b.iter().all(|v| *v == 0) && !s.index.contains_key(&(first + *j as u64))
-            })
-            .count();
-        ensure!(
-            s.index.len() + added <= self.config.max_index_mib * 1024 * 1024 / 128,
-            "page index limit reached; increase max_index_mib"
-        );
+        let mut added = 0;
+        for (j, b) in pages.as_chunks::<PAGE>().0.iter().enumerate() {
+            if !b.iter().all(|v| *v == 0)
+                && !s
+                    .index
+                    .contains_key(&(first + j as u64))
+                    .inspect_err(|_| self.fail_closed())?
+            {
+                added += 1;
+            }
+        }
+        s.index.check_additional_pages(added)?;
         let seq = s.seq.checked_add(1).context("sequence exhausted")?;
         let refs = match s.active.append(seq, first, &pages) {
             Ok(r) => r,
@@ -666,24 +927,30 @@ impl Engine {
         for (j, (r, zero)) in refs.into_iter().enumerate() {
             let p = first + j as u64;
             if zero {
-                s.index.remove(&p);
+                s.index.remove(&p).inspect_err(|_| self.fail_closed())?;
             } else {
-                s.index.insert(p, r);
+                s.index.insert(p, r).inspect_err(|_| self.fail_closed())?;
             }
             s.dirty.insert(p / SHARD_PAGES);
         }
         s.seq = seq;
-        let fills: Vec<_> = if self.page_cache.is_some() {
-            (first..end)
-                .filter_map(|p| s.index.get(&p).cloned().map(|r| (p, r)))
-                .collect()
-        } else {
-            Vec::new()
-        };
+        self.mark_unpublished();
+        let mut fills = Vec::new();
+        if self.page_cache.is_some() {
+            for p in first..end {
+                if let Some(r) = s.index.get(&p).inspect_err(|_| self.fail_closed())? {
+                    fills.push((p, r));
+                }
+            }
+        }
         if s.active.len >= self.config.segment_mib * 1024 * 1024 {
             self.rotate(&mut s)?;
         }
         drop(s);
+        if let Some(writer) = &self.cache_writer {
+            writer.enqueue(first, fills, pages.into());
+            return Ok(());
+        }
         if let Some(cache) = &self.page_cache {
             let cache = cache.clone();
             let result = tokio::task::spawn_blocking(move || {
@@ -701,26 +968,38 @@ impl Engine {
         Ok(())
     }
     fn rotate(&self, s: &mut State) -> Result<()> {
-        let mut next = Segment::create_with_options(
-            &self.config.local_dir.join("wal"),
-            self.identity.volume,
-            s.seq + 1,
-            if self.config.wal_preallocate {
-                self.config.segment_mib * 1024 * 1024
-            } else {
-                0
-            },
-            self.config.wal_writev,
-        )
-        .inspect_err(|_| self.fail_closed())?;
-        if self.config.wal_fixed_size {
-            next.initialize_capacity(
-                self.config.segment_mib * 1024 * 1024 + MAX_IO as u64 + PAGE as u64 + 128,
+        let prepared = self.wal_pool.as_ref().and_then(|pool| pool.take());
+        let next = if let Some(prepared) = prepared {
+            prepared
+                .activate(
+                    &self.config.local_dir.join("wal"),
+                    self.identity.volume,
+                    s.seq + 1,
+                )
+                .inspect_err(|_| self.fail_closed())?
+        } else {
+            let mut next = Segment::create_with_format(
+                &self.config.local_dir.join("wal"),
+                self.identity.volume,
+                s.seq + 1,
+                if self.config.wal_preallocate {
+                    self.config.segment_mib * 1024 * 1024
+                } else {
+                    0
+                },
+                self.config.wal_writev,
+                crate::wal_pool::format(&self.config),
             )
             .inspect_err(|_| self.fail_closed())?;
-        }
+            if self.config.wal_fixed_size {
+                next.initialize_capacity(crate::wal_pool::capacity(&self.config))
+                    .inspect_err(|_| self.fail_closed())?;
+            }
+            next
+        };
         s.local.insert(next.id, Arc::new(next.file.try_clone()?));
         let old = std::mem::replace(&mut s.active, next);
+        s.sealed_lengths.insert(old.id, old.len);
         if self.config.wal_preallocate {
             old.release_reservation(self.config.segment_mib * 1024 * 1024)
                 .inspect_err(|_| self.fail_closed())?;
@@ -759,24 +1038,36 @@ impl Engine {
             )
             .await?;
         }
-        let mut s = self.writable_state(32).await?;
+        let mut s = self
+            .writable_state(crate::wal_pool::format(&self.config).record_overhead() as u64)
+            .await?;
         let seq = s.seq.checked_add(1).context("sequence exhausted")?;
         if let Err(err) = s.active.zero(seq, first, last - first) {
             self.fail_closed();
             return Err(err);
         }
-        let keys: Vec<_> = s.index.range(first..last).map(|(p, _)| *p).collect();
-        for p in keys {
-            s.index.remove(&p);
-            s.dirty.insert(p / SHARD_PAGES);
-        }
+        let changed = s
+            .index
+            .remove_range(first..last)
+            .inspect_err(|_| self.fail_closed())?;
+        s.dirty.extend(changed);
         s.seq = seq;
+        self.mark_unpublished();
         if s.active.len >= self.config.segment_mib * 1024 * 1024 {
             self.rotate(&mut s)?;
         }
         Ok(())
     }
     pub async fn flush(&self) -> Result<()> {
+        if self.config.generation_mode {
+            // Taking State orders the barrier after completed writes. A later
+            // checkpoint captures an entire prefix; no disk durability is claimed.
+            drop(self.writable_state(0).await?);
+            return Ok(());
+        }
+        self.flush_durable().await
+    }
+    async fn flush_durable(&self) -> Result<()> {
         self.healthy()?;
         self.flush_metrics.calls.fetch_add(1, Ordering::Relaxed);
         let target = self.state.lock().await.seq;
@@ -806,6 +1097,7 @@ impl Engine {
                 seq,
                 s.sealed
                     .iter()
+                    .filter(|segment| !self.config.selective_sync || segment.last_seq > s.durable)
                     .map(|s| s.file.try_clone())
                     .chain(std::iter::once(s.active.file.try_clone()))
                     .collect::<std::io::Result<Vec<_>>>()?,
@@ -852,35 +1144,28 @@ impl Engine {
     pub async fn checkpoint(&self) -> Result<()> {
         self.healthy()?;
         let _guard = self.checkpoint_lock.lock().await;
-        self.flush().await?;
-        let (seq, segments, shards, dirty) = {
+        self.flush_durable().await?;
+        let capture_ns = (self.started.elapsed().as_nanos() as u64).max(1);
+        let (seq, segments, snapshots, dirty, lengths, sync_files, sources) = {
             let mut s = self.state.lock().await;
-            if s.dirty.is_empty() && s.sealed.is_empty() {
+            if s.dirty.is_empty() && s.sealed.is_empty() && s.active.is_empty() {
                 return Ok(());
             }
-            if s.active.len > 64 {
+            if !s.active.is_empty() {
                 self.rotate(&mut s)?;
             }
-            // Seal files before uploading. New writes continue in a different segment.
-            for f in &s.sealed {
-                f.file.sync_all()?;
-            }
-            let lengths: HashMap<Uuid, u64> = s.sealed.iter().map(|f| (f.id, f.len)).collect();
-            for r in s.index.values_mut() {
-                if let Some(len) = lengths.get(&r.segment) {
-                    r.segment_len = *len;
-                }
-            }
+            let sync_files = s
+                .sealed
+                .iter()
+                .filter(|segment| !self.config.selective_sync || segment.last_seq > s.durable)
+                .map(|f| f.file.try_clone())
+                .collect::<std::io::Result<Vec<_>>>()?;
+            let lengths = s.sealed_lengths.clone();
             let dirty = std::mem::take(&mut s.dirty);
-            let mut shards = Vec::new();
-            for id in &dirty {
-                let map: BTreeMap<u64, Ref> = s
-                    .index
-                    .range(id * SHARD_PAGES..(id + 1) * SHARD_PAGES)
-                    .map(|(p, r)| (*p, r.clone()))
-                    .collect();
-                shards.push((*id, bincode::serialize(&map)?));
-            }
+            let shards = s
+                .index
+                .snapshot(dirty.iter().copied())
+                .inspect_err(|_| self.fail_closed())?;
             (
                 s.seq,
                 s.sealed
@@ -889,9 +1174,23 @@ impl Engine {
                     .collect::<Vec<_>>(),
                 shards,
                 dirty,
+                lengths,
+                sync_files,
+                Arc::new(
+                    s.sealed
+                        .iter()
+                        .map(|segment| (segment.id, s.local[&segment.id].clone()))
+                        .collect::<HashMap<_, _>>(),
+                ),
             )
         };
         let result = async {
+            // Sealed files cannot be changed. All disk barriers and serialization
+            // run outside State; new writes use the next segment.
+            tokio::task::spawn_blocking(move || {
+                for file in sync_files {file.sync_all()?;}
+                Ok::<_, anyhow::Error>(())
+            }).await.inspect_err(|_| self.fail_closed())?.inspect_err(|_| self.fail_closed())?;
             let uploads =
                 segments
                     .clone()
@@ -926,29 +1225,92 @@ impl Engine {
                             .await
                             .inspect_err(|_| self.fail_closed())?;
                             let b = checked.inspect_err(|_| self.fail_closed())?;
-                            store.immutable(&format!("segments/{id}"), b.into()).await
+                            self.flush_metrics.checkpoint_wal_bytes.fetch_add(b.len() as u64, Ordering::Relaxed);
+                            if self.config.compact_checkpoints {Ok(())} else {
+                                let len = b.len();
+                                store.immutable(&format!("segments/{id}"), b.into()).await?;
+                                self.flush_metrics.uploaded_segment_bytes.fetch_add(len as u64, Ordering::Relaxed);
+                                Ok(())
+                            }
                         }
                     });
             stream::iter(uploads)
                 .buffer_unordered(4)
                 .try_collect::<Vec<_>>()
                 .await?;
-            let mut remote = self.remote.lock().await;
-            let mut h = remote.head.clone();
-            let uploaded: Vec<(u64, Shard)> = stream::iter(shards.into_iter().map(|(id, b)| {
+            let lengths = Arc::new(lengths);
+            let uploaded: Vec<(u64, Option<Shard>)> = stream::iter(snapshots.into_iter().map(|(id, snapshot)| {
                 let store = self.store.clone();
+                let lengths = lengths.clone();
+                let sources = sources.clone();
                 async move {
+                    let compact = self.config.compact_checkpoints;
+                    let volume = self.identity.volume;
+                    let size = self.identity.size;
+                    let (map, replacements, packed) = tokio::task::spawn_blocking(move || {
+                        let mut map = (*snapshot.load()?).clone();
+                        let mut replacements = Vec::new();
+                        for (&page, r) in &mut map {
+                            if let Some(len) = lengths.get(&r.segment)
+                                && r.segment_len != *len {
+                                    let old = r.clone();
+                                    r.segment_len = *len;
+                                    replacements.push((page, old, r.clone()));
+                            }
+                            ensure!(r.segment_len > 0, "checkpoint contains an unsealed reference");
+                        }
+                        let mut pages = Vec::new();
+                        if compact {
+                            for (&page, r) in &map {
+                                if let Some(file) = sources.get(&r.segment) {pages.push((page, Segment::read(file, r)?));}
+                            }
+                        }
+                        let packed = if pages.is_empty() {None} else {
+                            let (segment, bytes, refs) = wal::pack_pages(volume, &pages, size)?;
+                            for (p, new) in refs {
+                                let old = map.insert(p, new.clone()).context("compact reference missing")?;
+                                replacements.push((p, old, new));
+                            }
+                            Some((segment, bytes))
+                        };
+                        Ok::<_, anyhow::Error>((map, replacements, packed))
+                    }).await.inspect_err(|_| self.fail_closed())?.inspect_err(|_| self.fail_closed())?;
+                    if map.is_empty() {
+                        return Ok((id, None));
+                    }
+                    if let Some((segment, bytes)) = packed {
+                        let len = bytes.len();
+                        store.immutable(&format!("segments/{segment}"), bytes.into()).await?;
+                        self.flush_metrics.uploaded_segment_bytes.fetch_add(len as u64, Ordering::Relaxed);
+                    }
+                    // At most four serialized shards/packed objects are live. We
+                    // never collect all dirty payloads in memory before uploading.
+                    let b = bincode::serialize(&map)?;
                     let hash = hex::encode(Sha256::digest(&b));
                     let key = format!("indexes/{id}/{}", Uuid::new_v4());
                     store.immutable(&key, b.into()).await?;
-                    Ok::<_, anyhow::Error>((id, Shard { key, hash }))
+                    if !replacements.is_empty() {
+                        let mut state = self.state.lock().await;
+                        for (p, old, new) in &replacements {
+                            if state.index.get(p).inspect_err(|_| self.fail_closed())?.is_some_and(|r| (r.segment, r.offset, r.crc) == (old.segment, old.offset, old.crc)) {
+                                state.index.insert(*p, new.clone()).inspect_err(|_| self.fail_closed())?;
+                            }
+                        }
+                        drop(state);
+                        if let Some(cache) = self.page_cache.clone() {
+                            tokio::task::spawn_blocking(move || {
+                                for (p, old, new) in replacements {if let Err(err) = cache.rekey(p, &old, &new) {tracing::warn!(error=%err, "disposable cache rekey failed");}}
+                            }).await?;
+                        }
+                    }
+                    Ok::<_, anyhow::Error>((id, Some(Shard { key, hash })))
                 }
-            }))
-            .buffer_unordered(4)
-            .try_collect()
-            .await?;
+            })).buffer_unordered(4).try_collect().await?;
+            drop(sources);
+            let mut remote = self.remote.lock().await;
+            let mut h = remote.head.clone();
             for (id, shard) in uploaded {
-                h.shards.insert(id, shard);
+                if let Some(shard) = shard {h.shards.insert(id, shard);} else {h.shards.remove(&id);}
             }
             h.seq = seq;
             h.generation += 1;
@@ -984,10 +1346,16 @@ impl Engine {
             return Err(e);
         }
         let mut s = self.state.lock().await;
+        self.unpublished_since_ns
+            .store(if s.seq > seq { capture_ns } else { 0 }, Ordering::Release);
         let mut retained = Vec::new();
         let sealed = std::mem::take(&mut s.sealed);
         for segment in sealed {
             if segment.last_seq <= seq {
+                // Every captured live reference now carries its sealed length.
+                // Concurrent overwrites point at later segments; this side map
+                // must not grow with the lifetime number of WAL rotations.
+                s.sealed_lengths.remove(&segment.id);
                 // Keep recent writes on SSD after publication instead of making their
                 // first read pay an S3 GET. This cache is bounded and disposable.
                 s.pending -= segment.storage_bytes();
@@ -999,20 +1367,44 @@ impl Engine {
         }
         s.sealed = retained;
         self.space_available.notify_waiters();
+        let mut evicted = Vec::new();
         while s.resident_bytes > self.config.hot_wal_mib * 1024 * 1024 {
             let Some(segment) = s.resident.pop_front() else {
                 break;
             };
-            match std::fs::remove_file(&segment.path) {
-                Ok(()) => {
-                    s.resident_bytes -= segment.storage_bytes();
-                    s.local.remove(&segment.id);
+            let readers = s
+                .local
+                .remove(&segment.id)
+                .context("resident segment missing file")?;
+            s.resident_bytes -= segment.storage_bytes();
+            evicted.push((segment, readers));
+        }
+        drop(s);
+        for (segment, readers) in evicted {
+            let (segment, readers) = if let Some(pool) = &self.wal_pool
+                && segment.storage_bytes() <= pool.unit_bytes
+            {
+                match wal::RetiredSegment::try_retire(segment, readers, seq, &pool.directory)
+                    .inspect_err(|_| self.fail_closed())?
+                {
+                    wal::Retirement::Ready(retired) => {
+                        pool.offer(retired);
+                        continue;
+                    }
+                    // Unlink published files still held by readers instead of
+                    // retaining an over-budget cache until another checkpoint.
+                    // Their open descriptors stay valid, but are never reused.
+                    wal::Retirement::Busy { segment, readers } => (segment, readers),
                 }
-                Err(e) => {
-                    tracing::warn!(error=%e,"local WAL eviction failed");
-                    s.resident.push_front(segment);
-                    break;
-                }
+            } else {
+                (segment, readers)
+            };
+            if let Err(err) = std::fs::remove_file(&segment.path) {
+                tracing::warn!(error=%err, "local WAL cache eviction failed");
+                let mut s = self.state.lock().await;
+                s.resident_bytes += segment.storage_bytes();
+                s.local.insert(segment.id, readers);
+                s.resident.push_back(segment);
             }
         }
         wal::sync_dir(&self.config.local_dir.join("wal"))?;
@@ -1021,6 +1413,11 @@ impl Engine {
     pub async fn status(&self) -> Status {
         let s = self.state.lock().await;
         let r = self.remote.lock().await;
+        let (cache_queue_bytes, cache_fills_skipped, cache_fill_errors) = self
+            .cache_writer
+            .as_ref()
+            .map(|w| w.status())
+            .unwrap_or_default();
         Status {
             volume: self.identity.volume,
             size: self.identity.size,
@@ -1041,28 +1438,240 @@ impl Engine {
             logical_cache_hits: self.flush_metrics.page_hits.load(Ordering::Relaxed),
             remote_gets: self.flush_metrics.remote_gets.load(Ordering::Relaxed),
             remote_bytes: self.flush_metrics.remote_bytes.load(Ordering::Relaxed),
+            checkpoint_wal_bytes: self
+                .flush_metrics
+                .checkpoint_wal_bytes
+                .load(Ordering::Relaxed),
+            uploaded_segment_bytes: self
+                .flush_metrics
+                .uploaded_segment_bytes
+                .load(Ordering::Relaxed),
+            index: s.index.stats(),
+            wal_pool_bytes: self.wal_pool.as_ref().map(|p| p.bytes()).unwrap_or(0),
+            cache_queue_bytes,
+            cache_fills_skipped,
+            cache_fill_errors,
+            durability_mode: if self.config.generation_mode {
+                "remote-generation-rollback"
+            } else {
+                "local-fsync"
+            },
+            unpublished_age_ms: self.unpublished_age_ns() / 1_000_000,
         }
     }
     /// Offline only: opening takes the exclusive volume lock.
     pub async fn warm(c: Config) -> Result<usize> {
+        Self::warm_with_concurrency(c, 32).await
+    }
+    /// Concurrency limits physical groups, including their cache probes/fills.
+    pub async fn warm_with_concurrency(mut c: Config, concurrency: usize) -> Result<usize> {
+        ensure!(
+            (1..=128).contains(&concurrency),
+            "warm concurrency must be between 1 and 128"
+        );
         ensure!(c.logical_cache, "warm requires logical_cache=true");
+        // An explicit offline warm must finish every fill. The online queue may
+        // skip a disposable fill under pressure, leaving a successful warm cold.
+        c.async_cache = false;
         let e = Self::open(c).await?;
-        let refs: Vec<_> = {
-            let s = e.state.lock().await;
-            s.index
-                .iter()
-                .map(|(&p, r)| (p, r.clone(), s.local.get(&r.segment).cloned()))
-                .collect()
+        Ok(e.warm_cache(concurrency).await?.pages)
+    }
+    async fn warm_cache(self: &Arc<Self>, concurrency: usize) -> Result<WarmResult> {
+        ensure!(
+            (1..=128).contains(&concurrency),
+            "warm concurrency must be between 1 and 128"
+        );
+        ensure!(
+            !self.config.async_cache,
+            "offline warm requires synchronous fills"
+        );
+        let mut refs: Vec<_> = {
+            let mut s = self.state.lock().await;
+            s.index.entries().inspect_err(|_| self.fail_closed())?
         };
         let count = refs.len();
         ensure!(
-            (count as u64) * 4136 <= e.config.disk_cache_mib * 1024 * 1024,
+            (count as u64) * 4136 <= self.config.disk_cache_mib * 1024 * 1024,
             "allocated pages do not fit the configured logical cache"
         );
-        stream::iter(refs.into_iter().map(|(p, r, f)| e.page(p, Some(r), f)))
-            .buffered(32)
-            .try_for_each(|_| async { Ok(()) })
-            .await?;
+        self.page_cache
+            .as_ref()
+            .context("logical cache unavailable for warm")?
+            .ensure_capacity_for(refs.iter().map(|(page, _)| *page))?;
+        let extent = self.config.read_extent_kib * 1024;
+        ensure!(
+            [16, 64, 256].contains(&self.config.read_extent_kib),
+            "invalid warm extent size"
+        );
+        refs.sort_unstable_by_key(|(_, reference)| (reference.segment, reference.offset));
+        let mut groups: Vec<WarmGroup> = Vec::new();
+        {
+            let s = self.state.lock().await;
+            for (page, reference) in refs {
+                let key = (reference.segment, reference.offset / extent);
+                let same = groups.last().is_some_and(|group| {
+                    let previous = &group.pages[0].1;
+                    (previous.segment, previous.offset / extent) == key
+                });
+                if !same {
+                    groups.push(WarmGroup {
+                        local: s.local.get(&reference.segment).cloned(),
+                        pages: Vec::new(),
+                    });
+                }
+                groups.last_mut().unwrap().pages.push((page, reference));
+            }
+        }
+        let group_count = groups.len();
+        let ranges = WarmRanges::default();
+        let mut remaining = groups.into_iter();
+        let mut pending = futures::stream::FuturesUnordered::new();
+        for group in remaining.by_ref().take(concurrency) {
+            pending.push(self.warm_group(group, &ranges));
+        }
+        let mut completed = 0;
+        let mut failure = None;
+        let cadence = std::time::Duration::from_secs(5);
+        let mut progress = tokio::time::interval_at(tokio::time::Instant::now() + cadence, cadence);
+        progress.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+        while !pending.is_empty() {
+            let result = tokio::select! {
+                result = pending.next() => result.unwrap(),
+                _ = progress.tick() => {
+                    tracing::info!(pages_completed = completed, pages_total = count,
+                        remote_gets = self.flush_metrics.remote_gets.load(Ordering::Relaxed),
+                        remote_bytes = self.flush_metrics.remote_bytes.load(Ordering::Relaxed),
+                        range_inflight = ranges.active.load(Ordering::Relaxed),
+                        max_range_inflight = ranges.peak.load(Ordering::Relaxed),
+                        "offline cache warm progress");
+                    continue;
+                }
+            };
+            match result {
+                Ok(pages) => completed += pages,
+                Err(error) => {
+                    failure.get_or_insert(error);
+                }
+            }
+            // On error, drain already-started fills before releasing the
+            // volume lock. A blocking cache put must not outlive this open.
+            if failure.is_none()
+                && let Some(group) = remaining.next()
+            {
+                pending.push(self.warm_group(group, &ranges));
+            }
+        }
+        if let Some(error) = failure {
+            return Err(error);
+        }
+        let result = WarmResult {
+            pages: count,
+            range_peak: ranges.peak.load(Ordering::Relaxed),
+        };
+        tracing::info!(
+            pages = count,
+            groups = group_count,
+            concurrency,
+            remote_gets = self.flush_metrics.remote_gets.load(Ordering::Relaxed),
+            remote_bytes = self.flush_metrics.remote_bytes.load(Ordering::Relaxed),
+            max_range_inflight = result.range_peak,
+            "offline cache warm completed"
+        );
+        Ok(result)
+    }
+    async fn warm_group(self: &Arc<Self>, group: WarmGroup, ranges: &WarmRanges) -> Result<usize> {
+        let count = group.pages.len();
+        if let Some(file) = group.local {
+            // Retain authoritative local-WAL validation and fail_closed. A
+            // published damaged copy may use the existing verified fallback.
+            for (page, reference) in group.pages {
+                self.page_with_fill(page, Some(reference), Some(file.clone()), true)
+                    .await?;
+            }
+            return Ok(count);
+        }
+        if group
+            .pages
+            .iter()
+            .any(|(_, reference)| reference.segment_len == 0)
+        {
+            self.fail_closed();
+            anyhow::bail!("unpublished local page is missing");
+        }
+        let owner = self.clone();
+        let missing = tokio::task::spawn_blocking(move || {
+            // Keep the engine/LOCK alive even if the caller cancels its future.
+            let cache = owner.page_cache.as_ref().unwrap();
+            group
+                .pages
+                .into_iter()
+                .filter(|(page, reference)| {
+                    if cache.get(*page, reference).is_some() {
+                        owner
+                            .flush_metrics
+                            .page_hits
+                            .fetch_add(1, Ordering::Relaxed);
+                        false
+                    } else {
+                        true
+                    }
+                })
+                .collect::<Vec<_>>()
+        })
+        .await?;
+        if missing.is_empty() {
+            return Ok(count);
+        }
+        let first = &missing[0].1;
+        let extent = self.config.read_extent_kib * 1024;
+        let start = first.offset / extent * extent;
+        let end = start
+            .saturating_add(extent + PAGE as u64)
+            .min(first.segment_len);
+        ensure!(
+            missing.iter().all(|(_, r)| r.segment == first.segment
+                && r.segment_len == first.segment_len
+                && r.offset / extent * extent == start),
+            "inconsistent offline warm group"
+        );
+        let active = ranges.start();
+        let downloaded = self
+            .store
+            .range(&format!("segments/{}", first.segment), start..end)
+            .await;
+        drop(active);
+        let bytes = downloaded?;
+        self.flush_metrics
+            .remote_gets
+            .fetch_add(1, Ordering::Relaxed);
+        self.flush_metrics
+            .remote_bytes
+            .fetch_add(bytes.len() as u64, Ordering::Relaxed);
+        // Check every required page before putting any member of this range.
+        // The owned range survives through the entire blocking fill; RAM=0 is
+        // therefore just as efficient as a large online extent cache.
+        for (_, reference) in &missing {
+            let offset = (reference.offset - start) as usize;
+            ensure!(
+                offset
+                    .checked_add(PAGE)
+                    .is_some_and(|end| end <= bytes.len())
+                    && crc32fast::hash(&bytes[offset..offset + PAGE]) == reference.crc,
+                "remote page checksum mismatch during offline warm"
+            );
+        }
+        let owner = self.clone();
+        tokio::task::spawn_blocking(move || -> Result<()> {
+            let cache = owner.page_cache.as_ref().unwrap();
+            for (page, reference) in missing {
+                let offset = (reference.offset - start) as usize;
+                cache
+                    .put(page, &reference, &bytes[offset..offset + PAGE])
+                    .context("offline cache warm fill failed")?;
+            }
+            Ok(())
+        })
+        .await??;
         Ok(count)
     }
     /// Offline layout experiment. Old remote objects remain available; CAS is last.
@@ -1070,11 +1679,18 @@ impl Engine {
         let e = Self::open(c).await?;
         e.checkpoint().await?;
         let refs: Vec<_> = {
-            let s = e.state.lock().await;
+            let mut s = e.state.lock().await;
             s.index
-                .iter()
-                .map(|(&p, r)| (p, r.clone(), s.local.get(&r.segment).cloned()))
-                .collect()
+                .entries()?
+                .into_iter()
+                .map(|(p, r)| {
+                    Ok((
+                        p,
+                        s.reference(p)?.unwrap(),
+                        s.local.get(&r.segment).cloned(),
+                    ))
+                })
+                .collect::<Result<Vec<_>>>()?
         };
         let count = refs.len();
         let mut index = BTreeMap::new();
@@ -1197,10 +1813,10 @@ impl Engine {
                 "GC requires the current owner on a stopped volume"
             );
         }
-        let index = Self::load_index(&store, &h, c.max_index_mib).await?;
+        let mut index = Self::load_index(&store, &h, c).await?;
         let mut live: BTreeSet<object_store::path::Path> =
             h.shards.values().map(|s| store.path(&s.key)).collect();
-        for r in index.into_values() {
+        for (_, r) in index.entries()? {
             live.insert(store.path(&format!("segments/{}", r.segment)));
         }
         if apply && h.writer != Some(Uuid::nil()) {
@@ -1263,10 +1879,10 @@ impl Engine {
     pub async fn verify_remote(c: &Config) -> Result<(u64, usize)> {
         let store = Store::new(c)?;
         let h = decode(&store.head().await?.context("no volume")?.0)?;
-        let index = Self::load_index(&store, &h, c.max_index_mib).await?;
+        let mut index = Self::load_index(&store, &h, c).await?;
         let n = index.len();
         let mut groups = ScrubGroups::new();
-        for r in index.into_values() {
+        for (_, r) in index.entries()? {
             let start = r.offset / READ_EXTENT * READ_EXTENT;
             let group = groups
                 .entry((r.segment, start))
@@ -1315,8 +1931,40 @@ pub struct GcReport {
 }
 
 #[cfg(test)]
+#[path = "../tests/support/astra_warm.rs"]
+mod warm_tests;
+
+#[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn head_writer_never_publishes_a_root_rejected_by_its_reader_size_limit() -> Result<()> {
+        let mut head = Head {
+            format: 1,
+            volume: Uuid::new_v4(),
+            size: PAGE as u64,
+            writer: Some(Uuid::new_v4()),
+            generation: 0,
+            seq: 0,
+            shards: BTreeMap::new(),
+        };
+        let original = encode(&head)?;
+        assert_eq!(decode(&original)?.volume, head.volume);
+        head.shards.insert(
+            0,
+            Shard {
+                key: "x".repeat(MAX_HEAD_BYTES as usize),
+                hash: "0".repeat(64),
+            },
+        );
+        assert!(
+            encode(&head)
+                .unwrap_err()
+                .to_string()
+                .contains("metadata size")
+        );
+        Ok(())
+    }
     fn config(t: &tempfile::TempDir) -> Config {
         Config {
             local_dir: t.path().join("local"),
@@ -1473,8 +2121,8 @@ mod tests {
         e.write(0, &vec![9; PAGE]).await?;
         e.flush().await?;
         {
-            let s = e.state.lock().await;
-            let r = s.index.get(&0).unwrap();
+            let mut s = e.state.lock().await;
+            let r = s.index.get(&0)?.unwrap();
             s.active.file.write_all_at(&[77], r.offset + 11)?;
         }
         ensure!(

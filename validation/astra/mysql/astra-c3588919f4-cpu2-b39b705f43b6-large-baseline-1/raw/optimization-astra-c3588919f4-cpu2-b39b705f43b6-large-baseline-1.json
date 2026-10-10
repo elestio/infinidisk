@@ -1,0 +1,1613 @@
+{
+  "utc": "2026-10-10T04:26:45.554630+00:00",
+  "work": "/root/infinidisk2/test-output/comparison-be4ba51a4a38",
+  "device": "/dev/nbd31",
+  "size_bytes": 268435456,
+  "duration_seconds": 15,
+  "connections": 8,
+  "memory_mib": 64,
+  "cold_disk_mib": 128,
+  "warm_disk_mib": 512,
+  "runs": {},
+  "contracts": {
+    "infinidisk2": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog",
+    "zerofs": "ignore_fsync=false: explicit FLUSH/FUA seals extents and flushes metadata to S3",
+    "zerofs-async": "FLUSH/FUA ignored by ZeroFS, unsafe DB durability mode",
+    "zerofs-durable": "ZeroFS FLUSH/FUA publishes S3",
+    "native": "native VM ext4 disk; MySQL fsync honored",
+    "infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+  },
+  "disk_mib": 128,
+  "volume_size_bytes": 4294967296,
+  "executions": [
+    {
+      "phase": "mysql",
+      "utc": "2026-10-10T04:26:45.554666+00:00",
+      "script_sha256": "66b4c9899e1e333bf5bf6aa44f50d9e2c309100da8683b21e47a6c2e2ce54587",
+      "load_start": [
+        1.93505859375,
+        2.57568359375,
+        1.5595703125
+      ]
+    },
+    {
+      "phase": "mysql-resume",
+      "utc": "2026-10-10T04:45:13.535728+00:00",
+      "script_sha256": "dd363f08dfc86684bc44b3f4cb56872aa18489a14af3132a4da3e5de4f645033",
+      "load_start": [
+        0.25537109375,
+        1.1240234375,
+        1.8017578125
+      ]
+    },
+    {
+      "phase": "mysql-repeat",
+      "utc": "2026-10-10T12:47:47.888935+00:00",
+      "script_sha256": "c37aa66e5917578c2584553b115168572188ef06c51703af26cae6ed6ad5d00a",
+      "load_start": [
+        7.02001953125,
+        5.78125,
+        4.1669921875
+      ],
+      "binary_path": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+      "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+      "engine_options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 64,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64
+      },
+      "legacy_config": true,
+      "mysql_percentile": 99,
+      "mysql_cpu_limit": 2.0,
+      "warm_concurrency": null
+    }
+  ],
+  "binary_sha256": {
+    "infinidisk2": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+    "zerofs": "91651cb1894f77f6892d224bc119ac4a9bccabf1207d739f4ec71ff8c4e99e21"
+  },
+  "host": "Linux wordpress-ovh-u3 7.0.0-38-generic #38-Ubuntu SMP PREEMPT_DYNAMIC Fri Sep  4 09:10:14 UTC 2026 x86_64 GNU/Linux",
+  "logical_cpus": 4,
+  "load_start": [
+    7.02001953125,
+    5.78125,
+    4.1669921875
+  ],
+  "fio_version": "fio-3.41",
+  "zerofs_version": "zerofs 2.3.5",
+  "infinidisk2_version": "infinidisk2 0.1.0",
+  "prefixes": {
+    "infinidisk2": "s3://testperf-6czebk/infinidisk2-comparison-be4ba51a4a38/infinidisk2"
+  },
+  "mysql": {
+    "infinidisk2": {
+      "settings": [
+        "1",
+        "1",
+        "ON",
+        "O_DIRECT",
+        "268435456",
+        "8.0.46",
+        "1"
+      ],
+      "tables": 4,
+      "rows_per_table": 1000000,
+      "threads": 8,
+      "cpu_limit": 1,
+      "memory_mib": 1024,
+      "samples": {
+        "read_write": [
+          {
+            "tps": 24.66,
+            "avg_ms": 322.86,
+            "p95_ms": 694.45,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 61.58,
+            "avg_ms": 127.39,
+            "p95_ms": 383.33,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 119.86,
+            "avg_ms": 66.13,
+            "p95_ms": 219.36,
+            "ignored_errors": 0
+          }
+        ],
+        "read_only": [
+          {
+            "tps": 150.6,
+            "avg_ms": 52.87,
+            "p95_ms": 189.93,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 303.49,
+            "avg_ms": 26.31,
+            "p95_ms": 114.72,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 478.1,
+            "avg_ms": 16.56,
+            "p95_ms": 81.48,
+            "ignored_errors": 0
+          }
+        ],
+        "write_only": [
+          {
+            "tps": 32.2,
+            "avg_ms": 247.38,
+            "p95_ms": 802.05,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 141.94,
+            "avg_ms": 55.95,
+            "p95_ms": 215.44,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 304.16,
+            "avg_ms": 26.21,
+            "p95_ms": 87.56,
+            "ignored_errors": 0
+          }
+        ]
+      },
+      "sample_count": 3,
+      "sample_seconds": 15,
+      "trace_engine": false,
+      "table_file_bytes": 1006632960,
+      "random_distribution": "sysbench default special",
+      "database_SIGKILL_recovery": "passed_after_resume_larger_cache",
+      "integrity_resume": {
+        "ssd_cache_mib": 2048,
+        "check_timeout_seconds": 1800,
+        "original_timeout_seconds": 300
+      }
+    },
+    "infinidisk2-resume-check": {
+      "settings": [
+        "1",
+        "1",
+        "ON",
+        "O_DIRECT",
+        "268435456",
+        "8.0.46",
+        "1"
+      ],
+      "tables": 4,
+      "rows_per_table": 1000000,
+      "threads": 8,
+      "cpu_limit": 1,
+      "memory_mib": 1024,
+      "samples": {},
+      "sample_count": 3,
+      "sample_seconds": 15,
+      "trace_engine": false,
+      "warmup_seconds": 10,
+      "startup_seconds": 15.322129408996261,
+      "table_file_bytes": 1040187392,
+      "random_distribution": "special",
+      "database_recovery_seconds": 2.4463797160060494,
+      "database_SIGKILL_recovery": "passed"
+    },
+    "native": {
+      "settings": [
+        "1",
+        "1",
+        "ON",
+        "O_DIRECT",
+        "268435456",
+        "8.0.46",
+        "1"
+      ],
+      "tables": 4,
+      "rows_per_table": 1000000,
+      "threads": 8,
+      "cpu_limit": 1,
+      "memory_mib": 1024,
+      "samples": {
+        "read_write": [
+          {
+            "tps": 762.13,
+            "avg_ms": 10.49,
+            "p95_ms": 61.08,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 877.09,
+            "avg_ms": 9.12,
+            "p95_ms": 56.84,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 785.61,
+            "avg_ms": 10.18,
+            "p95_ms": 59.99,
+            "ignored_errors": 0
+          }
+        ],
+        "read_only": [
+          {
+            "tps": 1628.71,
+            "avg_ms": 4.91,
+            "p95_ms": 5.99,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 1716.5,
+            "avg_ms": 4.66,
+            "p95_ms": 2.76,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 1732.68,
+            "avg_ms": 4.62,
+            "p95_ms": 3.25,
+            "ignored_errors": 0
+          }
+        ],
+        "write_only": [
+          {
+            "tps": 1991.02,
+            "avg_ms": 4.02,
+            "p95_ms": 5.77,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 2406.99,
+            "avg_ms": 3.32,
+            "p95_ms": 4.82,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 2411.64,
+            "avg_ms": 3.32,
+            "p95_ms": 4.74,
+            "ignored_errors": 0
+          }
+        ]
+      },
+      "sample_count": 3,
+      "sample_seconds": 15,
+      "trace_engine": false,
+      "warmup_seconds": 10,
+      "startup_seconds": 6.242601861005824,
+      "table_file_bytes": 1006632960,
+      "random_distribution": "special",
+      "database_recovery_seconds": 9.534826256996894,
+      "database_SIGKILL_recovery": "passed"
+    },
+    "infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1": {
+      "settings": [
+        "1",
+        "1",
+        "ON",
+        "O_DIRECT",
+        "268435456",
+        "8.0.46",
+        "1"
+      ],
+      "tables": 4,
+      "rows_per_table": 1000000,
+      "threads": 8,
+      "cpu_limit": 2.0,
+      "memory_mib": 1024,
+      "samples": {
+        "read_only": [
+          {
+            "tps": 1246.42,
+            "avg_ms": 6.42,
+            "latency_percentile": 99,
+            "percentile_ms": 10.65,
+            "p95_ms": null,
+            "p99_ms": 10.65,
+            "ignored_errors": 0,
+            "resources": {
+              "processes": {
+                "engine": {
+                  "before": {
+                    "pid": 357172,
+                    "available": true,
+                    "monotonic_ns": 64854283444422,
+                    "start_ticks": 6479194,
+                    "user_ticks": 3563,
+                    "system_ticks": 6565,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 147372,
+                    "peak_rss_lifetime_kib": 166816,
+                    "io": {
+                      "rchar": 16091233230,
+                      "wchar": 139044206,
+                      "syscr": 3914965,
+                      "syscw": 485240,
+                      "read_bytes": 307200,
+                      "write_bytes": 135049216,
+                      "cancelled_write_bytes": 0
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/user.slice/user-0.slice/session-752.scope",
+                      "identity": [
+                        30,
+                        68532
+                      ],
+                      "counters": {
+                        "usage_usec": 414999544,
+                        "user_usec": 143138803,
+                        "system_usec": 271860740,
+                        "nr_periods": 0,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": null,
+                        "period_usec": 100000,
+                        "quota_cores": null
+                      }
+                    }
+                  },
+                  "after": {
+                    "pid": 357172,
+                    "available": true,
+                    "monotonic_ns": 64884301923109,
+                    "start_ticks": 6479194,
+                    "user_ticks": 5222,
+                    "system_ticks": 9734,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 147380,
+                    "peak_rss_lifetime_kib": 166816,
+                    "io": {
+                      "rchar": 24768707534,
+                      "wchar": 141260794,
+                      "syscr": 6033489,
+                      "syscw": 761898,
+                      "read_bytes": 307200,
+                      "write_bytes": 135057408,
+                      "cancelled_write_bytes": 0
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/user.slice/user-0.slice/session-752.scope",
+                      "identity": [
+                        30,
+                        68532
+                      ],
+                      "counters": {
+                        "usage_usec": 469788526,
+                        "user_usec": 161999277,
+                        "system_usec": 307789249,
+                        "nr_periods": 0,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": null,
+                        "period_usec": 100000,
+                        "quota_cores": null
+                      }
+                    }
+                  },
+                  "comparable": true,
+                  "window_seconds": 30.018478687,
+                  "user_cpu_seconds": 16.59,
+                  "system_cpu_seconds": 31.69,
+                  "cpu_percent_of_one_core": 160.834266464371,
+                  "io_delta": {
+                    "rchar": 8677474304,
+                    "wchar": 2216588,
+                    "syscr": 2118524,
+                    "syscw": 276658,
+                    "read_bytes": 0,
+                    "write_bytes": 8192,
+                    "cancelled_write_bytes": 0
+                  },
+                  "cgroup_cpu": {
+                    "comparable": true,
+                    "note": "cgroup subtree; throttled_usec is not a per-request I/O delay measurement",
+                    "path": "/user.slice/user-0.slice/session-752.scope",
+                    "direct_cpu_max": {
+                      "quota_usec": null,
+                      "period_usec": 100000,
+                      "quota_cores": null
+                    },
+                    "counters_delta": {
+                      "usage_usec": 54788982,
+                      "user_usec": 18860474,
+                      "system_usec": 35928509,
+                      "nr_periods": 0,
+                      "nr_throttled": 0,
+                      "throttled_usec": 0
+                    },
+                    "window_seconds": 30.018478687,
+                    "cpu_percent_of_one_core": 182.5175171975896
+                  }
+                },
+                "mysql": {
+                  "before": {
+                    "pid": 357251,
+                    "available": true,
+                    "monotonic_ns": 64854283731320,
+                    "start_ticks": 6479296,
+                    "user_ticks": 4819,
+                    "system_ticks": 3095,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 668776,
+                    "peak_rss_lifetime_kib": 668776,
+                    "io": {
+                      "rchar": 16029201587,
+                      "wchar": 16898324,
+                      "syscr": 979552,
+                      "syscw": 976,
+                      "read_bytes": 16017739776,
+                      "write_bytes": 16748544,
+                      "cancelled_write_bytes": 16384
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/system.slice/docker-404c22f6a654912f78c802250f38ee9afc2f227c39d0c1a49466f0c562343c44.scope",
+                      "identity": [
+                        30,
+                        69846
+                      ],
+                      "counters": {
+                        "usage_usec": 79488974,
+                        "user_usec": 48372937,
+                        "system_usec": 31116037,
+                        "nr_periods": 613,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": 200000,
+                        "period_usec": 100000,
+                        "quota_cores": 2.0
+                      }
+                    }
+                  },
+                  "after": {
+                    "pid": 357251,
+                    "available": true,
+                    "monotonic_ns": 64884302191539,
+                    "start_ticks": 6479296,
+                    "user_ticks": 7411,
+                    "system_ticks": 4748,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 670412,
+                    "peak_rss_lifetime_kib": 670412,
+                    "io": {
+                      "rchar": 24709117107,
+                      "wchar": 16898324,
+                      "syscr": 1509332,
+                      "syscw": 976,
+                      "read_bytes": 24697655296,
+                      "write_bytes": 16748544,
+                      "cancelled_write_bytes": 16384
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/system.slice/docker-404c22f6a654912f78c802250f38ee9afc2f227c39d0c1a49466f0c562343c44.scope",
+                      "identity": [
+                        30,
+                        69846
+                      ],
+                      "counters": {
+                        "usage_usec": 121943825,
+                        "user_usec": 74296605,
+                        "system_usec": 47647220,
+                        "nr_periods": 913,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": 200000,
+                        "period_usec": 100000,
+                        "quota_cores": 2.0
+                      }
+                    }
+                  },
+                  "comparable": true,
+                  "window_seconds": 30.018460219,
+                  "user_cpu_seconds": 25.92,
+                  "system_cpu_seconds": 16.53,
+                  "cpu_percent_of_one_core": 141.41298284557425,
+                  "io_delta": {
+                    "rchar": 8679915520,
+                    "wchar": 0,
+                    "syscr": 529780,
+                    "syscw": 0,
+                    "read_bytes": 8679915520,
+                    "write_bytes": 0,
+                    "cancelled_write_bytes": 0
+                  },
+                  "cgroup_cpu": {
+                    "comparable": true,
+                    "note": "cgroup subtree; throttled_usec is not a per-request I/O delay measurement",
+                    "path": "/system.slice/docker-404c22f6a654912f78c802250f38ee9afc2f227c39d0c1a49466f0c562343c44.scope",
+                    "direct_cpu_max": {
+                      "quota_usec": 200000,
+                      "period_usec": 100000,
+                      "quota_cores": 2.0
+                    },
+                    "counters_delta": {
+                      "usage_usec": 42454851,
+                      "user_usec": 25923668,
+                      "system_usec": 16531183,
+                      "nr_periods": 300,
+                      "nr_throttled": 0,
+                      "throttled_usec": 0
+                    },
+                    "window_seconds": 30.018460219,
+                    "cpu_percent_of_one_core": 141.42914290163512,
+                    "throttled_periods_percent": 0.0
+                  }
+                },
+                "nbd_client": {
+                  "before": {
+                    "pid": 357192,
+                    "available": true,
+                    "monotonic_ns": 64854283887623,
+                    "start_ticks": 6479274,
+                    "user_ticks": 0,
+                    "system_ticks": 0,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 6388,
+                    "peak_rss_lifetime_kib": 6388,
+                    "io": {
+                      "rchar": 9504,
+                      "wchar": 235,
+                      "syscr": 16,
+                      "syscw": 1,
+                      "read_bytes": 0,
+                      "write_bytes": 4096,
+                      "cancelled_write_bytes": 0
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/user.slice/user-0.slice/session-752.scope",
+                      "identity": [
+                        30,
+                        68532
+                      ],
+                      "counters": {
+                        "usage_usec": 414999544,
+                        "user_usec": 143138803,
+                        "system_usec": 271860740,
+                        "nr_periods": 0,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": null,
+                        "period_usec": 100000,
+                        "quota_cores": null
+                      }
+                    }
+                  },
+                  "after": {
+                    "pid": 357192,
+                    "available": true,
+                    "monotonic_ns": 64884302349084,
+                    "start_ticks": 6479274,
+                    "user_ticks": 0,
+                    "system_ticks": 0,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 6388,
+                    "peak_rss_lifetime_kib": 6388,
+                    "io": {
+                      "rchar": 9504,
+                      "wchar": 235,
+                      "syscr": 16,
+                      "syscw": 1,
+                      "read_bytes": 0,
+                      "write_bytes": 4096,
+                      "cancelled_write_bytes": 0
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/user.slice/user-0.slice/session-752.scope",
+                      "identity": [
+                        30,
+                        68532
+                      ],
+                      "counters": {
+                        "usage_usec": 469788526,
+                        "user_usec": 161999277,
+                        "system_usec": 307789249,
+                        "nr_periods": 0,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": null,
+                        "period_usec": 100000,
+                        "quota_cores": null
+                      }
+                    }
+                  },
+                  "comparable": true,
+                  "window_seconds": 30.018461461,
+                  "user_cpu_seconds": 0.0,
+                  "system_cpu_seconds": 0.0,
+                  "cpu_percent_of_one_core": 0.0,
+                  "io_delta": {
+                    "rchar": 0,
+                    "wchar": 0,
+                    "syscr": 0,
+                    "syscw": 0,
+                    "read_bytes": 0,
+                    "write_bytes": 0,
+                    "cancelled_write_bytes": 0
+                  },
+                  "cgroup_cpu": {
+                    "comparable": true,
+                    "note": "cgroup subtree; throttled_usec is not a per-request I/O delay measurement",
+                    "path": "/user.slice/user-0.slice/session-752.scope",
+                    "direct_cpu_max": {
+                      "quota_usec": null,
+                      "period_usec": 100000,
+                      "quota_cores": null
+                    },
+                    "counters_delta": {
+                      "usage_usec": 54788982,
+                      "user_usec": 18860474,
+                      "system_usec": 35928509,
+                      "nr_periods": 0,
+                      "nr_throttled": 0,
+                      "throttled_usec": 0
+                    },
+                    "window_seconds": 30.018461461,
+                    "cpu_percent_of_one_core": 182.51762193469463
+                  }
+                }
+              },
+              "host_cpu": {
+                "comparable": true,
+                "ticks_delta": [
+                  4464,
+                  0,
+                  4963,
+                  111,
+                  1227,
+                  0,
+                  1013,
+                  0
+                ],
+                "busy_percent": 88.63983698420785,
+                "iowait_percent": 10.417727967396841,
+                "note": "host aggregate; includes other services"
+              },
+              "sysbench": {
+                "window_seconds": 30.017765582997527,
+                "user_cpu_seconds": 2.272152,
+                "system_cpu_seconds": 4.240742000000001,
+                "cpu_percent_of_one_core": 21.69679812440468
+              }
+            }
+          },
+          {
+            "tps": 1193.18,
+            "avg_ms": 6.7,
+            "latency_percentile": 99,
+            "percentile_ms": 10.84,
+            "p95_ms": null,
+            "p99_ms": 10.84,
+            "ignored_errors": 0,
+            "resources": {
+              "processes": {
+                "engine": {
+                  "before": {
+                    "pid": 357172,
+                    "available": true,
+                    "monotonic_ns": 64884303129664,
+                    "start_ticks": 6479194,
+                    "user_ticks": 5222,
+                    "system_ticks": 9734,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 147380,
+                    "peak_rss_lifetime_kib": 166816,
+                    "io": {
+                      "rchar": 24768707534,
+                      "wchar": 141260794,
+                      "syscr": 6033489,
+                      "syscw": 761898,
+                      "read_bytes": 307200,
+                      "write_bytes": 135057408,
+                      "cancelled_write_bytes": 0
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/user.slice/user-0.slice/session-752.scope",
+                      "identity": [
+                        30,
+                        68532
+                      ],
+                      "counters": {
+                        "usage_usec": 469789527,
+                        "user_usec": 162000278,
+                        "system_usec": 307789249,
+                        "nr_periods": 0,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": null,
+                        "period_usec": 100000,
+                        "quota_cores": null
+                      }
+                    }
+                  },
+                  "after": {
+                    "pid": 357172,
+                    "available": true,
+                    "monotonic_ns": 64914324797341,
+                    "start_ticks": 6479194,
+                    "user_ticks": 6943,
+                    "system_ticks": 12945,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 147384,
+                    "peak_rss_lifetime_kib": 166816,
+                    "io": {
+                      "rchar": 33065499598,
+                      "wchar": 143278467,
+                      "syscr": 8059073,
+                      "syscw": 1013691,
+                      "read_bytes": 307200,
+                      "write_bytes": 135065600,
+                      "cancelled_write_bytes": 0
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/user.slice/user-0.slice/session-752.scope",
+                      "identity": [
+                        30,
+                        68532
+                      ],
+                      "counters": {
+                        "usage_usec": 525495309,
+                        "user_usec": 181480349,
+                        "system_usec": 344014959,
+                        "nr_periods": 0,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": null,
+                        "period_usec": 100000,
+                        "quota_cores": null
+                      }
+                    }
+                  },
+                  "comparable": true,
+                  "window_seconds": 30.021667677,
+                  "user_cpu_seconds": 17.21,
+                  "system_cpu_seconds": 32.11,
+                  "cpu_percent_of_one_core": 164.28134682799353,
+                  "io_delta": {
+                    "rchar": 8296792064,
+                    "wchar": 2017673,
+                    "syscr": 2025584,
+                    "syscw": 251793,
+                    "read_bytes": 0,
+                    "write_bytes": 8192,
+                    "cancelled_write_bytes": 0
+                  },
+                  "cgroup_cpu": {
+                    "comparable": true,
+                    "note": "cgroup subtree; throttled_usec is not a per-request I/O delay measurement",
+                    "path": "/user.slice/user-0.slice/session-752.scope",
+                    "direct_cpu_max": {
+                      "quota_usec": null,
+                      "period_usec": 100000,
+                      "quota_cores": null
+                    },
+                    "counters_delta": {
+                      "usage_usec": 55705782,
+                      "user_usec": 19480071,
+                      "system_usec": 36225710,
+                      "nr_periods": 0,
+                      "nr_throttled": 0,
+                      "throttled_usec": 0
+                    },
+                    "window_seconds": 30.021667677,
+                    "cpu_percent_of_one_core": 185.55192402811434
+                  }
+                },
+                "mysql": {
+                  "before": {
+                    "pid": 357251,
+                    "available": true,
+                    "monotonic_ns": 64884303304997,
+                    "start_ticks": 6479296,
+                    "user_ticks": 7411,
+                    "system_ticks": 4748,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 670412,
+                    "peak_rss_lifetime_kib": 670412,
+                    "io": {
+                      "rchar": 24709117107,
+                      "wchar": 16898324,
+                      "syscr": 1509332,
+                      "syscw": 976,
+                      "read_bytes": 24697655296,
+                      "write_bytes": 16748544,
+                      "cancelled_write_bytes": 16384
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/system.slice/docker-404c22f6a654912f78c802250f38ee9afc2f227c39d0c1a49466f0c562343c44.scope",
+                      "identity": [
+                        30,
+                        69846
+                      ],
+                      "counters": {
+                        "usage_usec": 121943825,
+                        "user_usec": 74296605,
+                        "system_usec": 47647220,
+                        "nr_periods": 913,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": 200000,
+                        "period_usec": 100000,
+                        "quota_cores": 2.0
+                      }
+                    }
+                  },
+                  "after": {
+                    "pid": 357251,
+                    "available": true,
+                    "monotonic_ns": 64914325075695,
+                    "start_ticks": 6479296,
+                    "user_ticks": 9944,
+                    "system_ticks": 6340,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 671172,
+                    "peak_rss_lifetime_kib": 671172,
+                    "io": {
+                      "rchar": 33008268467,
+                      "wchar": 16898324,
+                      "syscr": 2015872,
+                      "syscw": 976,
+                      "read_bytes": 32996806656,
+                      "write_bytes": 16748544,
+                      "cancelled_write_bytes": 16384
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/system.slice/docker-404c22f6a654912f78c802250f38ee9afc2f227c39d0c1a49466f0c562343c44.scope",
+                      "identity": [
+                        30,
+                        69846
+                      ],
+                      "counters": {
+                        "usage_usec": 163192724,
+                        "user_usec": 99625386,
+                        "system_usec": 63567338,
+                        "nr_periods": 1213,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": 200000,
+                        "period_usec": 100000,
+                        "quota_cores": 2.0
+                      }
+                    }
+                  },
+                  "comparable": true,
+                  "window_seconds": 30.021770698,
+                  "user_cpu_seconds": 25.33,
+                  "system_cpu_seconds": 15.92,
+                  "cpu_percent_of_one_core": 137.4002899927152,
+                  "io_delta": {
+                    "rchar": 8299151360,
+                    "wchar": 0,
+                    "syscr": 506540,
+                    "syscw": 0,
+                    "read_bytes": 8299151360,
+                    "write_bytes": 0,
+                    "cancelled_write_bytes": 0
+                  },
+                  "cgroup_cpu": {
+                    "comparable": true,
+                    "note": "cgroup subtree; throttled_usec is not a per-request I/O delay measurement",
+                    "path": "/system.slice/docker-404c22f6a654912f78c802250f38ee9afc2f227c39d0c1a49466f0c562343c44.scope",
+                    "direct_cpu_max": {
+                      "quota_usec": 200000,
+                      "period_usec": 100000,
+                      "quota_cores": 2.0
+                    },
+                    "counters_delta": {
+                      "usage_usec": 41248899,
+                      "user_usec": 25328781,
+                      "system_usec": 15920118,
+                      "nr_periods": 300,
+                      "nr_throttled": 0,
+                      "throttled_usec": 0
+                    },
+                    "window_seconds": 30.021770698,
+                    "cpu_percent_of_one_core": 137.39662265406594,
+                    "throttled_periods_percent": 0.0
+                  }
+                },
+                "nbd_client": {
+                  "before": {
+                    "pid": 357192,
+                    "available": true,
+                    "monotonic_ns": 64884303423082,
+                    "start_ticks": 6479274,
+                    "user_ticks": 0,
+                    "system_ticks": 0,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 6388,
+                    "peak_rss_lifetime_kib": 6388,
+                    "io": {
+                      "rchar": 9504,
+                      "wchar": 235,
+                      "syscr": 16,
+                      "syscw": 1,
+                      "read_bytes": 0,
+                      "write_bytes": 4096,
+                      "cancelled_write_bytes": 0
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/user.slice/user-0.slice/session-752.scope",
+                      "identity": [
+                        30,
+                        68532
+                      ],
+                      "counters": {
+                        "usage_usec": 469789527,
+                        "user_usec": 162000278,
+                        "system_usec": 307789249,
+                        "nr_periods": 0,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": null,
+                        "period_usec": 100000,
+                        "quota_cores": null
+                      }
+                    }
+                  },
+                  "after": {
+                    "pid": 357192,
+                    "available": true,
+                    "monotonic_ns": 64914325227082,
+                    "start_ticks": 6479274,
+                    "user_ticks": 0,
+                    "system_ticks": 0,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 6388,
+                    "peak_rss_lifetime_kib": 6388,
+                    "io": {
+                      "rchar": 9504,
+                      "wchar": 235,
+                      "syscr": 16,
+                      "syscw": 1,
+                      "read_bytes": 0,
+                      "write_bytes": 4096,
+                      "cancelled_write_bytes": 0
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/user.slice/user-0.slice/session-752.scope",
+                      "identity": [
+                        30,
+                        68532
+                      ],
+                      "counters": {
+                        "usage_usec": 525495309,
+                        "user_usec": 181480349,
+                        "system_usec": 344014959,
+                        "nr_periods": 0,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": null,
+                        "period_usec": 100000,
+                        "quota_cores": null
+                      }
+                    }
+                  },
+                  "comparable": true,
+                  "window_seconds": 30.021804,
+                  "user_cpu_seconds": 0.0,
+                  "system_cpu_seconds": 0.0,
+                  "cpu_percent_of_one_core": 0.0,
+                  "io_delta": {
+                    "rchar": 0,
+                    "wchar": 0,
+                    "syscr": 0,
+                    "syscw": 0,
+                    "read_bytes": 0,
+                    "write_bytes": 0,
+                    "cancelled_write_bytes": 0
+                  },
+                  "cgroup_cpu": {
+                    "comparable": true,
+                    "note": "cgroup subtree; throttled_usec is not a per-request I/O delay measurement",
+                    "path": "/user.slice/user-0.slice/session-752.scope",
+                    "direct_cpu_max": {
+                      "quota_usec": null,
+                      "period_usec": 100000,
+                      "quota_cores": null
+                    },
+                    "counters_delta": {
+                      "usage_usec": 55705782,
+                      "user_usec": 19480071,
+                      "system_usec": 36225710,
+                      "nr_periods": 0,
+                      "nr_throttled": 0,
+                      "throttled_usec": 0
+                    },
+                    "window_seconds": 30.021804,
+                    "cpu_percent_of_one_core": 185.5510814739847
+                  }
+                }
+              },
+              "host_cpu": {
+                "comparable": true,
+                "ticks_delta": [
+                  4477,
+                  0,
+                  4936,
+                  102,
+                  1273,
+                  0,
+                  1000,
+                  1
+                ],
+                "busy_percent": 88.33658495207396,
+                "iowait_percent": 10.798201713461701,
+                "note": "host aggregate; includes other services"
+              },
+              "sysbench": {
+                "window_seconds": 30.021160764998058,
+                "user_cpu_seconds": 2.265804000000001,
+                "system_cpu_seconds": 4.1216599999999985,
+                "cpu_percent_of_one_core": 21.276539071890923
+              }
+            }
+          },
+          {
+            "tps": 1246.78,
+            "avg_ms": 6.41,
+            "latency_percentile": 99,
+            "percentile_ms": 10.46,
+            "p95_ms": null,
+            "p99_ms": 10.46,
+            "ignored_errors": 0,
+            "resources": {
+              "processes": {
+                "engine": {
+                  "before": {
+                    "pid": 357172,
+                    "available": true,
+                    "monotonic_ns": 64914325789100,
+                    "start_ticks": 6479194,
+                    "user_ticks": 6943,
+                    "system_ticks": 12945,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 147384,
+                    "peak_rss_lifetime_kib": 166816,
+                    "io": {
+                      "rchar": 33065499598,
+                      "wchar": 143278467,
+                      "syscr": 8059073,
+                      "syscw": 1013691,
+                      "read_bytes": 307200,
+                      "write_bytes": 135065600,
+                      "cancelled_write_bytes": 0
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/user.slice/user-0.slice/session-752.scope",
+                      "identity": [
+                        30,
+                        68532
+                      ],
+                      "counters": {
+                        "usage_usec": 525495309,
+                        "user_usec": 181480349,
+                        "system_usec": 344014959,
+                        "nr_periods": 0,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": null,
+                        "period_usec": 100000,
+                        "quota_cores": null
+                      }
+                    }
+                  },
+                  "after": {
+                    "pid": 357172,
+                    "available": true,
+                    "monotonic_ns": 64944345794942,
+                    "start_ticks": 6479194,
+                    "user_ticks": 8623,
+                    "system_ticks": 16120,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 147552,
+                    "peak_rss_lifetime_kib": 166816,
+                    "io": {
+                      "rchar": 41746264238,
+                      "wchar": 164203636,
+                      "syscr": 10178309,
+                      "syscw": 1285294,
+                      "read_bytes": 307200,
+                      "write_bytes": 161124352,
+                      "cancelled_write_bytes": 0
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/user.slice/user-0.slice/session-752.scope",
+                      "identity": [
+                        30,
+                        68532
+                      ],
+                      "counters": {
+                        "usage_usec": 580400330,
+                        "user_usec": 200606155,
+                        "system_usec": 379794174,
+                        "nr_periods": 0,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": null,
+                        "period_usec": 100000,
+                        "quota_cores": null
+                      }
+                    }
+                  },
+                  "comparable": true,
+                  "window_seconds": 30.020005842,
+                  "user_cpu_seconds": 16.8,
+                  "system_cpu_seconds": 31.75,
+                  "cpu_percent_of_one_core": 161.72548485009054,
+                  "io_delta": {
+                    "rchar": 8680764640,
+                    "wchar": 20925169,
+                    "syscr": 2119236,
+                    "syscw": 271603,
+                    "read_bytes": 0,
+                    "write_bytes": 26058752,
+                    "cancelled_write_bytes": 0
+                  },
+                  "cgroup_cpu": {
+                    "comparable": true,
+                    "note": "cgroup subtree; throttled_usec is not a per-request I/O delay measurement",
+                    "path": "/user.slice/user-0.slice/session-752.scope",
+                    "direct_cpu_max": {
+                      "quota_usec": null,
+                      "period_usec": 100000,
+                      "quota_cores": null
+                    },
+                    "counters_delta": {
+                      "usage_usec": 54905021,
+                      "user_usec": 19125806,
+                      "system_usec": 35779215,
+                      "nr_periods": 0,
+                      "nr_throttled": 0,
+                      "throttled_usec": 0
+                    },
+                    "window_seconds": 30.020005842,
+                    "cpu_percent_of_one_core": 182.89477120348923
+                  }
+                },
+                "mysql": {
+                  "before": {
+                    "pid": 357251,
+                    "available": true,
+                    "monotonic_ns": 64914325928487,
+                    "start_ticks": 6479296,
+                    "user_ticks": 9944,
+                    "system_ticks": 6340,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 671172,
+                    "peak_rss_lifetime_kib": 671172,
+                    "io": {
+                      "rchar": 33008268467,
+                      "wchar": 16898324,
+                      "syscr": 2015872,
+                      "syscw": 976,
+                      "read_bytes": 32996806656,
+                      "write_bytes": 16748544,
+                      "cancelled_write_bytes": 16384
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/system.slice/docker-404c22f6a654912f78c802250f38ee9afc2f227c39d0c1a49466f0c562343c44.scope",
+                      "identity": [
+                        30,
+                        69846
+                      ],
+                      "counters": {
+                        "usage_usec": 163192724,
+                        "user_usec": 99625386,
+                        "system_usec": 63567338,
+                        "nr_periods": 1213,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": 200000,
+                        "period_usec": 100000,
+                        "quota_cores": 2.0
+                      }
+                    }
+                  },
+                  "after": {
+                    "pid": 357251,
+                    "available": true,
+                    "monotonic_ns": 64944346105968,
+                    "start_ticks": 6479296,
+                    "user_ticks": 12532,
+                    "system_ticks": 7953,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 671328,
+                    "peak_rss_lifetime_kib": 671328,
+                    "io": {
+                      "rchar": 41691673779,
+                      "wchar": 17063700,
+                      "syscr": 2545865,
+                      "syscw": 982,
+                      "read_bytes": 41680211968,
+                      "write_bytes": 17084416,
+                      "cancelled_write_bytes": 16384
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/system.slice/docker-404c22f6a654912f78c802250f38ee9afc2f227c39d0c1a49466f0c562343c44.scope",
+                      "identity": [
+                        30,
+                        69846
+                      ],
+                      "counters": {
+                        "usage_usec": 205197901,
+                        "user_usec": 125499965,
+                        "system_usec": 79697936,
+                        "nr_periods": 1513,
+                        "nr_throttled": 2,
+                        "throttled_usec": 9195
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": 200000,
+                        "period_usec": 100000,
+                        "quota_cores": 2.0
+                      }
+                    }
+                  },
+                  "comparable": true,
+                  "window_seconds": 30.020177481,
+                  "user_cpu_seconds": 25.88,
+                  "system_cpu_seconds": 16.13,
+                  "cpu_percent_of_one_core": 139.93921263986013,
+                  "io_delta": {
+                    "rchar": 8683405312,
+                    "wchar": 165376,
+                    "syscr": 529993,
+                    "syscw": 6,
+                    "read_bytes": 8683405312,
+                    "write_bytes": 335872,
+                    "cancelled_write_bytes": 0
+                  },
+                  "cgroup_cpu": {
+                    "comparable": true,
+                    "note": "cgroup subtree; throttled_usec is not a per-request I/O delay measurement",
+                    "path": "/system.slice/docker-404c22f6a654912f78c802250f38ee9afc2f227c39d0c1a49466f0c562343c44.scope",
+                    "direct_cpu_max": {
+                      "quota_usec": 200000,
+                      "period_usec": 100000,
+                      "quota_cores": 2.0
+                    },
+                    "counters_delta": {
+                      "usage_usec": 42005177,
+                      "user_usec": 25874579,
+                      "system_usec": 16130598,
+                      "nr_periods": 300,
+                      "nr_throttled": 2,
+                      "throttled_usec": 9195
+                    },
+                    "window_seconds": 30.020177481,
+                    "cpu_percent_of_one_core": 139.92314677881367,
+                    "throttled_periods_percent": 0.6666666666666666
+                  }
+                },
+                "nbd_client": {
+                  "before": {
+                    "pid": 357192,
+                    "available": true,
+                    "monotonic_ns": 64914326092513,
+                    "start_ticks": 6479274,
+                    "user_ticks": 0,
+                    "system_ticks": 0,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 6388,
+                    "peak_rss_lifetime_kib": 6388,
+                    "io": {
+                      "rchar": 9504,
+                      "wchar": 235,
+                      "syscr": 16,
+                      "syscw": 1,
+                      "read_bytes": 0,
+                      "write_bytes": 4096,
+                      "cancelled_write_bytes": 0
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/user.slice/user-0.slice/session-752.scope",
+                      "identity": [
+                        30,
+                        68532
+                      ],
+                      "counters": {
+                        "usage_usec": 525496313,
+                        "user_usec": 181481353,
+                        "system_usec": 344014959,
+                        "nr_periods": 0,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": null,
+                        "period_usec": 100000,
+                        "quota_cores": null
+                      }
+                    }
+                  },
+                  "after": {
+                    "pid": 357192,
+                    "available": true,
+                    "monotonic_ns": 64944346273098,
+                    "start_ticks": 6479274,
+                    "user_ticks": 0,
+                    "system_ticks": 0,
+                    "clock_ticks_per_second": 100,
+                    "rss_kib": 6388,
+                    "peak_rss_lifetime_kib": 6388,
+                    "io": {
+                      "rchar": 9504,
+                      "wchar": 235,
+                      "syscr": 16,
+                      "syscw": 1,
+                      "read_bytes": 0,
+                      "write_bytes": 4096,
+                      "cancelled_write_bytes": 0
+                    },
+                    "cgroup_cpu": {
+                      "available": true,
+                      "version": 2,
+                      "path": "/user.slice/user-0.slice/session-752.scope",
+                      "identity": [
+                        30,
+                        68532
+                      ],
+                      "counters": {
+                        "usage_usec": 580400330,
+                        "user_usec": 200606155,
+                        "system_usec": 379794174,
+                        "nr_periods": 0,
+                        "nr_throttled": 0,
+                        "throttled_usec": 0
+                      },
+                      "direct_cpu_max": {
+                        "quota_usec": null,
+                        "period_usec": 100000,
+                        "quota_cores": null
+                      }
+                    }
+                  },
+                  "comparable": true,
+                  "window_seconds": 30.020180585,
+                  "user_cpu_seconds": 0.0,
+                  "system_cpu_seconds": 0.0,
+                  "cpu_percent_of_one_core": 0.0,
+                  "io_delta": {
+                    "rchar": 0,
+                    "wchar": 0,
+                    "syscr": 0,
+                    "syscw": 0,
+                    "read_bytes": 0,
+                    "write_bytes": 0,
+                    "cancelled_write_bytes": 0
+                  },
+                  "cgroup_cpu": {
+                    "comparable": true,
+                    "note": "cgroup subtree; throttled_usec is not a per-request I/O delay measurement",
+                    "path": "/user.slice/user-0.slice/session-752.scope",
+                    "direct_cpu_max": {
+                      "quota_usec": null,
+                      "period_usec": 100000,
+                      "quota_cores": null
+                    },
+                    "counters_delta": {
+                      "usage_usec": 54904017,
+                      "user_usec": 19124802,
+                      "system_usec": 35779215,
+                      "nr_periods": 0,
+                      "nr_throttled": 0,
+                      "throttled_usec": 0
+                    },
+                    "window_seconds": 30.020180585,
+                    "cpu_percent_of_one_core": 182.89036218334263
+                  }
+                }
+              },
+              "host_cpu": {
+                "comparable": true,
+                "ticks_delta": [
+                  4497,
+                  0,
+                  4891,
+                  138,
+                  1243,
+                  0,
+                  1024,
+                  0
+                ],
+                "busy_percent": 88.2896633596201,
+                "iowait_percent": 10.540150936996524,
+                "note": "host aggregate; includes other services"
+              },
+              "sysbench": {
+                "window_seconds": 30.019494031999784,
+                "user_cpu_seconds": 2.322409999999998,
+                "system_cpu_seconds": 4.031034000000002,
+                "cpu_percent_of_one_core": 21.16439402085671
+              }
+            }
+          }
+        ]
+      },
+      "sample_count": 3,
+      "sample_seconds": 30,
+      "latency_percentile": 99,
+      "trace_engine": false,
+      "transport": "nbd",
+      "warmup_seconds": 60,
+      "startup_seconds": 1.3720134800023516,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+        "config_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1-config.toml",
+        "config_sha256": "d34a3a328a57de4f80b688df87c61dd028f00737c8d28a82ab28d252f6fea161",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1-config.toml",
+        "legacy_config": true,
+        "options": {
+          "checkpoint_seconds": 5,
+          "disk_cache_mib": 4096,
+          "flush_batch_us": 0,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 64,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "sync_data_only": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "resource_window_note": "/proc snapshots bracket each sysbench process including its setup/exit; process CPU includes all threads; peak RSS is lifetime high water, not the isolated window maximum",
+      "table_file_bytes": 1040187392,
+      "random_distribution": "uniform",
+      "ssd_cache_bytes_before_samples": 2049413120,
+      "engine_rss_kib_before_samples": 147372,
+      "engine_peak_rss_kib_before_samples": 166816,
+      "engine_memory_cache_mib": 64,
+      "engine_disk_cache_mib": 4096,
+      "database_recovery_seconds": 1.3549654480011668,
+      "database_SIGKILL_recovery": "passed"
+    }
+  },
+  "complete": true,
+  "binary_path": {
+    "infinidisk2": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+    "zerofs": "/usr/local/bin/zerofs"
+  },
+  "requested_engine_options": {
+    "logical_cache": true,
+    "wal_fixed_size": true,
+    "wal_commit_records": true,
+    "sync_data_only": true,
+    "wal_preallocate": false,
+    "wal_writev": true,
+    "flush_batch_us": 0,
+    "checkpoint_seconds": 5,
+    "segment_mib": 8,
+    "max_pending_mib": 1024,
+    "hot_wal_mib": 0,
+    "max_inflight": 128,
+    "max_index_mib": 1024,
+    "memory_cache_mib": 64,
+    "disk_cache_mib": 4096,
+    "read_extent_kib": 64
+  },
+  "legacy_config": true,
+  "requested_engine_options_sha256": "8d9c3fe5b9e5ce11702c2900ca36a535b5f21ffa171bb6a0cde6688057ddaccc",
+  "engine_starts": {
+    "infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1": {
+      "engine": "infinidisk2",
+      "binary_path": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+      "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+      "config_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1-config.toml",
+      "config_sha256": "d34a3a328a57de4f80b688df87c61dd028f00737c8d28a82ab28d252f6fea161",
+      "config_snapshot_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1-config.toml",
+      "legacy_config": true,
+      "options": {
+        "checkpoint_seconds": 5,
+        "disk_cache_mib": 4096,
+        "flush_batch_us": 0,
+        "hot_wal_mib": 0,
+        "logical_cache": true,
+        "max_index_mib": 1024,
+        "max_inflight": 128,
+        "max_pending_mib": 1024,
+        "memory_cache_mib": 64,
+        "read_extent_kib": 64,
+        "segment_mib": 8,
+        "sync_data_only": true,
+        "wal_commit_records": true,
+        "wal_fixed_size": true,
+        "wal_preallocate": false,
+        "wal_writev": true
+      },
+      "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+    }
+  },
+  "preparation": {
+    "infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1": {
+      "warm_seconds": 407.12854447800055,
+      "warm_concurrency": null
+    }
+  }
+}

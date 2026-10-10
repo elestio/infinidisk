@@ -1,0 +1,534 @@
+{
+  "schema": "infinidisk2.astra.postgres-comparison.v1",
+  "id": "cde40aeb205e",
+  "started_utc": "2026-10-10T12:18:45.103702+00:00",
+  "work": "/root/infinidisk2/test-output/astra-postgres-cde40aeb205e",
+  "complete": true,
+  "binary_sha256": {
+    "astra": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+    "baseline": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+    "zerofs": "91651cb1894f77f6892d224bc119ac4a9bccabf1207d739f4ec71ff8c4e99e21",
+    "helper": "c37aa66e5917578c2584553b115168572188ef06c51703af26cae6ed6ad5d00a"
+  },
+  "source_files_sha256": {
+    "scripts/compare_zerofs.py": "c37aa66e5917578c2584553b115168572188ef06c51703af26cae6ed6ad5d00a",
+    "scripts/profiles/astra-recovery-core.json": "98cdcf516d792282f3c0d3d633acb817529f2b505feed2cf29f686be039a2193",
+    "scripts/run_astra_postgres_compare.py": "bfb4d353f5940e536e52192e886f44558a37379adbe6ff97d641ba3a22855cdc",
+    "scripts/run_astra_recovery.py": "70d86fe44c9de1827557d4ed6cc97e1355ec470c6acb4c9730ac779de2e5b9ff",
+    "scripts/validate_vm.py": "28824c36832b46452c4e00e48c4a112df9efbaa0c65fa523f47f50ae177362d9",
+    "scripts/run_astra_mysql.py": "f599c525fc0fb5908636c3b0db863acfd9db3835b4d52ffc0e5bfbcc1e3d2311"
+  },
+  "binary_paths": {
+    "astra": "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+    "baseline": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+    "zerofs": "/usr/local/bin/zerofs"
+  },
+  "image": {
+    "Id": "sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d",
+    "RepoDigests": [
+      "postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d"
+    ],
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Created": "2026-10-06T01:33:18.890712895Z"
+  },
+  "protocol": {
+    "image_reference": "postgres:16",
+    "scale": 2,
+    "clients": 4,
+    "jobs": 4,
+    "samples": 3,
+    "sample_seconds": 15,
+    "cpu_limit": 1,
+    "memory_mib": 512,
+    "fsync": "on",
+    "synchronous_commit": "on",
+    "full_page_writes": "on",
+    "data_checksums": "on",
+    "warmup": "none, matching compare_zerofs.py --postgres-only; initialization precedes samples",
+    "transport": "nbd",
+    "fresh_fixture_per_series": true,
+    "order": [
+      "native",
+      "baseline",
+      "astra",
+      "zerofs-durable"
+    ],
+    "astra_options": {
+      "aligned_wal": false,
+      "async_cache": true,
+      "cache_queue_mib": 16,
+      "checkpoint_pipeline": true,
+      "checkpoint_seconds": 5,
+      "compact_checkpoints": true,
+      "disk_cache_mib": 128,
+      "fast_local_reads": true,
+      "flush_batch_us": 0,
+      "generation_max_lag_seconds": 30,
+      "generation_mode": false,
+      "hot_wal_mib": 64,
+      "logical_cache": true,
+      "max_index_mib": 64,
+      "max_inflight": 128,
+      "max_pending_mib": 1024,
+      "memory_cache_mib": 64,
+      "paged_index": true,
+      "read_extent_kib": 64,
+      "segment_mib": 8,
+      "selective_sync": true,
+      "sync_data_only": true,
+      "ublk_fast_path": false,
+      "wal_commit_records": true,
+      "wal_fixed_size": true,
+      "wal_preallocate": false,
+      "wal_writev": true
+    },
+    "baseline_options": {
+      "logical_cache": true,
+      "wal_fixed_size": true,
+      "wal_commit_records": true,
+      "sync_data_only": true,
+      "wal_preallocate": false,
+      "wal_writev": true,
+      "flush_batch_us": 0,
+      "checkpoint_seconds": 5,
+      "segment_mib": 8,
+      "max_pending_mib": 1024,
+      "hot_wal_mib": 64,
+      "max_inflight": 128,
+      "max_index_mib": 64,
+      "memory_cache_mib": 64,
+      "disk_cache_mib": 128,
+      "read_extent_kib": 64
+    },
+    "options_delta": {
+      "aligned_wal": {
+        "baseline": "not supported by the legacy binary",
+        "astra": false
+      },
+      "async_cache": {
+        "baseline": "not supported by the legacy binary",
+        "astra": true
+      },
+      "cache_queue_mib": {
+        "baseline": "not supported by the legacy binary",
+        "astra": 16
+      },
+      "checkpoint_pipeline": {
+        "baseline": "not supported by the legacy binary",
+        "astra": true
+      },
+      "compact_checkpoints": {
+        "baseline": "not supported by the legacy binary",
+        "astra": true
+      },
+      "fast_local_reads": {
+        "baseline": "not supported by the legacy binary",
+        "astra": true
+      },
+      "generation_max_lag_seconds": {
+        "baseline": "not supported by the legacy binary",
+        "astra": 30
+      },
+      "generation_mode": {
+        "baseline": "not supported by the legacy binary",
+        "astra": false
+      },
+      "paged_index": {
+        "baseline": "not supported by the legacy binary",
+        "astra": true
+      },
+      "selective_sync": {
+        "baseline": "not supported by the legacy binary",
+        "astra": true
+      },
+      "ublk_fast_path": {
+        "baseline": "not supported by the legacy binary",
+        "astra": false
+      }
+    },
+    "baseline_profile_source": "scripts/run_astra_mysql.py:options(small, baseline), matching only RAM/SSD/index/hot-WAL budgets to Astra",
+    "legacy_equivalent_modes": {
+      "aligned_wal": false,
+      "generation_mode": false
+    },
+    "measurement_window_seconds": 180,
+    "zerofs_cache_memory_mib": 64,
+    "zerofs_cache_disk_mib": 128,
+    "limitations": "Sequential tests on a shared VM; fixed order, no host page-cache drop. Configured caches do not bound total RAM. Both InfiniDisk2 binaries retain 64 MiB of hot WAL. pgbench reports mean latency, not p99. The three storage durability contracts differ.",
+    "zerofs_async": "not_run: the current helper only exposes ignored fsync through the roomy-cache repeat (1 GiB RAM/4 GiB SSD), which would change two variables. A fresh-fixture ignore_fsync flag is needed."
+  },
+  "contracts": {
+    "native": "PostgreSQL fsync on the VM filesystem; acknowledged commits rely on the local disk.",
+    "baseline": "Pre-Astra: FLUSH/FUA durable in the local WAL; S3 publication asynchronous. Previous logical cache, fixed WAL, commit markers, writev and sync_data_only retained; legacy format without aligned WAL or generation rollback.",
+    "astra": "FLUSH/FUA durable in the local WAL; S3 publication asynchronous. recovery-core, aligned_wal=false, generation_mode=false.",
+    "zerofs-durable": "ignore_fsync=false: FLUSH/FUA publishes extents and metadata to S3; stronger remote commit contract than local fsync."
+  },
+  "series": {
+    "native": {
+      "settings": [
+        "on",
+        "on",
+        "on",
+        "on"
+      ],
+      "samples": [
+        {
+          "tps": 4974.314817,
+          "latency_ms": 0.804,
+          "failed_transactions": 0
+        },
+        {
+          "tps": 4810.153659,
+          "latency_ms": 0.832,
+          "failed_transactions": 0
+        },
+        {
+          "tps": 4833.823164,
+          "latency_ms": 0.828,
+          "failed_transactions": 0
+        }
+      ],
+      "scale": 2,
+      "clients": 4,
+      "cpu_limit": 1,
+      "memory_mib": 512,
+      "container": {
+        "image": "sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d",
+        "nano_cpus": 1000000000,
+        "memory_bytes": 536870912,
+        "mounts": [
+          {
+            "Destination": "/var/lib/postgresql/data",
+            "Mode": "",
+            "Propagation": "rprivate",
+            "RW": true,
+            "Source": "/root/infinidisk2/test-output/astra-postgres-cde40aeb205e/native-data",
+            "Type": "bind"
+          }
+        ]
+      },
+      "integrity": "sums and pg_amcheck passed",
+      "database_SIGKILL_recovery": "not_run: comparison only; helper crash checks are separate evidence",
+      "contract": "PostgreSQL fsync on the VM filesystem; acknowledged commits rely on the local disk.",
+      "median_tps": 4833.823164,
+      "median_mean_latency_ms": 0.828
+    },
+    "baseline": {
+      "settings": [
+        "on",
+        "on",
+        "on",
+        "on"
+      ],
+      "samples": [
+        {
+          "tps": 1778.975271,
+          "latency_ms": 2.248,
+          "failed_transactions": 0
+        },
+        {
+          "tps": 1814.684743,
+          "latency_ms": 2.204,
+          "failed_transactions": 0
+        },
+        {
+          "tps": 1776.046087,
+          "latency_ms": 2.252,
+          "failed_transactions": 0
+        }
+      ],
+      "scale": 2,
+      "clients": 4,
+      "cpu_limit": 1,
+      "memory_mib": 512,
+      "database_SIGKILL_recovery": "passed",
+      "container": {
+        "image": "sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d",
+        "nano_cpus": 1000000000,
+        "memory_bytes": 536870912,
+        "mounts": [
+          {
+            "Destination": "/var/lib/postgresql/data",
+            "Mode": "",
+            "Propagation": "rprivate",
+            "RW": true,
+            "Source": "/root/infinidisk2/test-output/comparison-c14071d062a3/mount/postgres",
+            "Type": "bind"
+          }
+        ]
+      },
+      "source_work": "/root/infinidisk2/test-output/comparison-c14071d062a3",
+      "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+      "engine_options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 64,
+        "max_inflight": 128,
+        "max_index_mib": 64,
+        "memory_cache_mib": 64,
+        "disk_cache_mib": 128,
+        "read_extent_kib": 64
+      },
+      "legacy_config": true,
+      "engine_starts": {
+        "infinidisk2-initial": {
+          "engine": "infinidisk2",
+          "binary_path": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+          "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+          "config_path": "/root/infinidisk2/test-output/comparison-c14071d062a3/infinidisk2.toml",
+          "config_sha256": "eb93ebf9ac81cfd613c0b0242408dffd5b15999725562cd69a0bb469f8406595",
+          "config_snapshot_path": "/root/infinidisk2/test-output/comparison-c14071d062a3/infinidisk2-initial-config.toml",
+          "legacy_config": true,
+          "options": {
+            "checkpoint_seconds": 5,
+            "disk_cache_mib": 128,
+            "flush_batch_us": 0,
+            "hot_wal_mib": 64,
+            "logical_cache": true,
+            "max_index_mib": 64,
+            "max_inflight": 128,
+            "max_pending_mib": 1024,
+            "memory_cache_mib": 64,
+            "read_extent_kib": 64,
+            "segment_mib": 8,
+            "sync_data_only": true,
+            "wal_commit_records": true,
+            "wal_fixed_size": true,
+            "wal_preallocate": false,
+            "wal_writev": true
+          },
+          "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+        }
+      },
+      "source_report": "cde40aeb205e/baseline/report.json",
+      "contract": "Pre-Astra: FLUSH/FUA durable in the local WAL; S3 publication asynchronous. Previous logical cache, fixed WAL, commit markers, writev and sync_data_only retained; legacy format without aligned WAL or generation rollback.",
+      "median_tps": 1778.975271,
+      "median_mean_latency_ms": 2.248
+    },
+    "astra": {
+      "settings": [
+        "on",
+        "on",
+        "on",
+        "on"
+      ],
+      "samples": [
+        {
+          "tps": 2671.645579,
+          "latency_ms": 1.497,
+          "failed_transactions": 0
+        },
+        {
+          "tps": 3010.109295,
+          "latency_ms": 1.329,
+          "failed_transactions": 0
+        },
+        {
+          "tps": 2937.57224,
+          "latency_ms": 1.362,
+          "failed_transactions": 0
+        }
+      ],
+      "scale": 2,
+      "clients": 4,
+      "cpu_limit": 1,
+      "memory_mib": 512,
+      "database_SIGKILL_recovery": "passed",
+      "container": {
+        "image": "sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d",
+        "nano_cpus": 1000000000,
+        "memory_bytes": 536870912,
+        "mounts": [
+          {
+            "Destination": "/var/lib/postgresql/data",
+            "Mode": "",
+            "Propagation": "rprivate",
+            "RW": true,
+            "Source": "/root/infinidisk2/test-output/comparison-d99e8aec06f0/mount/postgres",
+            "Type": "bind"
+          }
+        ]
+      },
+      "source_work": "/root/infinidisk2/test-output/comparison-d99e8aec06f0",
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "engine_options": {
+        "aligned_wal": false,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "checkpoint_pipeline": true,
+        "checkpoint_seconds": 5,
+        "compact_checkpoints": true,
+        "disk_cache_mib": 128,
+        "fast_local_reads": true,
+        "flush_batch_us": 0,
+        "generation_max_lag_seconds": 30,
+        "generation_mode": false,
+        "hot_wal_mib": 64,
+        "logical_cache": true,
+        "max_index_mib": 64,
+        "max_inflight": 128,
+        "max_pending_mib": 1024,
+        "memory_cache_mib": 64,
+        "paged_index": true,
+        "read_extent_kib": 64,
+        "segment_mib": 8,
+        "selective_sync": true,
+        "sync_data_only": true,
+        "ublk_fast_path": false,
+        "wal_commit_records": true,
+        "wal_fixed_size": true,
+        "wal_preallocate": false,
+        "wal_writev": true
+      },
+      "legacy_config": false,
+      "engine_starts": {
+        "infinidisk2-initial": {
+          "engine": "infinidisk2",
+          "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+          "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+          "config_path": "/root/infinidisk2/test-output/comparison-d99e8aec06f0/infinidisk2.toml",
+          "config_sha256": "4438a0bb359ac18a29c54d048ce426b7bd324f3ae524069e247e984ac59fb2c1",
+          "config_snapshot_path": "/root/infinidisk2/test-output/comparison-d99e8aec06f0/infinidisk2-initial-config.toml",
+          "legacy_config": false,
+          "options": {
+            "aligned_wal": false,
+            "async_cache": true,
+            "cache_queue_mib": 16,
+            "checkpoint_pipeline": true,
+            "checkpoint_seconds": 5,
+            "compact_checkpoints": true,
+            "disk_cache_mib": 128,
+            "fast_local_reads": true,
+            "flush_batch_us": 0,
+            "generation_max_lag_seconds": 30,
+            "generation_mode": false,
+            "hot_wal_mib": 64,
+            "logical_cache": true,
+            "max_index_mib": 64,
+            "max_inflight": 128,
+            "max_pending_mib": 1024,
+            "memory_cache_mib": 64,
+            "paged_index": true,
+            "read_extent_kib": 64,
+            "segment_mib": 8,
+            "selective_sync": true,
+            "sync_data_only": true,
+            "ublk_fast_path": false,
+            "wal_commit_records": true,
+            "wal_fixed_size": true,
+            "wal_preallocate": false,
+            "wal_writev": true
+          },
+          "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+        }
+      },
+      "source_report": "cde40aeb205e/astra/report.json",
+      "contract": "FLUSH/FUA durable in the local WAL; S3 publication asynchronous. recovery-core, aligned_wal=false, generation_mode=false.",
+      "median_tps": 2937.57224,
+      "median_mean_latency_ms": 1.362
+    },
+    "zerofs-durable": {
+      "settings": [
+        "on",
+        "on",
+        "on",
+        "on"
+      ],
+      "samples": [
+        {
+          "tps": 0.612606,
+          "latency_ms": 6529.479,
+          "failed_transactions": 0
+        },
+        {
+          "tps": 0.822977,
+          "latency_ms": 4860.403,
+          "failed_transactions": 0
+        },
+        {
+          "tps": 0.863655,
+          "latency_ms": 4631.479,
+          "failed_transactions": 0
+        }
+      ],
+      "scale": 2,
+      "clients": 4,
+      "cpu_limit": 1,
+      "memory_mib": 512,
+      "database_SIGKILL_recovery": "passed",
+      "container": {
+        "image": "sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d",
+        "nano_cpus": 1000000000,
+        "memory_bytes": 536870912,
+        "mounts": [
+          {
+            "Destination": "/var/lib/postgresql/data",
+            "Mode": "",
+            "Propagation": "rprivate",
+            "RW": true,
+            "Source": "/root/infinidisk2/test-output/comparison-a7d403575484/mount/postgres",
+            "Type": "bind"
+          }
+        ]
+      },
+      "source_work": "/root/infinidisk2/test-output/comparison-a7d403575484",
+      "binary_sha256": "91651cb1894f77f6892d224bc119ac4a9bccabf1207d739f4ec71ff8c4e99e21",
+      "engine_options": {},
+      "legacy_config": false,
+      "engine_starts": {},
+      "source_report": "cde40aeb205e/zerofs-durable/report.json",
+      "contract": "ignore_fsync=false: FLUSH/FUA publishes extents and metadata to S3; stronger remote commit contract than local fsync.",
+      "median_tps": 0.822977,
+      "median_mean_latency_ms": 4860.403
+    }
+  },
+  "stages": [
+    {
+      "label": "native",
+      "started_utc": "2026-10-10T12:18:45.214570+00:00",
+      "complete": true,
+      "binary_sha256": null,
+      "finished_utc": "2026-10-10T12:19:32.104442+00:00"
+    },
+    {
+      "label": "baseline",
+      "started_utc": "2026-10-10T12:19:32.205905+00:00",
+      "complete": true,
+      "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+      "finished_utc": "2026-10-10T12:20:23.369603+00:00"
+    },
+    {
+      "label": "astra",
+      "started_utc": "2026-10-10T12:20:23.476831+00:00",
+      "complete": true,
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "finished_utc": "2026-10-10T12:21:14.134653+00:00"
+    },
+    {
+      "label": "zerofs-durable",
+      "started_utc": "2026-10-10T12:21:14.239484+00:00",
+      "complete": true,
+      "binary_sha256": "91651cb1894f77f6892d224bc119ac4a9bccabf1207d739f4ec71ff8c4e99e21",
+      "finished_utc": "2026-10-10T12:25:09.544480+00:00"
+    }
+  ],
+  "source_snapshot_is_build_attestation": false,
+  "ratios": {
+    "astra_over_baseline_tps": 1.651272104726182,
+    "astra_over_native_tps": 0.6077119787661309,
+    "astra_over_zerofs_durable_tps": 3569.4463393266155,
+    "baseline_over_astra_mean_latency": 1.6505139500734214
+  },
+  "finished_utc": "2026-10-10T12:25:09.546789+00:00",
+  "source_report": "cde40aeb205e/report.json",
+  "source_manifest": "cde40aeb205e/manifest.json"
+}

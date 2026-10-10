@@ -1,0 +1,45 @@
+warning: value assigned to `phase` is never read
+   --> src/ublk.rs:468:21
+    |
+468 |                     phase = "decode_request";
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^ this value is reassigned later and never used
+...
+482 |                             phase = "send_to_engine";
+    |                             ------------------------ `phase` is overwritten here before the previous value is read
+    |
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: `infinidisk2` (lib) generated 1 warning
+warning: `infinidisk2` (lib test) generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running unittests src/lib.rs (target/debug/deps/infinidisk2-94c38aa628d9e8b0)
+
+running 1 test
+test ublk::tests::queue_runtime_delivers_cross_runtime_completions ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 59 filtered out; finished in 0.16s
+
+     Running unittests src/main.rs (target/debug/deps/infinidisk2-84756ed02f315b75)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/astra_engine.rs (target/debug/deps/astra_engine-0737584b48696f82)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.00s
+
+     Running tests/astra_regressions.rs (target/debug/deps/astra_regressions-247428c220ead9dc)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/nbd_protocol.rs (target/debug/deps/nbd_protocol-f8c0016db1097a88)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+

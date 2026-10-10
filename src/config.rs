@@ -39,6 +39,29 @@ pub struct Config {
     pub wal_fixed_size: bool,
     /// Maximum additional delay to merge concurrent flush requests.
     pub flush_batch_us: u64,
+    /// Experimental disposable cache fills outside the write acknowledgement path.
+    pub async_cache: bool,
+    /// Bound the cache worker's queued and executing payloads.
+    pub cache_queue_mib: usize,
+    /// Batch local reads per request and partition the logical cache.
+    pub fast_local_reads: bool,
+    /// Prepare fixed WAL files before rotation and snapshot checkpoint metadata.
+    pub checkpoint_pipeline: bool,
+    /// Avoid resynchronizing immutable files already covered by a durable frontier.
+    pub selective_sync: bool,
+    /// Experimental persistent ublk workers and shared completion notification.
+    pub ublk_fast_path: bool,
+    /// New-volume format: recover ONLY a complete S3 generation after restart.
+    /// FLUSH/FUA order writes but do not promise per-transaction persistence.
+    pub generation_mode: bool,
+    /// Stop accepting writes when the oldest unpublished generation is this old.
+    pub generation_max_lag_seconds: u64,
+    /// Rebuildable SSD index with a bounded resident shard cache.
+    pub paged_index: bool,
+    /// Publish only final page versions at each checkpoint.
+    pub compact_checkpoints: bool,
+    /// Experimental IDWAL002 aligned records (old readers reject this format).
+    pub aligned_wal: bool,
 }
 impl Default for Config {
     fn default() -> Self {
@@ -64,6 +87,17 @@ impl Default for Config {
             wal_commit_records: false,
             wal_fixed_size: false,
             flush_batch_us: 0,
+            async_cache: false,
+            cache_queue_mib: 16,
+            fast_local_reads: false,
+            checkpoint_pipeline: false,
+            selective_sync: false,
+            ublk_fast_path: false,
+            generation_mode: false,
+            generation_max_lag_seconds: 30,
+            paged_index: false,
+            compact_checkpoints: false,
+            aligned_wal: false,
         }
     }
 }
@@ -85,6 +119,16 @@ impl Config {
         );
         ensure!(c.memory_cache_mib <= 16384, "memory cache too large");
         ensure!(
+            !c.generation_mode
+                || (c.generation_max_lag_seconds >= c.checkpoint_seconds
+                    && c.generation_max_lag_seconds <= 3600),
+            "invalid generation lag bound"
+        );
+        ensure!(
+            (1..=128).contains(&c.cache_queue_mib),
+            "invalid cache queue budget"
+        );
+        ensure!(
             [16, 64, 256].contains(&c.read_extent_kib),
             "read_extent_kib must be 16, 64 or 256"
         );
@@ -103,6 +147,52 @@ impl Config {
             c.max_index_mib > 0 && c.max_index_mib <= 65536,
             "invalid index limit"
         );
+        if c.checkpoint_pipeline {
+            ensure!(
+                c.wal_fixed_size,
+                "checkpoint_pipeline requires wal_fixed_size"
+            );
+        }
+        if c.wal_fixed_size {
+            let units = if c.checkpoint_pipeline { 5 } else { 2 };
+            ensure!(
+                c.max_pending_mib * 1024 * 1024 >= crate::wal_pool::capacity(&c) * units,
+                "pending WAL budget must hold two initialized segments plus any preparation pool"
+            );
+        }
         Ok(c)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn fixed_wal_budget_is_validated_using_physical_capacity() -> Result<()> {
+        let directory = tempfile::tempdir()?;
+        let path = directory.path().join("config.toml");
+        let mut config = Config {
+            local_dir: directory.path().join("volume"),
+            wal_fixed_size: true,
+            segment_mib: 16,
+            max_pending_mib: 32,
+            ..Config::default()
+        };
+        for (pipeline, budget, valid) in [
+            (false, 32, false),
+            (false, 49, true),
+            (true, 49, false),
+            (true, 121, true),
+        ] {
+            config.checkpoint_pipeline = pipeline;
+            config.max_pending_mib = budget;
+            std::fs::write(&path, toml::to_string(&config)?)?;
+            assert_eq!(
+                Config::load(&path).is_ok(),
+                valid,
+                "pipeline={pipeline}, budget={budget}"
+            );
+        }
+        Ok(())
     }
 }

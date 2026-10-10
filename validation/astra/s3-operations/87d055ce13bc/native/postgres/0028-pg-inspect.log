@@ -1,0 +1,1 @@
+{"image":"sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d","nano_cpus":1000000000,"memory_bytes":536870912,"mounts":[{"Destination":"/var/lib/postgresql/data","Mode":"","Propagation":"rprivate","RW":true,"Source":"/root/infinidisk2/test-output/s3-operations-87d055ce13bc/native/postgres/mount/postgres","Type":"bind"}]}

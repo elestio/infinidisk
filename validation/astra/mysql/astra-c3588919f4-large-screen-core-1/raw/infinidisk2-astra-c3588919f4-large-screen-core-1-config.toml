@@ -1,0 +1,69 @@
+local_dir = "/root/infinidisk2/test-output/comparison-be4ba51a4a38/initial-infinidisk2-local"
+store = "s3://testperf-6czebk/infinidisk2-comparison-be4ba51a4a38/infinidisk2"
+endpoint = "https://storage.elestio.com"
+region = "auto"
+listen = "127.0.0.1:11991"
+
+
+
+
+
+
+
+
+
+
+
+aligned_wal = false
+
+async_cache = true
+
+cache_queue_mib = 16
+
+checkpoint_pipeline = false
+
+checkpoint_seconds = 5
+
+compact_checkpoints = false
+
+disk_cache_mib = 4096
+
+fast_local_reads = true
+
+flush_batch_us = 0
+
+generation_max_lag_seconds = 30
+
+generation_mode = false
+
+hot_wal_mib = 0
+
+logical_cache = true
+
+max_index_mib = 1024
+
+max_inflight = 128
+
+max_pending_mib = 1024
+
+memory_cache_mib = 64
+
+paged_index = false
+
+read_extent_kib = 64
+
+segment_mib = 8
+
+selective_sync = true
+
+sync_data_only = true
+
+ublk_fast_path = false
+
+wal_commit_records = true
+
+wal_fixed_size = true
+
+wal_preallocate = false
+
+wal_writev = true

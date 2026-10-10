@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-10T09:56:36.232925+00:00",
+  "source": "read-only mapping of ublk command descriptor through duplicated existing file descriptor; no user data buffers",
+  "records": [
+    {
+      "qid": 3,
+      "tag": 27,
+      "error": "[Errno 22] Invalid argument"
+    }
+  ]
+}

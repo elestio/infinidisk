@@ -1,0 +1,5149 @@
+{
+  "campaign": "astra-c3588919f4",
+  "created_utc": "2026-10-10T08:52:27.246660+00:00",
+  "complete": true,
+  "stages": [
+    {
+      "label": "small-screen-baseline-before",
+      "size": "small",
+      "profile": "baseline",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-small-screen-baseline-before-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T08:52:27.272474+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-small-screen-baseline-before-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "write_only",
+        "read_write",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-small-screen-baseline-before-1/options.json",
+        "--legacy-config"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 1024,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64
+      },
+      "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+      "samples": 1,
+      "workloads": [
+        "write_only",
+        "read_write"
+      ],
+      "load_before": [
+        0.2646484375,
+        0.3544921875,
+        0.26611328125
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "seconds": 80.4113701929964,
+      "ended_utc": "2026-10-10T08:53:47.692778+00:00",
+      "load_after": [
+        3.66015625,
+        1.30517578125,
+        0.6015625
+      ],
+      "proof_report": "astra-c3588919f4-small-screen-baseline-before-1/comparison.json",
+      "summary": {
+        "write_only": {
+          "samples": 1,
+          "tps": [
+            1282.14
+          ],
+          "median_tps": 1282.14,
+          "p99_ms": [
+            21.89
+          ],
+          "median_p99_ms": 21.89,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 34.05014800122219,
+          "median_mysql_cpu_percent_of_one_core": 44.11195951709115,
+          "mysql_throttled_periods_percent": [],
+          "median_mysql_throttled_periods_percent": null,
+          "mysql_throttled_usec": []
+        },
+        "read_write": {
+          "samples": 1,
+          "tps": [
+            937.44
+          ],
+          "median_tps": 937.44,
+          "p99_ms": [
+            24.83
+          ],
+          "median_p99_ms": 24.83,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 33.821590317598854,
+          "median_mysql_cpu_percent_of_one_core": 86.0185748744938,
+          "mysql_throttled_periods_percent": [],
+          "median_mysql_throttled_periods_percent": null,
+          "mysql_throttled_usec": []
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+        "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-screen-baseline-before-1-config.toml",
+        "config_sha256": "c9cd4074468c798c318282ebfcb04a4900670e6c2fafb98bf7d530b2c6db7750",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-screen-baseline-before-1-config.toml",
+        "legacy_config": true,
+        "options": {
+          "checkpoint_seconds": 5,
+          "disk_cache_mib": 4096,
+          "flush_batch_us": 0,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 1024,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "sync_data_only": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "complete": true,
+      "proof_digest_checked_utc": "2026-10-10T11:13:02.509476+00:00",
+      "proof_report_sha256": "696250f44096a1828001b3f2c10ebde8b4d06825a707b74352bff4e657830b10",
+      "evidence_scope": "exploratory_screening",
+      "retained_for_selection_only": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "exploratory_screening_only"
+      ]
+    },
+    {
+      "label": "small-screen-core",
+      "size": "small",
+      "profile": "core",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-small-screen-core-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T08:53:47.741171+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-small-screen-core-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "write_only",
+        "read_write",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-small-screen-core-1/options.json"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 1024,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": false,
+        "selective_sync": true,
+        "ublk_fast_path": false,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": false,
+        "compact_checkpoints": false,
+        "aligned_wal": false
+      },
+      "binary_sha256": "13b4b02d5037c26d99ff60b6e12b3637a66731daf694899d3c42033a83471672",
+      "samples": 1,
+      "workloads": [
+        "write_only",
+        "read_write"
+      ],
+      "load_before": [
+        3.66015625,
+        1.30517578125,
+        0.6015625
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "seconds": 288.60213384099916,
+      "ended_utc": "2026-10-10T08:58:36.352286+00:00",
+      "load_after": [
+        0.60986328125,
+        1.59521484375,
+        1.001953125
+      ],
+      "proof_report": "astra-c3588919f4-small-screen-core-1/comparison.json",
+      "summary": {
+        "write_only": {
+          "samples": 1,
+          "tps": [
+            2227.67
+          ],
+          "median_tps": 2227.67,
+          "p99_ms": [
+            18.95
+          ],
+          "median_p99_ms": 18.95,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 47.418092101039775
+        },
+        "read_write": {
+          "samples": 1,
+          "tps": [
+            998.79
+          ],
+          "median_tps": 998.79,
+          "p99_ms": [
+            45.79
+          ],
+          "median_p99_ms": 45.79,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 36.07468228773487
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra",
+        "binary_sha256": "13b4b02d5037c26d99ff60b6e12b3637a66731daf694899d3c42033a83471672",
+        "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-screen-core-1-config.toml",
+        "config_sha256": "24b6958144ecd038f6f46098e1e53c8d827f808298bf185d5ee93f4a3dcf09ae",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-screen-core-1-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": false,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": false,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 1024,
+          "paged_index": false,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": false,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "complete": true,
+      "superseded": true,
+      "superseded_reason": "qualified binary revision before screening selection; rerun required",
+      "evidence_scope": "exploratory_screening_prior_binary"
+    },
+    {
+      "label": "small-screen-core",
+      "size": "small",
+      "profile": "core",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-small-screen-core-2",
+      "attempt": 2,
+      "started_utc": "2026-10-10T08:58:57.909238+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-small-screen-core-2",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "write_only",
+        "read_write",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-small-screen-core-2/options.json"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 1024,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": false,
+        "selective_sync": true,
+        "ublk_fast_path": false,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": false,
+        "compact_checkpoints": false,
+        "aligned_wal": false
+      },
+      "binary_sha256": "839abdf0cec29812ba280cf24c26ed8f122970fb76195d5241f38c98f736d5e9",
+      "samples": 1,
+      "workloads": [
+        "write_only",
+        "read_write"
+      ],
+      "load_before": [
+        0.43603515625,
+        1.49072265625,
+        0.97998046875
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "seconds": 80.70256424899708,
+      "ended_utc": "2026-10-10T09:00:18.620738+00:00",
+      "load_after": [
+        2.11669921875,
+        1.86328125,
+        1.162109375
+      ],
+      "proof_report": "astra-c3588919f4-small-screen-core-2/comparison.json",
+      "summary": {
+        "write_only": {
+          "samples": 1,
+          "tps": [
+            1908.26
+          ],
+          "median_tps": 1908.26,
+          "p99_ms": [
+            21.11
+          ],
+          "median_p99_ms": 21.11,
+          "ignored_errors": 1,
+          "median_engine_cpu_percent_of_one_core": 47.530851653443875,
+          "median_mysql_cpu_percent_of_one_core": 71.74606921636304,
+          "mysql_throttled_periods_percent": [],
+          "median_mysql_throttled_periods_percent": null,
+          "mysql_throttled_usec": []
+        },
+        "read_write": {
+          "samples": 1,
+          "tps": [
+            929.1
+          ],
+          "median_tps": 929.1,
+          "p99_ms": [
+            45.79
+          ],
+          "median_p99_ms": 45.79,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 35.47269258679145,
+          "median_mysql_cpu_percent_of_one_core": 97.99117221304549,
+          "mysql_throttled_periods_percent": [],
+          "median_mysql_throttled_periods_percent": null,
+          "mysql_throttled_usec": []
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra",
+        "binary_sha256": "839abdf0cec29812ba280cf24c26ed8f122970fb76195d5241f38c98f736d5e9",
+        "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-screen-core-2-config.toml",
+        "config_sha256": "24b6958144ecd038f6f46098e1e53c8d827f808298bf185d5ee93f4a3dcf09ae",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-screen-core-2-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": false,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": false,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 1024,
+          "paged_index": false,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": false,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "complete": true,
+      "evidence_scope": "exploratory_screening_prior_binary",
+      "proof_digest_checked_utc": "2026-10-10T11:13:02.529569+00:00",
+      "proof_report_sha256": "157d84f1d60c3bff5a4cc333be0abe7205c5c80b2f2a9eeb0cf0462c7d791282",
+      "retained_for_selection_only": true,
+      "ignored_sql_errors_total": 1,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "ignored_sql_errors",
+        "exploratory_screening_only"
+      ]
+    },
+    {
+      "label": "small-screen-pipeline",
+      "size": "small",
+      "profile": "pipeline",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-small-screen-pipeline-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T09:00:18.666776+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-small-screen-pipeline-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "write_only",
+        "read_write",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-small-screen-pipeline-1/options.json"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 1024,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": true,
+        "selective_sync": true,
+        "ublk_fast_path": false,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": false,
+        "compact_checkpoints": false,
+        "aligned_wal": false
+      },
+      "binary_sha256": "839abdf0cec29812ba280cf24c26ed8f122970fb76195d5241f38c98f736d5e9",
+      "samples": 1,
+      "workloads": [
+        "write_only",
+        "read_write"
+      ],
+      "load_before": [
+        2.11669921875,
+        1.86328125,
+        1.162109375
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "seconds": 79.37369131799642,
+      "ended_utc": "2026-10-10T09:01:38.049665+00:00",
+      "load_after": [
+        5.30224609375,
+        3.03662109375,
+        1.63525390625
+      ],
+      "proof_report": "astra-c3588919f4-small-screen-pipeline-1/comparison.json",
+      "summary": {
+        "write_only": {
+          "samples": 1,
+          "tps": [
+            2017.63
+          ],
+          "median_tps": 2017.63,
+          "p99_ms": [
+            13.7
+          ],
+          "median_p99_ms": 13.7,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 42.61058339940077,
+          "median_mysql_cpu_percent_of_one_core": 68.29682530861926,
+          "mysql_throttled_periods_percent": [],
+          "median_mysql_throttled_periods_percent": null,
+          "mysql_throttled_usec": []
+        },
+        "read_write": {
+          "samples": 1,
+          "tps": [
+            1060.03
+          ],
+          "median_tps": 1060.03,
+          "p99_ms": [
+            44.17
+          ],
+          "median_p99_ms": 44.17,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 31.113810756014924,
+          "median_mysql_cpu_percent_of_one_core": 95.30676016978366,
+          "mysql_throttled_periods_percent": [],
+          "median_mysql_throttled_periods_percent": null,
+          "mysql_throttled_usec": []
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra",
+        "binary_sha256": "839abdf0cec29812ba280cf24c26ed8f122970fb76195d5241f38c98f736d5e9",
+        "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-screen-pipeline-1-config.toml",
+        "config_sha256": "cc09e48f99d3f52b056d5c47873f44d992ec003355e01e5d307294631c547d62",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-screen-pipeline-1-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": true,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": false,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 1024,
+          "paged_index": false,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": false,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "complete": true,
+      "evidence_scope": "exploratory_screening_prior_binary",
+      "proof_digest_checked_utc": "2026-10-10T11:13:02.540297+00:00",
+      "proof_report_sha256": "ba25177c0a3241b809c549c7e4170f2c3a34b5304043c60734006f9277d167fb",
+      "retained_for_selection_only": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "exploratory_screening_only"
+      ]
+    },
+    {
+      "label": "small-screen-compact",
+      "size": "small",
+      "profile": "compact",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-small-screen-compact-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T09:01:38.095406+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-small-screen-compact-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "write_only",
+        "read_write",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-small-screen-compact-1/options.json"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 1024,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": true,
+        "selective_sync": true,
+        "ublk_fast_path": false,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": true,
+        "compact_checkpoints": true,
+        "aligned_wal": false
+      },
+      "binary_sha256": "839abdf0cec29812ba280cf24c26ed8f122970fb76195d5241f38c98f736d5e9",
+      "samples": 1,
+      "workloads": [
+        "write_only",
+        "read_write"
+      ],
+      "load_before": [
+        5.30224609375,
+        3.03662109375,
+        1.63525390625
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "seconds": 79.84842003899394,
+      "ended_utc": "2026-10-10T09:02:57.952612+00:00",
+      "load_after": [
+        4.580078125,
+        3.32861328125,
+        1.8544921875
+      ],
+      "proof_report": "astra-c3588919f4-small-screen-compact-1/comparison.json",
+      "summary": {
+        "write_only": {
+          "samples": 1,
+          "tps": [
+            2354.78
+          ],
+          "median_tps": 2354.78,
+          "p99_ms": [
+            10.65
+          ],
+          "median_p99_ms": 10.65,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 47.30258952298733,
+          "median_mysql_cpu_percent_of_one_core": 72.48624924017933,
+          "mysql_throttled_periods_percent": [],
+          "median_mysql_throttled_periods_percent": null,
+          "mysql_throttled_usec": []
+        },
+        "read_write": {
+          "samples": 1,
+          "tps": [
+            1088.16
+          ],
+          "median_tps": 1088.16,
+          "p99_ms": [
+            45.79
+          ],
+          "median_p99_ms": 45.79,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 32.681729894962814,
+          "median_mysql_cpu_percent_of_one_core": 96.7804050182306,
+          "mysql_throttled_periods_percent": [],
+          "median_mysql_throttled_periods_percent": null,
+          "mysql_throttled_usec": []
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra",
+        "binary_sha256": "839abdf0cec29812ba280cf24c26ed8f122970fb76195d5241f38c98f736d5e9",
+        "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-screen-compact-1-config.toml",
+        "config_sha256": "35f8cd091be10e15782684f7e1874d21c5d5d6b54a39fd52373159cf6a1ed381",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-screen-compact-1-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": true,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": true,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 1024,
+          "paged_index": true,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": false,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "complete": true,
+      "evidence_scope": "exploratory_screening_prior_binary",
+      "proof_digest_checked_utc": "2026-10-10T11:13:02.550894+00:00",
+      "proof_report_sha256": "e3f45b94771a04c7e3af44f84c8041af6397a50c27872bf734788775e9930af0",
+      "retained_for_selection_only": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "exploratory_screening_only"
+      ]
+    },
+    {
+      "label": "small-screen-baseline-after",
+      "size": "small",
+      "profile": "baseline",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-small-screen-baseline-after-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T09:02:57.996163+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-small-screen-baseline-after-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "write_only",
+        "read_write",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-small-screen-baseline-after-1/options.json",
+        "--legacy-config"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 1024,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64
+      },
+      "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+      "samples": 1,
+      "workloads": [
+        "write_only",
+        "read_write"
+      ],
+      "load_before": [
+        4.580078125,
+        3.32861328125,
+        1.8544921875
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "seconds": 96.30765962800069,
+      "ended_utc": "2026-10-10T09:04:34.312449+00:00",
+      "load_after": [
+        3.68115234375,
+        3.337890625,
+        2.00537109375
+      ],
+      "proof_report": "astra-c3588919f4-small-screen-baseline-after-1/comparison.json",
+      "summary": {
+        "write_only": {
+          "samples": 1,
+          "tps": [
+            1338.17
+          ],
+          "median_tps": 1338.17,
+          "p99_ms": [
+            20.37
+          ],
+          "median_p99_ms": 20.37,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 32.41567711153966,
+          "median_mysql_cpu_percent_of_one_core": 43.87611326477396,
+          "mysql_throttled_periods_percent": [],
+          "median_mysql_throttled_periods_percent": null,
+          "mysql_throttled_usec": []
+        },
+        "read_write": {
+          "samples": 1,
+          "tps": [
+            981.6
+          ],
+          "median_tps": 981.6,
+          "p99_ms": [
+            23.52
+          ],
+          "median_p99_ms": 23.52,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 33.675323264162216,
+          "median_mysql_cpu_percent_of_one_core": 87.90211539368879,
+          "mysql_throttled_periods_percent": [],
+          "median_mysql_throttled_periods_percent": null,
+          "mysql_throttled_usec": []
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+        "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-screen-baseline-after-1-config.toml",
+        "config_sha256": "c9cd4074468c798c318282ebfcb04a4900670e6c2fafb98bf7d530b2c6db7750",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-screen-baseline-after-1-config.toml",
+        "legacy_config": true,
+        "options": {
+          "checkpoint_seconds": 5,
+          "disk_cache_mib": 4096,
+          "flush_batch_us": 0,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 1024,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "sync_data_only": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "complete": true,
+      "proof_digest_checked_utc": "2026-10-10T11:13:02.561151+00:00",
+      "proof_report_sha256": "c9b0518ba86a2fdba2c535ba8a4dd43a1fff17c4646bdc11c45e9428c83d3cbd",
+      "evidence_scope": "exploratory_screening",
+      "retained_for_selection_only": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "exploratory_screening_only"
+      ]
+    },
+    {
+      "label": "large-screen-baseline-before",
+      "size": "large",
+      "profile": "baseline",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-large-screen-baseline-before-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T09:04:34.357568+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+        "--phase-label",
+        "astra-c3588919f4-large-screen-baseline-before-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-warm-seconds",
+        "60",
+        "--mysql-rand-type",
+        "uniform",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-large-screen-baseline-before-1/options.json",
+        "--legacy-config",
+        "--offline-warm",
+        "--mysql-skip-crash-check"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 64,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64
+      },
+      "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+      "samples": 1,
+      "workloads": [
+        "read_only"
+      ],
+      "load_before": [
+        3.68115234375,
+        3.337890625,
+        2.00537109375
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "seconds": 118.20762422699772,
+      "ended_utc": "2026-10-10T09:06:32.574365+00:00",
+      "load_after": [
+        7.78857421875,
+        4.24951171875,
+        2.447265625
+      ],
+      "proof_report": "astra-c3588919f4-large-screen-baseline-before-1/comparison.json",
+      "summary": {
+        "read_only": {
+          "samples": 1,
+          "tps": [
+            957.92
+          ],
+          "median_tps": 957.92,
+          "p99_ms": [
+            46.63
+          ],
+          "median_p99_ms": 46.63,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 95.57444352474747,
+          "median_mysql_cpu_percent_of_one_core": 100.03857892688042,
+          "mysql_throttled_periods_percent": [],
+          "median_mysql_throttled_periods_percent": null,
+          "mysql_throttled_usec": []
+        }
+      },
+      "database_SIGKILL_recovery": "not_run_read_only_repeat",
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+        "config_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-screen-baseline-before-1-config.toml",
+        "config_sha256": "d34a3a328a57de4f80b688df87c61dd028f00737c8d28a82ab28d252f6fea161",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-screen-baseline-before-1-config.toml",
+        "legacy_config": true,
+        "options": {
+          "checkpoint_seconds": 5,
+          "disk_cache_mib": 4096,
+          "flush_batch_us": 0,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 64,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "sync_data_only": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "complete": true,
+      "proof_digest_checked_utc": "2026-10-10T11:13:02.571140+00:00",
+      "proof_report_sha256": "8dd02fcf3caf56db468d28e43c7512a5b56f81a3ce969a5341cc1b92e0de3910",
+      "evidence_scope": "exploratory_screening",
+      "retained_for_selection_only": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "exploratory_screening_only"
+      ]
+    },
+    {
+      "label": "large-screen-core",
+      "size": "large",
+      "profile": "core",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-large-screen-core-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T09:06:32.618337+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+        "--phase-label",
+        "astra-c3588919f4-large-screen-core-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-warm-seconds",
+        "60",
+        "--mysql-rand-type",
+        "uniform",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-large-screen-core-1/options.json",
+        "--offline-warm",
+        "--mysql-skip-crash-check"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 64,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": false,
+        "selective_sync": true,
+        "ublk_fast_path": false,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": false,
+        "compact_checkpoints": false,
+        "aligned_wal": false
+      },
+      "binary_sha256": "839abdf0cec29812ba280cf24c26ed8f122970fb76195d5241f38c98f736d5e9",
+      "samples": 1,
+      "workloads": [
+        "read_only"
+      ],
+      "load_before": [
+        7.78857421875,
+        4.24951171875,
+        2.447265625
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "seconds": 1421.4105640400012,
+      "ended_utc": "2026-10-10T09:30:14.037730+00:00",
+      "load_after": [
+        0.22412109375,
+        0.2265625,
+        0.66259765625
+      ],
+      "proof_report": "astra-c3588919f4-large-screen-core-1/comparison.json",
+      "summary": {
+        "read_only": {
+          "samples": 1,
+          "tps": [
+            913.77
+          ],
+          "median_tps": 913.77,
+          "p99_ms": [
+            47.47
+          ],
+          "median_p99_ms": 47.47,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 81.30566624930408,
+          "median_mysql_cpu_percent_of_one_core": 99.90987652884489,
+          "mysql_throttled_periods_percent": [],
+          "median_mysql_throttled_periods_percent": null,
+          "mysql_throttled_usec": []
+        }
+      },
+      "database_SIGKILL_recovery": "not_run_read_only_repeat",
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra",
+        "binary_sha256": "839abdf0cec29812ba280cf24c26ed8f122970fb76195d5241f38c98f736d5e9",
+        "config_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-screen-core-1-config.toml",
+        "config_sha256": "cad6016176cba1497885f55e3cc0dcd329d730fcaca09a6815bcfdbb56064305",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-screen-core-1-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": false,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": false,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 64,
+          "paged_index": false,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": false,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "complete": true,
+      "evidence_scope": "exploratory_screening_prior_binary",
+      "proof_digest_checked_utc": "2026-10-10T11:13:02.582040+00:00",
+      "proof_report_sha256": "7be85106c0146cf505e496a1338ce87827f96c7b7ddceb8e5e4765878f43475b",
+      "retained_for_selection_only": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "exploratory_screening_only"
+      ]
+    },
+    {
+      "label": "large-screen-ublk",
+      "size": "large",
+      "profile": "ublk",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-large-screen-ublk-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T09:31:24.094458+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+        "--phase-label",
+        "astra-c3588919f4-large-screen-ublk-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-warm-seconds",
+        "60",
+        "--mysql-rand-type",
+        "uniform",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-large-screen-ublk-1/options.json",
+        "--transport",
+        "ublk",
+        "--offline-warm",
+        "--mysql-skip-crash-check"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 64,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": false,
+        "selective_sync": true,
+        "ublk_fast_path": true,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": false,
+        "compact_checkpoints": false,
+        "aligned_wal": false
+      },
+      "binary_sha256": "839abdf0cec29812ba280cf24c26ed8f122970fb76195d5241f38c98f736d5e9",
+      "samples": 1,
+      "workloads": [
+        "read_only"
+      ],
+      "load_before": [
+        0.06689453125,
+        0.17578125,
+        0.611328125
+      ],
+      "returncode": 1,
+      "zero_ignore_fsync": null,
+      "seconds": 726.7595101960032,
+      "ended_utc": "2026-10-10T09:43:30.863124+00:00",
+      "load_after": [
+        2.13427734375,
+        2.00537109375,
+        1.48876953125
+      ],
+      "proof_report": "astra-c3588919f4-large-screen-ublk-1/comparison.json",
+      "complete": false,
+      "failure_reason": "ublk fast transport stalled during MySQL startup; 4 direct reads succeeded while one journal I/O remained pending; engine SIGKILL followed by normal runner cleanup; root cause under investigation",
+      "hang_proofs": [
+        "astra-c3588919f4-large-screen-ublk-1/hang-diagnostics.json",
+        "astra-c3588919f4-large-screen-ublk-1/hang-read-probe.json"
+      ],
+      "evidence_scope": "exploratory_screening_prior_binary"
+    },
+    {
+      "label": "large-screen-ublk",
+      "size": "large",
+      "profile": "ublk",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-large-screen-ublk-2",
+      "attempt": 2,
+      "started_utc": "2026-10-10T10:29:43.597857+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+        "--phase-label",
+        "astra-c3588919f4-large-screen-ublk-2",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "1",
+        "--mysql-warm-seconds",
+        "60",
+        "--mysql-rand-type",
+        "uniform",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-large-screen-ublk-2/options.json",
+        "--transport",
+        "ublk",
+        "--offline-warm",
+        "--mysql-skip-crash-check"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 64,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": false,
+        "selective_sync": true,
+        "ublk_fast_path": true,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": false,
+        "compact_checkpoints": false,
+        "aligned_wal": false
+      },
+      "binary_sha256": "38c94cedb88bcc31475fcde72331b10725c72bbaaac43209782505935a68858e",
+      "samples": 1,
+      "workloads": [
+        "read_only"
+      ],
+      "load_before": [
+        2.4873046875,
+        1.1494140625,
+        0.66748046875
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "ublk",
+      "storage_crash": false,
+      "mysql_cpus": 1,
+      "seconds": 96.8825998090033,
+      "ended_utc": "2026-10-10T10:31:20.489917+00:00",
+      "load_after": [
+        9.13720703125,
+        4.05419921875,
+        1.77294921875
+      ],
+      "proof_report": "astra-c3588919f4-large-screen-ublk-2/comparison.json",
+      "summary": {
+        "read_only": {
+          "samples": 1,
+          "tps": [
+            1271.5
+          ],
+          "median_tps": 1271.5,
+          "p99_ms": [
+            57.87
+          ],
+          "median_p99_ms": 57.87,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 56.332925178581796,
+          "median_mysql_cpu_percent_of_one_core": 100.07344990129434,
+          "mysql_throttled_periods_percent": [
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            59467890
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "not_run_read_only_repeat",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra",
+        "binary_sha256": "38c94cedb88bcc31475fcde72331b10725c72bbaaac43209782505935a68858e",
+        "config_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-screen-ublk-2-config.toml",
+        "config_sha256": "31d63255c22c57abdf7549425bcc793204fc5bd1922029b2c167ffbde0f6e12b",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-screen-ublk-2-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": false,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": false,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 64,
+          "paged_index": false,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {
+        "warm_seconds": 3.0278917549949256
+      },
+      "measurement_context": {
+        "table_file_bytes": 1040187392,
+        "ssd_cache_bytes_before_samples": 2034040832,
+        "engine_rss_kib_before_samples": 261972,
+        "engine_peak_rss_kib_before_samples": 283564,
+        "engine_memory_cache_mib": 64,
+        "engine_disk_cache_mib": 4096,
+        "warmup_seconds": 60,
+        "startup_seconds": 1.348831601004349
+      },
+      "complete": true,
+      "evidence_scope": "exploratory_screening_prior_binary",
+      "proof_digest_checked_utc": "2026-10-10T11:13:02.602362+00:00",
+      "proof_report_sha256": "bdd42da7b88d2b3a819e54459fdaf1a1c9bc4530db8dbe08926ab546d4a73eda",
+      "retained_for_selection_only": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "exploratory_screening_only"
+      ]
+    },
+    {
+      "label": "large-screen-baseline-after",
+      "size": "large",
+      "profile": "baseline",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-large-screen-baseline-after-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T10:31:20.535863+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+        "--phase-label",
+        "astra-c3588919f4-large-screen-baseline-after-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "1",
+        "--mysql-warm-seconds",
+        "60",
+        "--mysql-rand-type",
+        "uniform",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-large-screen-baseline-after-1/options.json",
+        "--legacy-config",
+        "--offline-warm",
+        "--mysql-skip-crash-check"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 64,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64
+      },
+      "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+      "samples": 1,
+      "workloads": [
+        "read_only"
+      ],
+      "load_before": [
+        9.13720703125,
+        4.05419921875,
+        1.77294921875
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 1,
+      "seconds": 1279.8791805420042,
+      "ended_utc": "2026-10-10T10:52:40.424345+00:00",
+      "load_after": [
+        3.82080078125,
+        1.9482421875,
+        1.23095703125
+      ],
+      "proof_report": "astra-c3588919f4-large-screen-baseline-after-1/comparison.json",
+      "summary": {
+        "read_only": {
+          "samples": 1,
+          "tps": [
+            983.69
+          ],
+          "median_tps": 983.69,
+          "p99_ms": [
+            45.79
+          ],
+          "median_p99_ms": 45.79,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 95.85930709367406,
+          "median_mysql_cpu_percent_of_one_core": 99.95341829208398,
+          "mysql_throttled_periods_percent": [
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            42291912
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "not_run_read_only_repeat",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+        "config_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-screen-baseline-after-1-config.toml",
+        "config_sha256": "d34a3a328a57de4f80b688df87c61dd028f00737c8d28a82ab28d252f6fea161",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-screen-baseline-after-1-config.toml",
+        "legacy_config": true,
+        "options": {
+          "checkpoint_seconds": 5,
+          "disk_cache_mib": 4096,
+          "flush_batch_us": 0,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 64,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "sync_data_only": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {
+        "warm_seconds": 1184.8719348399973
+      },
+      "measurement_context": {
+        "table_file_bytes": 1040187392,
+        "ssd_cache_bytes_before_samples": 2003447808,
+        "engine_rss_kib_before_samples": 149960,
+        "engine_peak_rss_kib_before_samples": 169640,
+        "engine_memory_cache_mib": 64,
+        "engine_disk_cache_mib": 4096,
+        "warmup_seconds": 60,
+        "startup_seconds": 1.3502338479956961
+      },
+      "complete": true,
+      "proof_digest_checked_utc": "2026-10-10T11:13:02.612639+00:00",
+      "proof_report_sha256": "72a02107085c145ab24bd4648a2fd6d7645ed8b6fc3134e3541c4b90fd3c5495",
+      "evidence_scope": "exploratory_screening",
+      "retained_for_selection_only": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "exploratory_screening_only"
+      ]
+    },
+    {
+      "label": "small-qualified-baseline",
+      "size": "small",
+      "profile": "baseline",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-small-qualified-baseline-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T11:13:02.636371+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-small-qualified-baseline-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "read_write",
+        "write_only",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "1",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-small-qualified-baseline-1/options.json",
+        "--legacy-config"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 1024,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64
+      },
+      "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+      "samples": 3,
+      "workloads": [
+        "read_only",
+        "read_write",
+        "write_only"
+      ],
+      "load_before": [
+        0.0458984375,
+        0.271484375,
+        0.5849609375
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 1,
+      "warm_concurrency": null,
+      "seconds": 296.25189412300097,
+      "ended_utc": "2026-10-10T11:17:58.897836+00:00",
+      "load_after": [
+        5.39453125,
+        3.3955078125,
+        1.8291015625
+      ],
+      "proof_report": "astra-c3588919f4-small-qualified-baseline-1/comparison.json",
+      "proof_report_sha256": "1cab0c80a40503e15887a3bf362f002be7df75c0c71bc8a6206fb2fe977a0275",
+      "summary": {
+        "read_only": {
+          "samples": 3,
+          "tps": [
+            2245.67,
+            2087.34,
+            2121.97
+          ],
+          "median_tps": 2121.97,
+          "p99_ms": [
+            71.83,
+            71.83,
+            71.83
+          ],
+          "median_p99_ms": 71.83,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 0.033245870156859036,
+          "median_mysql_cpu_percent_of_one_core": 100.04634969890684,
+          "mysql_throttled_periods_percent": [
+            100.0,
+            100.0,
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            82600388,
+            82735273,
+            82937932
+          ]
+        },
+        "read_write": {
+          "samples": 3,
+          "tps": [
+            909.08,
+            989.02,
+            887.98
+          ],
+          "median_tps": 909.08,
+          "p99_ms": [
+            25.28,
+            23.52,
+            25.28
+          ],
+          "median_p99_ms": 25.28,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 34.84023860483431,
+          "median_mysql_cpu_percent_of_one_core": 88.7728630492769,
+          "mysql_throttled_periods_percent": [
+            38.333333333333336,
+            32.333333333333336,
+            33.666666666666664
+          ],
+          "median_mysql_throttled_periods_percent": 33.666666666666664,
+          "mysql_throttled_usec": [
+            2175533,
+            1850847,
+            2015875
+          ]
+        },
+        "write_only": {
+          "samples": 3,
+          "tps": [
+            1255.0,
+            1284.86,
+            1280.42
+          ],
+          "median_tps": 1280.42,
+          "p99_ms": [
+            21.89,
+            20.74,
+            20.74
+          ],
+          "median_p99_ms": 20.74,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 34.94346779856647,
+          "median_mysql_cpu_percent_of_one_core": 45.73611584837958,
+          "mysql_throttled_periods_percent": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "median_mysql_throttled_periods_percent": 0.0,
+          "mysql_throttled_usec": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+        "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-qualified-baseline-1-config.toml",
+        "config_sha256": "c9cd4074468c798c318282ebfcb04a4900670e6c2fafb98bf7d530b2c6db7750",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-qualified-baseline-1-config.toml",
+        "legacy_config": true,
+        "options": {
+          "checkpoint_seconds": 5,
+          "disk_cache_mib": 4096,
+          "flush_batch_us": 0,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 1024,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "sync_data_only": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {},
+      "measurement_context": {
+        "table_file_bytes": 62914560,
+        "ssd_cache_bytes_before_samples": 350691328,
+        "engine_rss_kib_before_samples": 96412,
+        "engine_peak_rss_kib_before_samples": 112160,
+        "engine_memory_cache_mib": 1024,
+        "engine_disk_cache_mib": 4096,
+        "warmup_seconds": 10,
+        "startup_seconds": 3.334288596000988
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": true,
+      "comparison_exclusion_reasons": [],
+      "proof_digest_checked_utc": "2026-10-10T11:35:06.698128+00:00"
+    },
+    {
+      "label": "small-qualified-compact",
+      "size": "small",
+      "profile": "compact",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-small-qualified-compact-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T11:17:58.947236+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-small-qualified-compact-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "read_write",
+        "write_only",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "1",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-small-qualified-compact-1/options.json"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 1024,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": true,
+        "selective_sync": true,
+        "ublk_fast_path": false,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": true,
+        "compact_checkpoints": true,
+        "aligned_wal": false
+      },
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 3,
+      "workloads": [
+        "read_only",
+        "read_write",
+        "write_only"
+      ],
+      "load_before": [
+        5.39453125,
+        3.3955078125,
+        1.8291015625
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 1,
+      "warm_concurrency": null,
+      "seconds": 318.8609636620022,
+      "ended_utc": "2026-10-10T11:23:17.818430+00:00",
+      "load_after": [
+        5.81640625,
+        4.58984375,
+        2.7177734375
+      ],
+      "proof_report": "astra-c3588919f4-small-qualified-compact-1/comparison.json",
+      "proof_report_sha256": "f13f2688b3a9d188e4f127e56be5065c0d8b1e3b8de0a5c0f46af11ddc3703e7",
+      "summary": {
+        "read_only": {
+          "samples": 3,
+          "tps": [
+            1986.65,
+            2142.59,
+            2067.78
+          ],
+          "median_tps": 2067.78,
+          "p99_ms": [
+            71.83,
+            71.83,
+            71.83
+          ],
+          "median_p99_ms": 71.83,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 0.06662997289650283,
+          "median_mysql_cpu_percent_of_one_core": 100.02132383489021,
+          "mysql_throttled_periods_percent": [
+            100.0,
+            100.0,
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            81856505,
+            82419854,
+            81892620
+          ]
+        },
+        "read_write": {
+          "samples": 3,
+          "tps": [
+            936.71,
+            1098.14,
+            1053.95
+          ],
+          "median_tps": 1053.95,
+          "p99_ms": [
+            43.39,
+            43.39,
+            44.98
+          ],
+          "median_p99_ms": 43.39,
+          "ignored_errors": 1,
+          "median_engine_cpu_percent_of_one_core": 34.14258241733006,
+          "median_mysql_cpu_percent_of_one_core": 98.04771304709924,
+          "mysql_throttled_periods_percent": [
+            94.33333333333333,
+            100.0,
+            98.67109634551495
+          ],
+          "median_mysql_throttled_periods_percent": 98.67109634551495,
+          "mysql_throttled_usec": [
+            19251160,
+            22098547,
+            22336630
+          ]
+        },
+        "write_only": {
+          "samples": 3,
+          "tps": [
+            2561.69,
+            2365.97,
+            1950.51
+          ],
+          "median_tps": 2365.97,
+          "p99_ms": [
+            11.04,
+            11.04,
+            12.3
+          ],
+          "median_p99_ms": 11.04,
+          "ignored_errors": 2,
+          "median_engine_cpu_percent_of_one_core": 48.70369662254969,
+          "median_mysql_cpu_percent_of_one_core": 77.25276518212898,
+          "mysql_throttled_periods_percent": [
+            0.3333333333333333,
+            1.3559322033898304,
+            0.33444816053511706
+          ],
+          "median_mysql_throttled_periods_percent": 0.33444816053511706,
+          "mysql_throttled_usec": [
+            2705,
+            32607,
+            15542
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra",
+        "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+        "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-qualified-compact-1-config.toml",
+        "config_sha256": "35f8cd091be10e15782684f7e1874d21c5d5d6b54a39fd52373159cf6a1ed381",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-qualified-compact-1-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": true,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": true,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 1024,
+          "paged_index": true,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": false,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {},
+      "measurement_context": {
+        "table_file_bytes": 62914560,
+        "ssd_cache_bytes_before_samples": 37531648,
+        "engine_rss_kib_before_samples": 202876,
+        "engine_peak_rss_kib_before_samples": 202876,
+        "engine_memory_cache_mib": 1024,
+        "engine_disk_cache_mib": 4096,
+        "warmup_seconds": 10,
+        "startup_seconds": 19.04544226299913
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 3,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "ignored_sql_errors"
+      ],
+      "proof_digest_checked_utc": "2026-10-10T11:35:06.708893+00:00"
+    },
+    {
+      "label": "small-qualified-native",
+      "size": "small",
+      "profile": "compat",
+      "engine": "native",
+      "phase": "astra-c3588919f4-small-qualified-native-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T11:35:06.731323+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-small-qualified-native-1",
+        "--engine",
+        "native",
+        "--mysql-workloads",
+        "read_only",
+        "read_write",
+        "write_only",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "1",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special"
+      ],
+      "options": {},
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 3,
+      "workloads": [
+        "read_only",
+        "read_write",
+        "write_only"
+      ],
+      "load_before": [
+        1.99658203125,
+        2.6845703125,
+        2.294921875
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 1,
+      "warm_concurrency": null,
+      "seconds": 288.5143634749984,
+      "ended_utc": "2026-10-10T11:39:55.255590+00:00",
+      "load_after": [
+        4.9443359375,
+        4.92529296875,
+        3.4384765625
+      ],
+      "proof_report": "astra-c3588919f4-small-qualified-native-1/comparison.json",
+      "proof_report_sha256": "a8765182bd16ca9775657822b1b97bf9b07c368ee12b0b32beeda1063b754d50",
+      "summary": {
+        "read_only": {
+          "samples": 3,
+          "tps": [
+            1968.77,
+            2143.17,
+            2325.66
+          ],
+          "median_tps": 2143.17,
+          "p99_ms": [
+            71.83,
+            71.83,
+            71.83
+          ],
+          "median_p99_ms": 71.83,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": null,
+          "median_mysql_cpu_percent_of_one_core": 100.11565029423737,
+          "mysql_throttled_periods_percent": [
+            100.0,
+            100.0,
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            82085274,
+            82981750,
+            83003799
+          ]
+        },
+        "read_write": {
+          "samples": 3,
+          "tps": [
+            1096.92,
+            1050.5,
+            1155.16
+          ],
+          "median_tps": 1096.92,
+          "p99_ms": [
+            61.08,
+            61.08,
+            61.08
+          ],
+          "median_p99_ms": 61.08,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": null,
+          "median_mysql_cpu_percent_of_one_core": 99.04351399501446,
+          "mysql_throttled_periods_percent": [
+            100.0,
+            100.0,
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            39472982,
+            38162916,
+            37858678
+          ]
+        },
+        "write_only": {
+          "samples": 3,
+          "tps": [
+            3860.05,
+            3849.5,
+            3376.38
+          ],
+          "median_tps": 3849.5,
+          "p99_ms": [
+            18.95,
+            18.28,
+            21.11
+          ],
+          "median_p99_ms": 18.95,
+          "ignored_errors": 2,
+          "median_engine_cpu_percent_of_one_core": null,
+          "median_mysql_cpu_percent_of_one_core": 99.40466511749202,
+          "mysql_throttled_periods_percent": [
+            98.33333333333333,
+            96.66666666666667,
+            99.66666666666667
+          ],
+          "median_mysql_throttled_periods_percent": 98.33333333333333,
+          "mysql_throttled_usec": [
+            9561967,
+            9376983,
+            10605409
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": null,
+      "preparation": {},
+      "measurement_context": {
+        "table_file_bytes": 62914560,
+        "ssd_cache_bytes_before_samples": null,
+        "engine_rss_kib_before_samples": null,
+        "engine_peak_rss_kib_before_samples": null,
+        "engine_memory_cache_mib": null,
+        "engine_disk_cache_mib": null,
+        "warmup_seconds": 10,
+        "startup_seconds": 1.351863037001749
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 2,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "ignored_sql_errors"
+      ]
+    },
+    {
+      "label": "large-qualified-baseline",
+      "size": "large",
+      "profile": "baseline",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-large-qualified-baseline-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T11:39:55.303331+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+        "--phase-label",
+        "astra-c3588919f4-large-qualified-baseline-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "read_write",
+        "write_only",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "1",
+        "--mysql-warm-seconds",
+        "60",
+        "--mysql-rand-type",
+        "uniform",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-large-qualified-baseline-1/options.json",
+        "--legacy-config",
+        "--offline-warm"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 64,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64
+      },
+      "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+      "samples": 3,
+      "workloads": [
+        "read_only",
+        "read_write",
+        "write_only"
+      ],
+      "load_before": [
+        4.9443359375,
+        4.92529296875,
+        3.4384765625
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 1,
+      "warm_concurrency": null,
+      "seconds": 392.20019586399576,
+      "ended_utc": "2026-10-10T11:46:27.512831+00:00",
+      "load_after": [
+        7.8017578125,
+        8.08447265625,
+        5.58349609375
+      ],
+      "proof_report": "astra-c3588919f4-large-qualified-baseline-1/comparison.json",
+      "proof_report_sha256": "f1f8d431d3e4224f6eefaa4388b7aea05adc4ec8e3a403dd67f79dd91e5b112d",
+      "summary": {
+        "read_only": {
+          "samples": 3,
+          "tps": [
+            917.04,
+            975.43,
+            997.55
+          ],
+          "median_tps": 975.43,
+          "p99_ms": [
+            41.1,
+            45.79,
+            45.79
+          ],
+          "median_p99_ms": 45.79,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 99.10549652433816,
+          "median_mysql_cpu_percent_of_one_core": 100.00465845484335,
+          "mysql_throttled_periods_percent": [
+            100.0,
+            100.0,
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            32536908,
+            40001063,
+            42474350
+          ]
+        },
+        "read_write": {
+          "samples": 3,
+          "tps": [
+            243.24,
+            224.98,
+            230.88
+          ],
+          "median_tps": 230.88,
+          "p99_ms": [
+            106.75,
+            114.72,
+            114.72
+          ],
+          "median_p99_ms": 114.72,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 83.66392470870262,
+          "median_mysql_cpu_percent_of_one_core": 67.67069325409166,
+          "mysql_throttled_periods_percent": [
+            7.0,
+            0.6666666666666666,
+            1.9933554817275747
+          ],
+          "median_mysql_throttled_periods_percent": 1.9933554817275747,
+          "mysql_throttled_usec": [
+            434950,
+            5851,
+            25379
+          ]
+        },
+        "write_only": {
+          "samples": 3,
+          "tps": [
+            401.98,
+            332.25,
+            378.07
+          ],
+          "median_tps": 378.07,
+          "p99_ms": [
+            55.82,
+            64.47,
+            54.83
+          ],
+          "median_p99_ms": 55.82,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 50.42075480388925,
+          "median_mysql_cpu_percent_of_one_core": 39.85058320459598,
+          "mysql_throttled_periods_percent": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "median_mysql_throttled_periods_percent": 0.0,
+          "mysql_throttled_usec": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+        "config_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-qualified-baseline-1-config.toml",
+        "config_sha256": "d34a3a328a57de4f80b688df87c61dd028f00737c8d28a82ab28d252f6fea161",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-qualified-baseline-1-config.toml",
+        "legacy_config": true,
+        "options": {
+          "checkpoint_seconds": 5,
+          "disk_cache_mib": 4096,
+          "flush_batch_us": 0,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 64,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "sync_data_only": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {
+        "warm_seconds": 36.0573204100001,
+        "warm_concurrency": null
+      },
+      "measurement_context": {
+        "table_file_bytes": 1040187392,
+        "ssd_cache_bytes_before_samples": 2003505152,
+        "engine_rss_kib_before_samples": 159536,
+        "engine_peak_rss_kib_before_samples": 159536,
+        "engine_memory_cache_mib": 64,
+        "engine_disk_cache_mib": 4096,
+        "warmup_seconds": 60,
+        "startup_seconds": 1.3547778690044652
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": true,
+      "comparison_exclusion_reasons": []
+    },
+    {
+      "label": "large-qualified-compact",
+      "size": "large",
+      "profile": "compact",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-large-qualified-compact-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T11:46:27.563989+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+        "--phase-label",
+        "astra-c3588919f4-large-qualified-compact-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "read_write",
+        "write_only",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "1",
+        "--mysql-warm-seconds",
+        "60",
+        "--mysql-rand-type",
+        "uniform",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-large-qualified-compact-1/options.json",
+        "--offline-warm",
+        "--warm-concurrency",
+        "128"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 64,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": true,
+        "selective_sync": true,
+        "ublk_fast_path": false,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": true,
+        "compact_checkpoints": true,
+        "aligned_wal": false
+      },
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 3,
+      "workloads": [
+        "read_only",
+        "read_write",
+        "write_only"
+      ],
+      "load_before": [
+        7.8017578125,
+        8.08447265625,
+        5.58349609375
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 1,
+      "warm_concurrency": 128,
+      "seconds": 409.5623077140044,
+      "ended_utc": "2026-10-10T11:53:17.138197+00:00",
+      "load_after": [
+        7.00390625,
+        5.9833984375,
+        5.30078125
+      ],
+      "proof_report": "astra-c3588919f4-large-qualified-compact-1/comparison.json",
+      "proof_report_sha256": "8e29da2230c22ef6d54cc6d9a886d4b7831abec64bea933fb323be4dfa8e2434",
+      "summary": {
+        "read_only": {
+          "samples": 3,
+          "tps": [
+            922.49,
+            924.23,
+            916.77
+          ],
+          "median_tps": 922.49,
+          "p99_ms": [
+            46.63,
+            46.63,
+            46.63
+          ],
+          "median_p99_ms": 46.63,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 82.28250179836387,
+          "median_mysql_cpu_percent_of_one_core": 100.03766815625124,
+          "mysql_throttled_periods_percent": [
+            100.0,
+            100.0,
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            43378596,
+            43024425,
+            43214916
+          ]
+        },
+        "read_write": {
+          "samples": 3,
+          "tps": [
+            304.34,
+            254.5,
+            278.88
+          ],
+          "median_tps": 278.88,
+          "p99_ms": [
+            84.47,
+            244.38,
+            244.38
+          ],
+          "median_p99_ms": 244.38,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 71.56210613555452,
+          "median_mysql_cpu_percent_of_one_core": 72.28703619314437,
+          "mysql_throttled_periods_percent": [
+            54.23728813559322,
+            40.2027027027027,
+            59.92779783393502
+          ],
+          "median_mysql_throttled_periods_percent": 54.23728813559322,
+          "mysql_throttled_usec": [
+            6923062,
+            3871660,
+            7166577
+          ]
+        },
+        "write_only": {
+          "samples": 3,
+          "tps": [
+            517.48,
+            394.06,
+            521.18
+          ],
+          "median_tps": 517.48,
+          "p99_ms": [
+            173.58,
+            176.73,
+            33.72
+          ],
+          "median_p99_ms": 173.58,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 47.922860237952,
+          "median_mysql_cpu_percent_of_one_core": 51.51944700866294,
+          "mysql_throttled_periods_percent": [
+            11.191335740072201,
+            4.659498207885305,
+            9.215017064846416
+          ],
+          "median_mysql_throttled_periods_percent": 9.215017064846416,
+          "mysql_throttled_usec": [
+            412916,
+            86815,
+            192034
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra",
+        "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+        "config_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-qualified-compact-1-config.toml",
+        "config_sha256": "1955c8c046a9ec8d12280233c6bb9f08915ce3d400a2fbfc81cad7980c85c114",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-qualified-compact-1-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": true,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": true,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 64,
+          "paged_index": true,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": false,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {
+        "warm_seconds": 51.36495751199982,
+        "warm_concurrency": 128
+      },
+      "measurement_context": {
+        "table_file_bytes": 1040187392,
+        "ssd_cache_bytes_before_samples": 2039959552,
+        "engine_rss_kib_before_samples": 148976,
+        "engine_peak_rss_kib_before_samples": 151292,
+        "engine_memory_cache_mib": 64,
+        "engine_disk_cache_mib": 4096,
+        "warmup_seconds": 60,
+        "startup_seconds": 1.3603840729992953
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": true,
+      "comparison_exclusion_reasons": []
+    },
+    {
+      "label": "large-qualified-native",
+      "size": "large",
+      "profile": "compat",
+      "engine": "native",
+      "phase": "astra-c3588919f4-large-qualified-native-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T11:53:17.368821+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+        "--phase-label",
+        "astra-c3588919f4-large-qualified-native-1",
+        "--engine",
+        "native",
+        "--mysql-workloads",
+        "read_only",
+        "read_write",
+        "write_only",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "1",
+        "--mysql-warm-seconds",
+        "60",
+        "--mysql-rand-type",
+        "uniform"
+      ],
+      "options": {},
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 3,
+      "workloads": [
+        "read_only",
+        "read_write",
+        "write_only"
+      ],
+      "load_before": [
+        7.00390625,
+        5.9833984375,
+        5.30078125
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 1,
+      "warm_concurrency": null,
+      "seconds": 345.51720337699953,
+      "ended_utc": "2026-10-10T11:59:02.896065+00:00",
+      "load_after": [
+        2.3544921875,
+        5.45263671875,
+        5.4716796875
+      ],
+      "proof_report": "astra-c3588919f4-large-qualified-native-1/comparison.json",
+      "proof_report_sha256": "8a89273ec4326bf00399ed0de7873de7a2255ab4d85677ae1d443f46d9f15ed8",
+      "summary": {
+        "read_only": {
+          "samples": 3,
+          "tps": [
+            1056.84,
+            1057.46,
+            1055.09
+          ],
+          "median_tps": 1056.84,
+          "p99_ms": [
+            10.27,
+            10.27,
+            10.27
+          ],
+          "median_p99_ms": 10.27,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": null,
+          "median_mysql_cpu_percent_of_one_core": 75.22461919376173,
+          "mysql_throttled_periods_percent": [
+            3.3333333333333335,
+            3.6666666666666665,
+            3.6666666666666665
+          ],
+          "median_mysql_throttled_periods_percent": 3.6666666666666665,
+          "mysql_throttled_usec": [
+            1837372,
+            2010186,
+            1970499
+          ]
+        },
+        "read_write": {
+          "samples": 3,
+          "tps": [
+            482.55,
+            516.03,
+            457.03
+          ],
+          "median_tps": 482.55,
+          "p99_ms": [
+            68.05,
+            68.05,
+            70.55
+          ],
+          "median_p99_ms": 68.05,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": null,
+          "median_mysql_cpu_percent_of_one_core": 99.78322321928748,
+          "mysql_throttled_periods_percent": [
+            97.67441860465117,
+            100.0,
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            43981066,
+            48953373,
+            50880367
+          ]
+        },
+        "write_only": {
+          "samples": 3,
+          "tps": [
+            1424.81,
+            1546.76,
+            1365.78
+          ],
+          "median_tps": 1424.81,
+          "p99_ms": [
+            49.21,
+            47.47,
+            52.89
+          ],
+          "median_p99_ms": 49.21,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": null,
+          "median_mysql_cpu_percent_of_one_core": 99.60266872488447,
+          "mysql_throttled_periods_percent": [
+            100.0,
+            100.0,
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            28317366,
+            27082769,
+            31805145
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": null,
+      "preparation": {},
+      "measurement_context": {
+        "table_file_bytes": 1040187392,
+        "ssd_cache_bytes_before_samples": null,
+        "engine_rss_kib_before_samples": null,
+        "engine_peak_rss_kib_before_samples": null,
+        "engine_memory_cache_mib": null,
+        "engine_disk_cache_mib": null,
+        "warmup_seconds": 60,
+        "startup_seconds": 1.3368250890052877
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": true,
+      "comparison_exclusion_reasons": []
+    },
+    {
+      "label": "small-zerofs-durable",
+      "size": "small",
+      "profile": "compat",
+      "engine": "zerofs",
+      "phase": "astra-c3588919f4-small-zerofs-durable-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T11:59:03.018275+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-small-zerofs-durable-1",
+        "--engine",
+        "zerofs",
+        "--mysql-workloads",
+        "read_only",
+        "read_write",
+        "write_only",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "1",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special"
+      ],
+      "options": {},
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 1,
+      "workloads": [
+        "read_only",
+        "read_write",
+        "write_only"
+      ],
+      "load_before": [
+        2.3544921875,
+        5.45263671875,
+        5.4716796875
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": false,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 1,
+      "warm_concurrency": null,
+      "seconds": 601.6888854029967,
+      "ended_utc": "2026-10-10T12:09:04.717601+00:00",
+      "load_after": [
+        2.521484375,
+        3.20458984375,
+        4.22998046875
+      ],
+      "proof_report": "astra-c3588919f4-small-zerofs-durable-1/comparison.json",
+      "proof_report_sha256": "36cdee557e800c9ea16b2ff3b5475f733d32c7df07b3b19521d944afc3164828",
+      "summary": {
+        "read_only": {
+          "samples": 1,
+          "tps": [
+            2372.42
+          ],
+          "median_tps": 2372.42,
+          "p99_ms": [
+            71.83
+          ],
+          "median_p99_ms": 71.83,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 0.9647543539975452,
+          "median_mysql_cpu_percent_of_one_core": 99.83556482329122,
+          "mysql_throttled_periods_percent": [
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            82752625
+          ]
+        },
+        "read_write": {
+          "samples": 1,
+          "tps": [
+            1.37
+          ],
+          "median_tps": 1.37,
+          "p99_ms": [
+            11523.48
+          ],
+          "median_p99_ms": 11523.48,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 9.0014101375956,
+          "median_mysql_cpu_percent_of_one_core": 1.7131669370304554,
+          "mysql_throttled_periods_percent": [
+            0.0
+          ],
+          "median_mysql_throttled_periods_percent": 0.0,
+          "mysql_throttled_usec": [
+            0
+          ]
+        },
+        "write_only": {
+          "samples": 1,
+          "tps": [
+            1.32
+          ],
+          "median_tps": 1.32,
+          "p99_ms": [
+            10343.39
+          ],
+          "median_p99_ms": 10343.39,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 7.409655156577361,
+          "median_mysql_cpu_percent_of_one_core": 5.970568097789055,
+          "mysql_throttled_periods_percent": [
+            0.0
+          ],
+          "median_mysql_throttled_periods_percent": 0.0,
+          "mysql_throttled_usec": [
+            0
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "zerofs",
+        "config_sha256": "e1f852437a5921bcafc614ddbf56d23625f212e226e4876cb452d61a1a84a47a",
+        "ignore_fsync": false
+      },
+      "preparation": {},
+      "measurement_context": {
+        "table_file_bytes": 62914560,
+        "ssd_cache_bytes_before_samples": null,
+        "engine_rss_kib_before_samples": null,
+        "engine_peak_rss_kib_before_samples": null,
+        "engine_memory_cache_mib": null,
+        "engine_disk_cache_mib": null,
+        "warmup_seconds": 10,
+        "startup_seconds": 130.86388081099722
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": true,
+      "comparison_exclusion_reasons": []
+    },
+    {
+      "label": "small-zerofs-async",
+      "size": "small",
+      "profile": "compat",
+      "engine": "zerofs",
+      "phase": "astra-c3588919f4-small-zerofs-async-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T12:09:04.831220+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-small-zerofs-async-1",
+        "--engine",
+        "zerofs",
+        "--mysql-workloads",
+        "read_only",
+        "read_write",
+        "write_only",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "1",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special"
+      ],
+      "options": {},
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 1,
+      "workloads": [
+        "read_only",
+        "read_write",
+        "write_only"
+      ],
+      "load_before": [
+        2.521484375,
+        3.20458984375,
+        4.22998046875
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": true,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 1,
+      "warm_concurrency": null,
+      "seconds": 122.965576169001,
+      "ended_utc": "2026-10-10T12:11:07.807151+00:00",
+      "load_after": [
+        3.2197265625,
+        3.583984375,
+        4.259765625
+      ],
+      "proof_report": "astra-c3588919f4-small-zerofs-async-1/comparison.json",
+      "proof_report_sha256": "b8646f8133674bcbd8d4bcaa8fcdcf3e38c1d67610b076c4811275c075d442e3",
+      "summary": {
+        "read_only": {
+          "samples": 1,
+          "tps": [
+            2254.46
+          ],
+          "median_tps": 2254.46,
+          "p99_ms": [
+            71.83
+          ],
+          "median_p99_ms": 71.83,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 0.9971386459743166,
+          "median_mysql_cpu_percent_of_one_core": 100.04633763125102,
+          "mysql_throttled_periods_percent": [
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            82499532
+          ]
+        },
+        "read_write": {
+          "samples": 1,
+          "tps": [
+            354.49
+          ],
+          "median_tps": 354.49,
+          "p99_ms": [
+            50.11
+          ],
+          "median_p99_ms": 50.11,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 102.92915213041059,
+          "median_mysql_cpu_percent_of_one_core": 38.76069384758027,
+          "mysql_throttled_periods_percent": [
+            0.0
+          ],
+          "median_mysql_throttled_periods_percent": 0.0,
+          "mysql_throttled_usec": [
+            0
+          ]
+        },
+        "write_only": {
+          "samples": 1,
+          "tps": [
+            613.23
+          ],
+          "median_tps": 613.23,
+          "p99_ms": [
+            28.16
+          ],
+          "median_p99_ms": 28.16,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 92.06610711401306,
+          "median_mysql_cpu_percent_of_one_core": 27.583083798016432,
+          "mysql_throttled_periods_percent": [
+            0.0
+          ],
+          "median_mysql_throttled_periods_percent": 0.0,
+          "mysql_throttled_usec": [
+            0
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "zerofs",
+        "config_sha256": "85dfef38cfbf9bde80d853d95fe729cdaa582ee4a3efbba5628c6a5b43ce1a96",
+        "ignore_fsync": true
+      },
+      "preparation": {},
+      "measurement_context": {
+        "table_file_bytes": 62914560,
+        "ssd_cache_bytes_before_samples": null,
+        "engine_rss_kib_before_samples": null,
+        "engine_peak_rss_kib_before_samples": null,
+        "engine_memory_cache_mib": null,
+        "engine_disk_cache_mib": null,
+        "warmup_seconds": 10,
+        "startup_seconds": 3.5474049000040395
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": true,
+      "comparison_exclusion_reasons": []
+    },
+    {
+      "label": "small-final-b39b705f43b6-ublk",
+      "size": "small",
+      "profile": "compact",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-small-final-b39b705f43b6-ublk-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T12:36:21.198644+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-small-final-b39b705f43b6-ublk-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "read_write",
+        "write_only",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "1",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-small-final-b39b705f43b6-ublk-1/options.json",
+        "--transport",
+        "ublk"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 1024,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": true,
+        "selective_sync": true,
+        "ublk_fast_path": true,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": true,
+        "compact_checkpoints": true,
+        "aligned_wal": false
+      },
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 3,
+      "workloads": [
+        "read_only",
+        "read_write",
+        "write_only"
+      ],
+      "load_before": [
+        0.1806640625,
+        1.1962890625,
+        1.98974609375
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "ublk",
+      "storage_crash": false,
+      "mysql_cpus": 1,
+      "warm_concurrency": null,
+      "seconds": 296.48051080100413,
+      "ended_utc": "2026-10-10T12:41:17.689437+00:00",
+      "load_after": [
+        6.51953125,
+        4.66650390625,
+        3.25244140625
+      ],
+      "proof_report": "astra-c3588919f4-small-final-b39b705f43b6-ublk-1/comparison.json",
+      "proof_report_sha256": "683a39e5b7db1a3b01ede9149a020cc296bac8569401b7b13951e203f23f81f3",
+      "summary": {
+        "read_only": {
+          "samples": 3,
+          "tps": [
+            2195.86,
+            2128.96,
+            2059.78
+          ],
+          "median_tps": 2128.96,
+          "p99_ms": [
+            71.83,
+            71.83,
+            71.83
+          ],
+          "median_p99_ms": 71.83,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 0.0,
+          "median_mysql_cpu_percent_of_one_core": 100.0173469302066,
+          "mysql_throttled_periods_percent": [
+            100.0,
+            100.0,
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            82236356,
+            82278306,
+            83001648
+          ]
+        },
+        "read_write": {
+          "samples": 3,
+          "tps": [
+            1062.35,
+            1014.7,
+            1029.42
+          ],
+          "median_tps": 1029.42,
+          "p99_ms": [
+            46.63,
+            46.63,
+            47.47
+          ],
+          "median_p99_ms": 46.63,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 33.01100927958838,
+          "median_mysql_cpu_percent_of_one_core": 97.03868411290742,
+          "mysql_throttled_periods_percent": [
+            99.66666666666667,
+            96.0,
+            97.3421926910299
+          ],
+          "median_mysql_throttled_periods_percent": 97.3421926910299,
+          "mysql_throttled_usec": [
+            24410463,
+            22626391,
+            22621445
+          ]
+        },
+        "write_only": {
+          "samples": 3,
+          "tps": [
+            2400.25,
+            2663.03,
+            2735.1
+          ],
+          "median_tps": 2663.03,
+          "p99_ms": [
+            11.45,
+            10.84,
+            10.27
+          ],
+          "median_p99_ms": 10.84,
+          "ignored_errors": 3,
+          "median_engine_cpu_percent_of_one_core": 48.27056367543081,
+          "median_mysql_cpu_percent_of_one_core": 78.38532507827348,
+          "mysql_throttled_periods_percent": [
+            5.333333333333333,
+            1.3333333333333333,
+            1.0
+          ],
+          "median_mysql_throttled_periods_percent": 1.3333333333333333,
+          "mysql_throttled_usec": [
+            53677,
+            1660,
+            8569
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+        "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-1-config.toml",
+        "config_sha256": "3c0e2b694adf2d5c6e276fd8994c2604ca9a7b1eb8d0d520e29112a1a10db6ae",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-1-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": true,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": true,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 1024,
+          "paged_index": true,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {},
+      "measurement_context": {
+        "table_file_bytes": 62914560,
+        "ssd_cache_bytes_before_samples": 1316593664,
+        "engine_rss_kib_before_samples": 253224,
+        "engine_peak_rss_kib_before_samples": 254224,
+        "engine_memory_cache_mib": 1024,
+        "engine_disk_cache_mib": 4096,
+        "warmup_seconds": 10,
+        "startup_seconds": 4.013016435994359
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 3,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "ignored_sql_errors"
+      ]
+    },
+    {
+      "label": "small-final-b39b705f43b6-ublk-recovery",
+      "size": "small",
+      "profile": "compact",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T12:41:17.740790+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "--mysql-recovery-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "read_write",
+        "write_only",
+        "--mysql-samples",
+        "1",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "1",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1/options.json",
+        "--transport",
+        "ublk"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 1024,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": true,
+        "selective_sync": true,
+        "ublk_fast_path": true,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": true,
+        "compact_checkpoints": true,
+        "aligned_wal": false
+      },
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 0,
+      "workloads": [],
+      "load_before": [
+        6.51953125,
+        4.66650390625,
+        3.25244140625
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "ublk",
+      "storage_crash": true,
+      "mysql_cpus": 1,
+      "warm_concurrency": null,
+      "seconds": 16.50550931700127,
+      "ended_utc": "2026-10-10T12:41:34.256412+00:00",
+      "load_after": [
+        5.22265625,
+        4.47021484375,
+        3.21044921875
+      ],
+      "proof_report": "astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1/comparison.json",
+      "proof_report_sha256": "dbf3b8d690740ed642f3103ead7cc6463a0181d2500ddd140cfd8c5289b27146",
+      "summary": {},
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": "passed",
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+        "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1-config.toml",
+        "config_sha256": "3c0e2b694adf2d5c6e276fd8994c2604ca9a7b1eb8d0d520e29112a1a10db6ae",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": true,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": true,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 1024,
+          "paged_index": true,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {},
+      "measurement_context": {
+        "table_file_bytes": 62914560,
+        "ssd_cache_bytes_before_samples": null,
+        "engine_rss_kib_before_samples": null,
+        "engine_peak_rss_kib_before_samples": null,
+        "engine_memory_cache_mib": null,
+        "engine_disk_cache_mib": null,
+        "warmup_seconds": 10,
+        "startup_seconds": 2.3856404350008233
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": true,
+      "comparison_exclusion_reasons": []
+    },
+    {
+      "label": "cpu2-b39b705f43b6-small-baseline",
+      "size": "small",
+      "profile": "baseline",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-cpu2-b39b705f43b6-small-baseline-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T12:41:34.398595+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-cpu2-b39b705f43b6-small-baseline-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_write",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "2",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-cpu2-b39b705f43b6-small-baseline-1/options.json",
+        "--legacy-config"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 1024,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64
+      },
+      "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+      "samples": 3,
+      "workloads": [
+        "read_write"
+      ],
+      "load_before": [
+        5.22265625,
+        4.47021484375,
+        3.21044921875
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 2,
+      "warm_concurrency": null,
+      "seconds": 137.2630164210059,
+      "ended_utc": "2026-10-10T12:43:51.671013+00:00",
+      "load_after": [
+        4.99267578125,
+        4.72607421875,
+        3.48486328125
+      ],
+      "proof_report": "astra-c3588919f4-cpu2-b39b705f43b6-small-baseline-1/comparison.json",
+      "proof_report_sha256": "4d60ad5ca0b7a23b94e9fa44f88b34367a817e85fa26660b71bbe2308e82ec44",
+      "summary": {
+        "read_write": {
+          "samples": 3,
+          "tps": [
+            1060.61,
+            1052.36,
+            1029.61
+          ],
+          "median_tps": 1052.36,
+          "p99_ms": [
+            21.5,
+            21.5,
+            21.89
+          ],
+          "median_p99_ms": 21.5,
+          "ignored_errors": 1,
+          "median_engine_cpu_percent_of_one_core": 32.542404100204465,
+          "median_mysql_cpu_percent_of_one_core": 86.53523863407719,
+          "mysql_throttled_periods_percent": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "median_mysql_throttled_periods_percent": 0.0,
+          "mysql_throttled_usec": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+        "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-small-baseline-1-config.toml",
+        "config_sha256": "c9cd4074468c798c318282ebfcb04a4900670e6c2fafb98bf7d530b2c6db7750",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-small-baseline-1-config.toml",
+        "legacy_config": true,
+        "options": {
+          "checkpoint_seconds": 5,
+          "disk_cache_mib": 4096,
+          "flush_batch_us": 0,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 1024,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "sync_data_only": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {},
+      "measurement_context": {
+        "table_file_bytes": 62914560,
+        "ssd_cache_bytes_before_samples": 38572032,
+        "engine_rss_kib_before_samples": 153212,
+        "engine_peak_rss_kib_before_samples": 153212,
+        "engine_memory_cache_mib": 1024,
+        "engine_disk_cache_mib": 4096,
+        "warmup_seconds": 10,
+        "startup_seconds": 18.057817803994112
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 1,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "ignored_sql_errors"
+      ]
+    },
+    {
+      "label": "cpu2-b39b705f43b6-small-compact",
+      "size": "small",
+      "profile": "compact",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-cpu2-b39b705f43b6-small-compact-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T12:43:51.719074+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-cpu2-b39b705f43b6-small-compact-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_write",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "2",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-cpu2-b39b705f43b6-small-compact-1/options.json"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 1024,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": true,
+        "selective_sync": true,
+        "ublk_fast_path": false,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": true,
+        "compact_checkpoints": true,
+        "aligned_wal": false
+      },
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 3,
+      "workloads": [
+        "read_write"
+      ],
+      "load_before": [
+        4.99267578125,
+        4.72607421875,
+        3.48486328125
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 2,
+      "warm_concurrency": null,
+      "seconds": 129.8168018580036,
+      "ended_utc": "2026-10-10T12:46:01.545690+00:00",
+      "load_after": [
+        5.015625,
+        4.93505859375,
+        3.724609375
+      ],
+      "proof_report": "astra-c3588919f4-cpu2-b39b705f43b6-small-compact-1/comparison.json",
+      "proof_report_sha256": "bd6b6719568fc59c83c1b0abbe5ffdeaf693462ce9863ef1b8338a398eccc1be",
+      "summary": {
+        "read_write": {
+          "samples": 3,
+          "tps": [
+            1593.28,
+            1403.41,
+            1497.21
+          ],
+          "median_tps": 1497.21,
+          "p99_ms": [
+            13.7,
+            13.95,
+            13.95
+          ],
+          "median_p99_ms": 13.95,
+          "ignored_errors": 1,
+          "median_engine_cpu_percent_of_one_core": 46.42341792964662,
+          "median_mysql_cpu_percent_of_one_core": 135.71571281107254,
+          "mysql_throttled_periods_percent": [
+            0.0,
+            0.0,
+            2.3255813953488373
+          ],
+          "median_mysql_throttled_periods_percent": 0.0,
+          "mysql_throttled_usec": [
+            0,
+            0,
+            180484
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+        "config_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-small-compact-1-config.toml",
+        "config_sha256": "35f8cd091be10e15782684f7e1874d21c5d5d6b54a39fd52373159cf6a1ed381",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-323bb1097b47/infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-small-compact-1-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": true,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": true,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 1024,
+          "paged_index": true,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": false,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {},
+      "measurement_context": {
+        "table_file_bytes": 62914560,
+        "ssd_cache_bytes_before_samples": 36237312,
+        "engine_rss_kib_before_samples": 190404,
+        "engine_peak_rss_kib_before_samples": 190404,
+        "engine_memory_cache_mib": 1024,
+        "engine_disk_cache_mib": 4096,
+        "warmup_seconds": 10,
+        "startup_seconds": 13.973052187000576
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 1,
+      "eligible_for_comparison": false,
+      "comparison_exclusion_reasons": [
+        "ignored_sql_errors"
+      ]
+    },
+    {
+      "label": "cpu2-b39b705f43b6-small-native",
+      "size": "small",
+      "profile": "compat",
+      "engine": "native",
+      "phase": "astra-c3588919f4-cpu2-b39b705f43b6-small-native-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T12:46:01.593518+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+        "--phase-label",
+        "astra-c3588919f4-cpu2-b39b705f43b6-small-native-1",
+        "--engine",
+        "native",
+        "--mysql-workloads",
+        "read_write",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "2",
+        "--mysql-warm-seconds",
+        "10",
+        "--mysql-rand-type",
+        "special"
+      ],
+      "options": {},
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 3,
+      "workloads": [
+        "read_write"
+      ],
+      "load_before": [
+        5.015625,
+        4.93505859375,
+        3.724609375
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 2,
+      "warm_concurrency": null,
+      "seconds": 106.1831255549987,
+      "ended_utc": "2026-10-10T12:47:47.786511+00:00",
+      "load_after": [
+        7.02001953125,
+        5.78125,
+        4.1669921875
+      ],
+      "proof_report": "astra-c3588919f4-cpu2-b39b705f43b6-small-native-1/comparison.json",
+      "proof_report_sha256": "70afb0f0312ad68b64e467ac90b4a5137ea87fc78403913975b858191be422c5",
+      "summary": {
+        "read_write": {
+          "samples": 3,
+          "tps": [
+            1291.81,
+            1309.08,
+            1351.98
+          ],
+          "median_tps": 1309.08,
+          "p99_ms": [
+            40.37,
+            39.65,
+            41.85
+          ],
+          "median_p99_ms": 40.37,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": null,
+          "median_mysql_cpu_percent_of_one_core": 199.79013010807867,
+          "mysql_throttled_periods_percent": [
+            99.33333333333333,
+            100.0,
+            99.66777408637874
+          ],
+          "median_mysql_throttled_periods_percent": 99.66777408637874,
+          "mysql_throttled_usec": [
+            27440829,
+            27905450,
+            31994060
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": null,
+      "preparation": {},
+      "measurement_context": {
+        "table_file_bytes": 62914560,
+        "ssd_cache_bytes_before_samples": null,
+        "engine_rss_kib_before_samples": null,
+        "engine_peak_rss_kib_before_samples": null,
+        "engine_memory_cache_mib": null,
+        "engine_disk_cache_mib": null,
+        "warmup_seconds": 10,
+        "startup_seconds": 1.331177216998185
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": true,
+      "comparison_exclusion_reasons": []
+    },
+    {
+      "label": "cpu2-b39b705f43b6-large-baseline",
+      "size": "large",
+      "profile": "baseline",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T12:47:47.834313+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+        "--phase-label",
+        "astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "2",
+        "--mysql-warm-seconds",
+        "60",
+        "--mysql-rand-type",
+        "uniform",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1/options.json",
+        "--legacy-config",
+        "--offline-warm"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 64,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64
+      },
+      "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+      "samples": 3,
+      "workloads": [
+        "read_only"
+      ],
+      "load_before": [
+        7.02001953125,
+        5.78125,
+        4.1669921875
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 2,
+      "warm_concurrency": null,
+      "seconds": 569.7643863389967,
+      "ended_utc": "2026-10-10T12:57:17.608033+00:00",
+      "load_after": [
+        13.1337890625,
+        7.43359375,
+        4.83203125
+      ],
+      "proof_report": "astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1/comparison.json",
+      "proof_report_sha256": "507579721a7c18d48d20976b388694c9c976458879dbf549963e98f0240b09de",
+      "summary": {
+        "read_only": {
+          "samples": 3,
+          "tps": [
+            1246.42,
+            1193.18,
+            1246.78
+          ],
+          "median_tps": 1246.42,
+          "p99_ms": [
+            10.65,
+            10.84,
+            10.46
+          ],
+          "median_p99_ms": 10.65,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 161.72548485009054,
+          "median_mysql_cpu_percent_of_one_core": 139.93921263986013,
+          "mysql_throttled_periods_percent": [
+            0.0,
+            0.0,
+            0.6666666666666666
+          ],
+          "median_mysql_throttled_periods_percent": 0.0,
+          "mysql_throttled_usec": [
+            0,
+            0,
+            9195
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-pre-astra",
+        "binary_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+        "config_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1-config.toml",
+        "config_sha256": "d34a3a328a57de4f80b688df87c61dd028f00737c8d28a82ab28d252f6fea161",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1-config.toml",
+        "legacy_config": true,
+        "options": {
+          "checkpoint_seconds": 5,
+          "disk_cache_mib": 4096,
+          "flush_batch_us": 0,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 64,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "sync_data_only": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {
+        "warm_seconds": 407.12854447800055,
+        "warm_concurrency": null
+      },
+      "measurement_context": {
+        "table_file_bytes": 1040187392,
+        "ssd_cache_bytes_before_samples": 2049413120,
+        "engine_rss_kib_before_samples": 147372,
+        "engine_peak_rss_kib_before_samples": 166816,
+        "engine_memory_cache_mib": 64,
+        "engine_disk_cache_mib": 4096,
+        "warmup_seconds": 60,
+        "startup_seconds": 1.3720134800023516
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": true,
+      "comparison_exclusion_reasons": []
+    },
+    {
+      "label": "cpu2-b39b705f43b6-large-compact",
+      "size": "large",
+      "profile": "compact",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T12:57:17.657685+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+        "--phase-label",
+        "astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "2",
+        "--mysql-warm-seconds",
+        "60",
+        "--mysql-rand-type",
+        "uniform",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1/options.json",
+        "--offline-warm",
+        "--warm-concurrency",
+        "128"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 64,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": true,
+        "selective_sync": true,
+        "ublk_fast_path": false,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": true,
+        "compact_checkpoints": true,
+        "aligned_wal": false
+      },
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 3,
+      "workloads": [
+        "read_only"
+      ],
+      "load_before": [
+        13.1337890625,
+        7.43359375,
+        4.83203125
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 2,
+      "warm_concurrency": 128,
+      "seconds": 179.7559037220053,
+      "ended_utc": "2026-10-10T13:00:17.423955+00:00",
+      "load_after": [
+        11.69677734375,
+        9.79052734375,
+        6.2353515625
+      ],
+      "proof_report": "astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1/comparison.json",
+      "proof_report_sha256": "d08d005ac3a2eb69bb642c6665d5be4615decd148215943afee60cc61599d888",
+      "summary": {
+        "read_only": {
+          "samples": 3,
+          "tps": [
+            1422.52,
+            1528.42,
+            1589.23
+          ],
+          "median_tps": 1528.42,
+          "p99_ms": [
+            8.9,
+            8.43,
+            8.13
+          ],
+          "median_p99_ms": 8.43,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 126.35304406042776,
+          "median_mysql_cpu_percent_of_one_core": 159.23169306855522,
+          "mysql_throttled_periods_percent": [
+            0.0,
+            0.3333333333333333,
+            0.0
+          ],
+          "median_mysql_throttled_periods_percent": 0.0,
+          "mysql_throttled_usec": [
+            0,
+            486,
+            0
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+        "config_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-config.toml",
+        "config_sha256": "1955c8c046a9ec8d12280233c6bb9f08915ce3d400a2fbfc81cad7980c85c114",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": true,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": true,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 64,
+          "paged_index": true,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": false,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {
+        "warm_seconds": 18.97549291600444,
+        "warm_concurrency": 128
+      },
+      "measurement_context": {
+        "table_file_bytes": 1040187392,
+        "ssd_cache_bytes_before_samples": 2055680000,
+        "engine_rss_kib_before_samples": 149028,
+        "engine_peak_rss_kib_before_samples": 151468,
+        "engine_memory_cache_mib": 64,
+        "engine_disk_cache_mib": 4096,
+        "warmup_seconds": 60,
+        "startup_seconds": 1.403768329997547
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": true,
+      "comparison_exclusion_reasons": []
+    },
+    {
+      "label": "cpu2-b39b705f43b6-large-native",
+      "size": "large",
+      "profile": "compat",
+      "engine": "native",
+      "phase": "astra-c3588919f4-cpu2-b39b705f43b6-large-native-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T13:00:17.472502+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+        "--phase-label",
+        "astra-c3588919f4-cpu2-b39b705f43b6-large-native-1",
+        "--engine",
+        "native",
+        "--mysql-workloads",
+        "read_only",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "2",
+        "--mysql-warm-seconds",
+        "60",
+        "--mysql-rand-type",
+        "uniform"
+      ],
+      "options": {},
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 3,
+      "workloads": [
+        "read_only"
+      ],
+      "load_before": [
+        11.69677734375,
+        9.79052734375,
+        6.2353515625
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "nbd",
+      "storage_crash": false,
+      "mysql_cpus": 2,
+      "warm_concurrency": null,
+      "seconds": 159.14641588999802,
+      "ended_utc": "2026-10-10T13:02:56.629377+00:00",
+      "load_after": [
+        7.5185546875,
+        8.99755859375,
+        6.5185546875
+      ],
+      "proof_report": "astra-c3588919f4-cpu2-b39b705f43b6-large-native-1/comparison.json",
+      "proof_report_sha256": "5638c774369d451d99ca45f3555c0fb55c4eb472cfd5ba4bf2a40b89681ad851",
+      "summary": {
+        "read_only": {
+          "samples": 3,
+          "tps": [
+            1058.89,
+            1058.56,
+            1058.95
+          ],
+          "median_tps": 1058.89,
+          "p99_ms": [
+            10.09,
+            10.27,
+            10.27
+          ],
+          "median_p99_ms": 10.27,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": null,
+          "median_mysql_cpu_percent_of_one_core": 86.87709264235025,
+          "mysql_throttled_periods_percent": [
+            0.0,
+            1.0,
+            0.6666666666666666
+          ],
+          "median_mysql_throttled_periods_percent": 0.6666666666666666,
+          "mysql_throttled_usec": [
+            0,
+            153598,
+            61224
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": null,
+      "preparation": {},
+      "measurement_context": {
+        "table_file_bytes": 1040187392,
+        "ssd_cache_bytes_before_samples": null,
+        "engine_rss_kib_before_samples": null,
+        "engine_peak_rss_kib_before_samples": null,
+        "engine_memory_cache_mib": null,
+        "engine_disk_cache_mib": null,
+        "warmup_seconds": 60,
+        "startup_seconds": 1.3325787870053318
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": true,
+      "comparison_exclusion_reasons": []
+    },
+    {
+      "label": "large-ublk-cpu1-b39b705f43b6",
+      "size": "large",
+      "profile": "compact",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-large-ublk-cpu1-b39b705f43b6-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T13:02:56.679040+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+        "--phase-label",
+        "astra-c3588919f4-large-ublk-cpu1-b39b705f43b6-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "1",
+        "--mysql-warm-seconds",
+        "60",
+        "--mysql-rand-type",
+        "uniform",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-large-ublk-cpu1-b39b705f43b6-1/options.json",
+        "--transport",
+        "ublk",
+        "--offline-warm",
+        "--warm-concurrency",
+        "128"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 64,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": true,
+        "selective_sync": true,
+        "ublk_fast_path": true,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": true,
+        "compact_checkpoints": true,
+        "aligned_wal": false
+      },
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 3,
+      "workloads": [
+        "read_only"
+      ],
+      "load_before": [
+        7.5185546875,
+        8.99755859375,
+        6.5185546875
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "ublk",
+      "storage_crash": false,
+      "mysql_cpus": 1,
+      "warm_concurrency": 128,
+      "seconds": 164.77345841499482,
+      "ended_utc": "2026-10-10T13:05:41.462833+00:00",
+      "load_after": [
+        9.23681640625,
+        8.931640625,
+        6.85302734375
+      ],
+      "proof_report": "astra-c3588919f4-large-ublk-cpu1-b39b705f43b6-1/comparison.json",
+      "proof_report_sha256": "7ef6e8ab6b1c6803c475746ae3eef6fcbec98c1becbd64beb060fdc8ec631231",
+      "summary": {
+        "read_only": {
+          "samples": 3,
+          "tps": [
+            1109.26,
+            1133.81,
+            1256.7
+          ],
+          "median_tps": 1133.81,
+          "p99_ms": [
+            55.82,
+            56.84,
+            56.84
+          ],
+          "median_p99_ms": 56.84,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 62.76384117576343,
+          "median_mysql_cpu_percent_of_one_core": 99.94215317858237,
+          "mysql_throttled_periods_percent": [
+            100.0,
+            100.0,
+            100.0
+          ],
+          "median_mysql_throttled_periods_percent": 100.0,
+          "mysql_throttled_usec": [
+            53925659,
+            54979239,
+            58934966
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+        "config_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-ublk-cpu1-b39b705f43b6-1-config.toml",
+        "config_sha256": "abaacf31bbc61c8a1382d6232aa7a4d4c56c765922b28e54b8c6f2d9f921a878",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-ublk-cpu1-b39b705f43b6-1-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": true,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": true,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 64,
+          "paged_index": true,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {
+        "warm_seconds": 2.0429299410025124,
+        "warm_concurrency": 128
+      },
+      "measurement_context": {
+        "table_file_bytes": 1040187392,
+        "ssd_cache_bytes_before_samples": 2055680000,
+        "engine_rss_kib_before_samples": 273540,
+        "engine_peak_rss_kib_before_samples": 277124,
+        "engine_memory_cache_mib": 64,
+        "engine_disk_cache_mib": 4096,
+        "warmup_seconds": 60,
+        "startup_seconds": 1.3519953139984864
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": true,
+      "comparison_exclusion_reasons": []
+    },
+    {
+      "label": "large-ublk-cpu2-b39b705f43b6",
+      "size": "large",
+      "profile": "compact",
+      "engine": "infinidisk2",
+      "phase": "astra-c3588919f4-large-ublk-cpu2-b39b705f43b6-1",
+      "attempt": 1,
+      "started_utc": "2026-10-10T13:05:41.512020+00:00",
+      "arguments": [
+        "/usr/bin/python3",
+        "/root/infinidisk2/scripts/compare_zerofs.py",
+        "--binary",
+        "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "--mysql-repeat-report",
+        "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+        "--phase-label",
+        "astra-c3588919f4-large-ublk-cpu2-b39b705f43b6-1",
+        "--engine",
+        "infinidisk2",
+        "--mysql-workloads",
+        "read_only",
+        "--mysql-samples",
+        "3",
+        "--mysql-seconds",
+        "30",
+        "--mysql-percentile",
+        "99",
+        "--mysql-cpus",
+        "2",
+        "--mysql-warm-seconds",
+        "60",
+        "--mysql-rand-type",
+        "uniform",
+        "--engine-options",
+        "/root/infinidisk2/validation/astra/mysql/astra-c3588919f4-large-ublk-cpu2-b39b705f43b6-1/options.json",
+        "--transport",
+        "ublk",
+        "--offline-warm",
+        "--warm-concurrency",
+        "128"
+      ],
+      "options": {
+        "logical_cache": true,
+        "wal_fixed_size": true,
+        "wal_commit_records": true,
+        "sync_data_only": true,
+        "wal_preallocate": false,
+        "wal_writev": true,
+        "flush_batch_us": 0,
+        "checkpoint_seconds": 5,
+        "segment_mib": 8,
+        "max_pending_mib": 1024,
+        "hot_wal_mib": 0,
+        "max_inflight": 128,
+        "max_index_mib": 1024,
+        "memory_cache_mib": 64,
+        "disk_cache_mib": 4096,
+        "read_extent_kib": 64,
+        "async_cache": true,
+        "cache_queue_mib": 16,
+        "fast_local_reads": true,
+        "checkpoint_pipeline": true,
+        "selective_sync": true,
+        "ublk_fast_path": true,
+        "generation_mode": false,
+        "generation_max_lag_seconds": 30,
+        "paged_index": true,
+        "compact_checkpoints": true,
+        "aligned_wal": false
+      },
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "samples": 3,
+      "workloads": [
+        "read_only"
+      ],
+      "load_before": [
+        9.23681640625,
+        8.931640625,
+        6.85302734375
+      ],
+      "returncode": 0,
+      "zero_ignore_fsync": null,
+      "transport": "ublk",
+      "storage_crash": false,
+      "mysql_cpus": 2,
+      "warm_concurrency": 128,
+      "seconds": 166.5443969340049,
+      "ended_utc": "2026-10-10T13:08:28.066878+00:00",
+      "load_after": [
+        10.04150390625,
+        9.8984375,
+        7.58642578125
+      ],
+      "proof_report": "astra-c3588919f4-large-ublk-cpu2-b39b705f43b6-1/comparison.json",
+      "proof_report_sha256": "2446bd6ad43036736200fcedd128a28e41cf36f96fbc7e587212e5d27f636305",
+      "summary": {
+        "read_only": {
+          "samples": 3,
+          "tps": [
+            2549.8,
+            2552.45,
+            2540.66
+          ],
+          "median_tps": 2549.8,
+          "p99_ms": [
+            8.13,
+            7.84,
+            7.98
+          ],
+          "median_p99_ms": 7.98,
+          "ignored_errors": 0,
+          "median_engine_cpu_percent_of_one_core": 115.66314523173064,
+          "median_mysql_cpu_percent_of_one_core": 199.65322150336792,
+          "mysql_throttled_periods_percent": [
+            94.33333333333333,
+            95.66666666666667,
+            96.66666666666667
+          ],
+          "median_mysql_throttled_periods_percent": 95.66666666666667,
+          "mysql_throttled_usec": [
+            4206246,
+            4226333,
+            4305438
+          ]
+        }
+      },
+      "database_SIGKILL_recovery": "passed",
+      "storage_engine_SIGKILL_recovery": null,
+      "engine_metadata": {
+        "engine": "infinidisk2",
+        "binary_path": "/root/infinidisk2/target/release/infinidisk2-astra-b39b705f43b6",
+        "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+        "config_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-ublk-cpu2-b39b705f43b6-1-config.toml",
+        "config_sha256": "abaacf31bbc61c8a1382d6232aa7a4d4c56c765922b28e54b8c6f2d9f921a878",
+        "config_snapshot_path": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/infinidisk2-astra-c3588919f4-large-ublk-cpu2-b39b705f43b6-1-config.toml",
+        "legacy_config": false,
+        "options": {
+          "aligned_wal": false,
+          "async_cache": true,
+          "cache_queue_mib": 16,
+          "checkpoint_pipeline": true,
+          "checkpoint_seconds": 5,
+          "compact_checkpoints": true,
+          "disk_cache_mib": 4096,
+          "fast_local_reads": true,
+          "flush_batch_us": 0,
+          "generation_max_lag_seconds": 30,
+          "generation_mode": false,
+          "hot_wal_mib": 0,
+          "logical_cache": true,
+          "max_index_mib": 1024,
+          "max_inflight": 128,
+          "max_pending_mib": 1024,
+          "memory_cache_mib": 64,
+          "paged_index": true,
+          "read_extent_kib": 64,
+          "segment_mib": 8,
+          "selective_sync": true,
+          "sync_data_only": true,
+          "ublk_fast_path": true,
+          "wal_commit_records": true,
+          "wal_fixed_size": true,
+          "wal_preallocate": false,
+          "wal_writev": true
+        },
+        "contract": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog"
+      },
+      "preparation": {
+        "warm_seconds": 1.0798087319999468,
+        "warm_concurrency": 128
+      },
+      "measurement_context": {
+        "table_file_bytes": 1040187392,
+        "ssd_cache_bytes_before_samples": 2055680000,
+        "engine_rss_kib_before_samples": 272264,
+        "engine_peak_rss_kib_before_samples": 282208,
+        "engine_memory_cache_mib": 64,
+        "engine_disk_cache_mib": 4096,
+        "warmup_seconds": 60,
+        "startup_seconds": 1.3430249559969525
+      },
+      "complete": true,
+      "ignored_sql_errors_total": 0,
+      "eligible_for_comparison": true,
+      "comparison_exclusion_reasons": []
+    }
+  ],
+  "binary_sha256": {
+    "astra": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+    "baseline": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1"
+  },
+  "binary_paths": {
+    "astra": "/root/infinidisk2/target/release/infinidisk2-astra",
+    "baseline": "/root/infinidisk2/target/release/infinidisk2-pre-astra"
+  },
+  "fixtures": {
+    "small": {
+      "report": "/root/infinidisk2/test-output/comparison-323bb1097b47/report.json",
+      "sha256": "4ea733e5d778e74f960dc625669b08168fa4919c0d34c3dc80cb7ef2567adf11"
+    },
+    "large": {
+      "report": "/root/infinidisk2/test-output/comparison-be4ba51a4a38/report.json",
+      "sha256": "cfb3c53f6e73a8977743ea24e12e9c5183490d7ddae23016d46ecd2373048df8"
+    }
+  },
+  "protocol": {
+    "sample_seconds": 30,
+    "screen_samples": 1,
+    "qualification_samples": 3,
+    "latency_percentile": 99,
+    "small_warm_seconds": 10,
+    "large_warm_seconds": 60,
+    "small_random_distribution": "special",
+    "large_random_distribution": "uniform",
+    "large_ssd_prefill": "offline warm before every InfiniDisk2 large stage, including baseline",
+    "small_engine_memory_mib": 1024,
+    "large_engine_memory_mib": 64,
+    "ssd_mib": 4096,
+    "mysql_cpu_limit": 1,
+    "mysql_memory_mib": 1024,
+    "mysql_buffer_pool_mib": 256,
+    "threads": 8,
+    "durability": "InnoDB fsync=1, sync_binlog=1, doublewrite ON; InfiniDisk2 local WAL fsync; ZeroFS durable S3 and ignored-fsync modes reported separately",
+    "recovery": "write and qualification stages include MySQL SIGKILL + CHECK TABLE; read-only screening reuses validated fixture and explicitly skips that repeated check",
+    "selection": "highest geometric mean of small read_write/write_only TPS, choosing simpler profile within 3%; reject candidates with ignored SQL errors; use NBD for conservative qualification",
+    "limitations": "single VM and evolving fixed-size database; no global cache drop; Linux page cache outside configured engine RAM; screening has one sample; host services remain running",
+    "excluded_formats": [
+      "aligned_wal",
+      "generation_mode"
+    ],
+    "astra_qualification_warm_concurrency": 128,
+    "reuse_policy": "Qualification/confirmation/controls require matching binary, parameters, raw proof and config digests. Historical screenings are explicitly retained only for profile selection.",
+    "sql_error_policy": "Any ignored SQL error excludes the complete stage from performance comparisons; preserve counters and do not automatically repeat to obtain a cleaner score."
+  },
+  "host": {
+    "kernel": "Linux wordpress-ovh-u3 7.0.0-38-generic #38-Ubuntu SMP PREEMPT_DYNAMIC Fri Sep  4 09:10:14 UTC 2026 x86_64",
+    "logical_cpus": 4
+  },
+  "build_revisions": [
+    {
+      "utc": "2026-10-10T08:58:57.598342+00:00",
+      "old_sha256": "13b4b02d5037c26d99ff60b6e12b3637a66731daf694899d3c42033a83471672",
+      "new_sha256": "839abdf0cec29812ba280cf24c26ed8f122970fb76195d5241f38c98f736d5e9",
+      "reason": "cache rekey avoids metadata rewrite for segment-length-only changes; generation recovery recreates disposable watermark after verified HEAD (generation mode excluded from this campaign)",
+      "superseded_stages": [
+        "astra-c3588919f4-small-screen-core-1"
+      ],
+      "baseline_unchanged": true,
+      "intentional_pause": "coordinator paused while current phase finished, test MySQL removed and nbd31 detached before compilation; old coordinator then archived proof and rejected binary change"
+    },
+    {
+      "utc": "2026-10-10T10:29:43.569569+00:00",
+      "old_sha256": "839abdf0cec29812ba280cf24c26ed8f122970fb76195d5241f38c98f736d5e9",
+      "new_sha256": "38c94cedb88bcc31475fcde72331b10725c72bbaaac43209782505935a68858e",
+      "reason": "Final-v2 after confirmed FLUSH u64::MAX descriptor fix, fatal queue supervision and joined completion-pump teardown; six real clean deletions and short MySQL SIGKILL/integrity diagnostic passed. Also incorporates final engine warm sorting, bounded TRIM and generation shutdown fixes. Earlier 839 screening remains exploratory and failed ublk attempt excluded.",
+      "baseline_unchanged": true,
+      "retained_stages": [
+        "astra-c3588919f4-small-screen-baseline-before-1",
+        "astra-c3588919f4-small-screen-core-1",
+        "astra-c3588919f4-small-screen-core-2",
+        "astra-c3588919f4-small-screen-pipeline-1",
+        "astra-c3588919f4-small-screen-compact-1",
+        "astra-c3588919f4-small-screen-baseline-after-1",
+        "astra-c3588919f4-large-screen-baseline-before-1",
+        "astra-c3588919f4-large-screen-core-1",
+        "astra-c3588919f4-large-screen-ublk-1"
+      ],
+      "superseded_stages": [],
+      "protocol": "Prior per-stage binary hashes and raw proofs remain unchanged. Completed screening is exploratory evidence for profile selection; failed stages are retried and remaining qualification uses this revision."
+    },
+    {
+      "utc": "2026-10-10T11:13:02.491259+00:00",
+      "old_sha256": "38c94cedb88bcc31475fcde72331b10725c72bbaaac43209782505935a68858e",
+      "new_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "reason": "Final-v3 adds physically grouped parallel offline warm. Rust hot paths unchanged from validated 38c94 transport; 92 tests, real io_uring teardown and Clippy passed. Controlled warm sweep 8/16/32/64/128 complete with original caches restored. All qualification uses b39b705; prior screenings remain selection-only. Astra preparation explicitly uses --warm-concurrency 128; legacy preparation remains unchanged. Strict proof/SHA reuse and SQL-error exclusions apply.",
+      "baseline_unchanged": true,
+      "retained_stages": [
+        "astra-c3588919f4-small-screen-baseline-before-1",
+        "astra-c3588919f4-small-screen-core-1",
+        "astra-c3588919f4-small-screen-core-2",
+        "astra-c3588919f4-small-screen-pipeline-1",
+        "astra-c3588919f4-small-screen-compact-1",
+        "astra-c3588919f4-small-screen-baseline-after-1",
+        "astra-c3588919f4-large-screen-baseline-before-1",
+        "astra-c3588919f4-large-screen-core-1",
+        "astra-c3588919f4-large-screen-ublk-1",
+        "astra-c3588919f4-large-screen-ublk-2",
+        "astra-c3588919f4-large-screen-baseline-after-1"
+      ],
+      "superseded_stages": [],
+      "protocol": "Prior per-stage binary hashes and raw proofs remain unchanged. Completed screening is exploratory evidence for profile selection; failed stages are retried and remaining qualification uses this revision."
+    }
+  ],
+  "cache_preservation_proof": "cache-preservations.json",
+  "selection": {
+    "profile": "compact",
+    "transport": "nbd",
+    "candidate_scores": {
+      "pipeline": 1462.4460088837468,
+      "compact": 1600.742766593059
+    },
+    "explanation": "geometric mean of small write/mixed throughput, with simpler profile selected within 3%; ublk remains separately measured because screen covered reads only"
+  },
+  "sql_diagnostics": [
+    {
+      "phase": "sql-diagnostic-b39b705f43b6-1791631847359295075",
+      "proof_report": "sql-diagnostic-b39b705f43b6-1791631847359295075/report.json",
+      "proof_report_sha256": "1562315c6131d00a8794cf324a688fce723067a04d13a49d40471661c86c7429",
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "source_phase": "astra-c3588919f4-small-qualified-compact-1",
+      "complete": true,
+      "eligible_for_comparison": false,
+      "scope": "separate fixed diagnostic; no replacement samples; historical events remain individually unidentified",
+      "ignored_error_codes": {
+        "1213": 2
+      },
+      "ignored_errors_total": 2,
+      "counters_concordant": true,
+      "database_SIGKILL_recovery": "passed",
+      "clean_teardown": true,
+      "result": "reproduced two InnoDB transaction deadlocks (1213, SQLSTATE 40001); no lock timeout in this diagnostic",
+      "completed_utc": "2026-10-10T11:34:12.400244+00:00"
+    }
+  ],
+  "completed_utc": "2026-10-10T12:11:07.834553+00:00",
+  "final_confirmations": [
+    {
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "started_utc": "2026-10-10T12:36:21.162716+00:00",
+      "complete": true,
+      "matrix_binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "profile": "compact",
+      "protocol": "small fixture, 3 samples of 30s per workload, NBD then ublk; separate engine SIGKILL during mixed writes, ext4 recovery and InnoDB CHECK TABLE; process cgroup v2 CPU counters sampled",
+      "reused_nbd_qualification": "astra-c3588919f4-small-qualified-compact-1",
+      "stages": [
+        "astra-c3588919f4-small-qualified-compact-1",
+        "astra-c3588919f4-small-final-b39b705f43b6-ublk-1",
+        "astra-c3588919f4-small-final-b39b705f43b6-ublk-recovery-1"
+      ],
+      "ended_utc": "2026-10-10T12:41:34.282998+00:00"
+    }
+  ],
+  "cpu_controls": [
+    {
+      "binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+      "baseline_sha256": "6096fff8d5b69e9e3f21c8a500cb7a1c98d737a876a018d2faf8d8a1b64046d1",
+      "started_utc": "2026-10-10T12:41:34.375734+00:00",
+      "complete": true,
+      "profile": "compact",
+      "mysql_cpus": 2,
+      "samples": 3,
+      "sample_seconds": 30,
+      "protocol": "Separate CPU-quota diagnostic, not a replacement for the 1-CPU campaign. Baseline/Astra NBD/native, small mixed then large uniform read-only; same seed, configured caches and warmup durations. Cache banks preserve only disposable cache files; every large InfiniDisk2 stage still runs complete warm.",
+      "stages": [
+        "astra-c3588919f4-cpu2-b39b705f43b6-small-baseline-1",
+        "astra-c3588919f4-cpu2-b39b705f43b6-small-compact-1",
+        "astra-c3588919f4-cpu2-b39b705f43b6-small-native-1",
+        "astra-c3588919f4-cpu2-b39b705f43b6-large-baseline-1",
+        "astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1",
+        "astra-c3588919f4-cpu2-b39b705f43b6-large-native-1"
+      ],
+      "transport_comparison": {
+        "profile": "compact",
+        "transport": "ublk",
+        "mysql_cpus": [
+          1,
+          2
+        ],
+        "samples": 3,
+        "sample_seconds": 30,
+        "protocol": "Large uniform read-only with the same selected profile and configured caches as NBD; only ublk_fast_path and transport differ. Quotas 1 and 2 CPU are reported separately from the six CPU-quota stages."
+      },
+      "transport_stages": [
+        "astra-c3588919f4-large-ublk-cpu1-b39b705f43b6-1",
+        "astra-c3588919f4-large-ublk-cpu2-b39b705f43b6-1"
+      ],
+      "ended_utc": "2026-10-10T13:08:28.093202+00:00"
+    }
+  ]
+}

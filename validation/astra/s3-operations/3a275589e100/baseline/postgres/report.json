@@ -1,0 +1,822 @@
+{
+  "complete": true,
+  "integrity": {
+    "prepared": "passed",
+    "warm_restored": "passed",
+    "cold_restored": "passed"
+  },
+  "phases": {
+    "postgres.init": {
+      "started_utc": "2026-10-10T13:21:45.522010+00:00",
+      "seconds": 2.667972244002158,
+      "summary": {
+        "total_upstream_attempts": 3,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 1,
+          "B": 2,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 1,
+          "B": 2
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "GetObject": 2,
+          "PutObject": 1
+        },
+        "by_status": {
+          "200": 2,
+          "404": 1
+        },
+        "by_phase": {
+          "postgres.init": 3
+        },
+        "by_object_type": {
+          "infinidisk_head": 3
+        },
+        "request_payload_bytes": 125,
+        "response_payload_bytes": 506,
+        "estimated_gross_request_cost_usd": 6e-06,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "postgres.prepare_drain": {
+      "started_utc": "2026-10-10T13:21:48.189988+00:00",
+      "seconds": 2.363085774006322,
+      "summary": {
+        "total_upstream_attempts": 31,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 31,
+          "B": 0,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 31,
+          "B": 0
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "PutObject": 31
+        },
+        "by_status": {
+          "200": 31
+        },
+        "by_phase": {
+          "postgres.prepare_drain": 31
+        },
+        "by_object_type": {
+          "infinidisk_head": 1,
+          "infinidisk_index": 15,
+          "segment": 15
+        },
+        "request_payload_bytes": 137588210,
+        "response_payload_bytes": 0,
+        "estimated_gross_request_cost_usd": 0.000155,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "postgres.open": {
+      "started_utc": "2026-10-10T13:21:50.553070+00:00",
+      "seconds": 0.9675334269995801,
+      "summary": {
+        "total_upstream_attempts": 16,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 0,
+          "B": 16,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 0,
+          "B": 16
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "GetObject": 16
+        },
+        "by_status": {
+          "200": 16
+        },
+        "by_phase": {
+          "postgres.open": 16
+        },
+        "by_object_type": {
+          "infinidisk_head": 1,
+          "infinidisk_index": 15
+        },
+        "request_payload_bytes": 0,
+        "response_payload_bytes": 1170290,
+        "estimated_gross_request_cost_usd": 8e-06,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "postgres.idle": {
+      "started_utc": "2026-10-10T13:21:51.520607+00:00",
+      "seconds": 10.001297747003264,
+      "summary": {
+        "total_upstream_attempts": 11,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 11,
+          "B": 0,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 11,
+          "B": 0
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "PutObject": 11
+        },
+        "by_status": {
+          "200": 11
+        },
+        "by_phase": {
+          "postgres.idle": 11
+        },
+        "by_object_type": {
+          "infinidisk_head": 2,
+          "infinidisk_index": 7,
+          "segment": 2
+        },
+        "request_payload_bytes": 845188,
+        "response_payload_bytes": 0,
+        "estimated_gross_request_cost_usd": 5.5e-05,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "postgres.load": {
+      "started_utc": "2026-10-10T13:22:01.521909+00:00",
+      "seconds": 0.1825921540003037,
+      "summary": {
+        "total_upstream_attempts": 0,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 0,
+          "B": 0,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 0,
+          "B": 0
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {},
+        "by_status": {},
+        "by_phase": {},
+        "by_object_type": {},
+        "request_payload_bytes": 0,
+        "response_payload_bytes": 0,
+        "estimated_gross_request_cost_usd": 0.0,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "postgres.drain": {
+      "started_utc": "2026-10-10T13:22:01.704497+00:00",
+      "seconds": 0.6702524489955977,
+      "summary": {
+        "total_upstream_attempts": 11,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 11,
+          "B": 0,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 11,
+          "B": 0
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "PutObject": 11
+        },
+        "by_status": {
+          "200": 11
+        },
+        "by_phase": {
+          "postgres.drain": 11
+        },
+        "by_object_type": {
+          "infinidisk_head": 1,
+          "infinidisk_index": 8,
+          "segment": 2
+        },
+        "request_payload_bytes": 11226126,
+        "response_payload_bytes": 0,
+        "estimated_gross_request_cost_usd": 5.5e-05,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "postgres.warm_open": {
+      "started_utc": "2026-10-10T13:22:02.374749+00:00",
+      "seconds": 0.5038506669952767,
+      "summary": {
+        "total_upstream_attempts": 16,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 0,
+          "B": 16,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 0,
+          "B": 16
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "GetObject": 16
+        },
+        "by_status": {
+          "200": 16
+        },
+        "by_phase": {
+          "postgres.warm_open": 16
+        },
+        "by_object_type": {
+          "infinidisk_head": 1,
+          "infinidisk_index": 15
+        },
+        "request_payload_bytes": 0,
+        "response_payload_bytes": 1228582,
+        "estimated_gross_request_cost_usd": 8e-06,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "postgres.warm_database_open": {
+      "started_utc": "2026-10-10T13:22:02.878601+00:00",
+      "seconds": 0.2459216700081015,
+      "summary": {
+        "total_upstream_attempts": 0,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 0,
+          "B": 0,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 0,
+          "B": 0
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {},
+        "by_status": {},
+        "by_phase": {},
+        "by_object_type": {},
+        "request_payload_bytes": 0,
+        "response_payload_bytes": 0,
+        "estimated_gross_request_cost_usd": 0.0,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "postgres.warm_check": {
+      "started_utc": "2026-10-10T13:22:03.124522+00:00",
+      "seconds": 0.2292062289925525,
+      "summary": {
+        "total_upstream_attempts": 0,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 0,
+          "B": 0,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 0,
+          "B": 0
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {},
+        "by_status": {},
+        "by_phase": {},
+        "by_object_type": {},
+        "request_payload_bytes": 0,
+        "response_payload_bytes": 0,
+        "estimated_gross_request_cost_usd": 0.0,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "postgres.warm_drain": {
+      "started_utc": "2026-10-10T13:22:03.353728+00:00",
+      "seconds": 0.5040208620048361,
+      "summary": {
+        "total_upstream_attempts": 10,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 10,
+          "B": 0,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 10,
+          "B": 0
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "PutObject": 10
+        },
+        "by_status": {
+          "200": 10
+        },
+        "by_phase": {
+          "postgres.warm_drain": 10
+        },
+        "by_object_type": {
+          "infinidisk_head": 1,
+          "infinidisk_index": 8,
+          "segment": 1
+        },
+        "request_payload_bytes": 6014710,
+        "response_payload_bytes": 0,
+        "estimated_gross_request_cost_usd": 5e-05,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "postgres.cold_open": {
+      "started_utc": "2026-10-10T13:22:03.857749+00:00",
+      "seconds": 0.4213431239913916,
+      "summary": {
+        "total_upstream_attempts": 34,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 1,
+          "B": 33,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 1,
+          "B": 33
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "GetObject": 33,
+          "PutObject": 1
+        },
+        "by_status": {
+          "200": 33,
+          "206": 1
+        },
+        "by_phase": {
+          "postgres.cold_open": 34
+        },
+        "by_object_type": {
+          "infinidisk_head": 3,
+          "infinidisk_index": 30,
+          "segment": 1
+        },
+        "request_payload_bytes": 2146,
+        "response_payload_bytes": 2591324,
+        "estimated_gross_request_cost_usd": 2.15e-05,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "postgres.cold_database_open": {
+      "started_utc": "2026-10-10T13:22:04.279090+00:00",
+      "seconds": 4.2020114390034,
+      "summary": {
+        "total_upstream_attempts": 75,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 0,
+          "B": 75,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 0,
+          "B": 75
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "GetObject": 75
+        },
+        "by_status": {
+          "206": 75
+        },
+        "by_phase": {
+          "postgres.cold_database_open": 75
+        },
+        "by_object_type": {
+          "segment": 75
+        },
+        "request_payload_bytes": 0,
+        "response_payload_bytes": 5222400,
+        "estimated_gross_request_cost_usd": 3.75e-05,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "postgres.cold_check": {
+      "started_utc": "2026-10-10T13:22:08.481101+00:00",
+      "seconds": 9.422388250008225,
+      "summary": {
+        "total_upstream_attempts": 649,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 7,
+          "B": 642,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 7,
+          "B": 642
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "GetObject": 642,
+          "PutObject": 7
+        },
+        "by_status": {
+          "200": 7,
+          "206": 642
+        },
+        "by_phase": {
+          "postgres.cold_check": 649
+        },
+        "by_object_type": {
+          "infinidisk_head": 1,
+          "infinidisk_index": 5,
+          "segment": 643
+        },
+        "request_payload_bytes": 675198,
+        "response_payload_bytes": 44593440,
+        "estimated_gross_request_cost_usd": 0.000356,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    },
+    "postgres.cold_drain": {
+      "started_utc": "2026-10-10T13:22:17.903490+00:00",
+      "seconds": 0.4687279719946673,
+      "summary": {
+        "total_upstream_attempts": 9,
+        "local_only_requests": 0,
+        "request_classes": {
+          "A": 9,
+          "B": 0,
+          "FREE": 0,
+          "UNKNOWN": 0
+        },
+        "estimated_billable_requests": {
+          "A": 9,
+          "B": 0
+        },
+        "explicitly_nonbillable_status_requests": 0,
+        "transport_uncertain_requests": 0,
+        "unknown_class_requests": 0,
+        "assumed_class_requests": 0,
+        "by_operation": {
+          "PutObject": 9
+        },
+        "by_status": {
+          "200": 9
+        },
+        "by_phase": {
+          "postgres.cold_drain": 9
+        },
+        "by_object_type": {
+          "infinidisk_head": 1,
+          "infinidisk_index": 7,
+          "segment": 1
+        },
+        "request_payload_bytes": 1349986,
+        "response_payload_bytes": 0,
+        "estimated_gross_request_cost_usd": 4.5e-05,
+        "completed_transactions_for_normalization": null,
+        "estimated_usd_per_1000_transactions": null,
+        "estimated_usd_per_10000_transactions": null,
+        "upstream_attempts_per_million_transactions": null,
+        "estimated_usd_per_million_transactions": null,
+        "cost_has_unpriced_or_uncertain_requests": false,
+        "pricing_source": "https://www.tigrisdata.com/pricing/",
+        "pricing_verified_utc": "2026-10-10",
+        "monthly_free_tier_applied": false,
+        "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+      }
+    }
+  },
+  "committed_history_rows": {
+    "prepared": 0,
+    "warm_restored": 256,
+    "cold_restored": 256
+  },
+  "transactions": 256,
+  "instrumented_pgbench": {
+    "tps": 2212.504105,
+    "latency_ms": 1.808,
+    "failed_transactions": 0
+  },
+  "sql_accounting": {
+    "business_queries": 1280,
+    "all_commands_including_begin_end": 1792,
+    "queries_per_transaction": 5,
+    "commands_per_transaction": 7,
+    "statement_failures": 0,
+    "basis": "TPC-B-like built-in script: three UPDATE, one SELECT, one INSERT; BEGIN and END excluded from query unit. No vacuum during load; max-tries=1, zero failed transactions.",
+    "source": "https://www.postgresql.org/docs/16/pgbench.html"
+  },
+  "proxy": {
+    "backend_attempts": 865,
+    "forwarded": 865,
+    "finished": 865,
+    "inflight": 0,
+    "peak_inflight": 15,
+    "upload_bytes": 157701689,
+    "download_bytes": 54806542,
+    "local_rejections": 0,
+    "closed_error": null,
+    "journal_complete": true
+  },
+  "summary": {
+    "total_upstream_attempts": 865,
+    "local_only_requests": 0,
+    "request_classes": {
+      "A": 81,
+      "B": 784,
+      "FREE": 0,
+      "UNKNOWN": 0
+    },
+    "estimated_billable_requests": {
+      "A": 81,
+      "B": 784
+    },
+    "explicitly_nonbillable_status_requests": 0,
+    "transport_uncertain_requests": 0,
+    "unknown_class_requests": 0,
+    "assumed_class_requests": 0,
+    "by_operation": {
+      "GetObject": 784,
+      "PutObject": 81
+    },
+    "by_status": {
+      "200": 146,
+      "206": 718,
+      "404": 1
+    },
+    "by_phase": {
+      "postgres.cold_check": 649,
+      "postgres.cold_database_open": 75,
+      "postgres.cold_drain": 9,
+      "postgres.cold_open": 34,
+      "postgres.drain": 11,
+      "postgres.idle": 11,
+      "postgres.init": 3,
+      "postgres.open": 16,
+      "postgres.prepare_drain": 31,
+      "postgres.warm_drain": 10,
+      "postgres.warm_open": 16
+    },
+    "by_object_type": {
+      "infinidisk_head": 15,
+      "infinidisk_index": 110,
+      "segment": 740
+    },
+    "request_payload_bytes": 157701689,
+    "response_payload_bytes": 54806542,
+    "estimated_gross_request_cost_usd": 0.000797,
+    "completed_transactions_for_normalization": null,
+    "estimated_usd_per_1000_transactions": null,
+    "estimated_usd_per_10000_transactions": null,
+    "upstream_attempts_per_million_transactions": null,
+    "estimated_usd_per_million_transactions": null,
+    "cost_has_unpriced_or_uncertain_requests": false,
+    "pricing_source": "https://www.tigrisdata.com/pricing/",
+    "pricing_verified_utc": "2026-10-10",
+    "monthly_free_tier_applied": false,
+    "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+  },
+  "workload_normalized": {
+    "total_upstream_attempts": 11,
+    "local_only_requests": 0,
+    "request_classes": {
+      "A": 11,
+      "B": 0,
+      "FREE": 0,
+      "UNKNOWN": 0
+    },
+    "estimated_billable_requests": {
+      "A": 11,
+      "B": 0
+    },
+    "explicitly_nonbillable_status_requests": 0,
+    "transport_uncertain_requests": 0,
+    "unknown_class_requests": 0,
+    "assumed_class_requests": 0,
+    "by_operation": {
+      "PutObject": 11
+    },
+    "by_status": {
+      "200": 11
+    },
+    "by_phase": {
+      "postgres.drain": 11
+    },
+    "by_object_type": {
+      "infinidisk_head": 1,
+      "infinidisk_index": 8,
+      "segment": 2
+    },
+    "request_payload_bytes": 11226126,
+    "response_payload_bytes": 0,
+    "estimated_gross_request_cost_usd": 5.5e-05,
+    "completed_transactions_for_normalization": 256,
+    "estimated_usd_per_1000_transactions": 0.00021484375,
+    "estimated_usd_per_10000_transactions": 0.0021484375,
+    "upstream_attempts_per_million_transactions": 42968.75,
+    "estimated_usd_per_million_transactions": 0.21484375,
+    "cost_has_unpriced_or_uncertain_requests": false,
+    "pricing_source": "https://www.tigrisdata.com/pricing/",
+    "pricing_verified_utc": "2026-10-10",
+    "monthly_free_tier_applied": false,
+    "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+  },
+  "query_normalized": {
+    "completed_business_queries": 1280,
+    "all_commands_including_begin_end": 1792,
+    "queries_per_transaction": 5,
+    "basis": "TPC-B-like built-in script: three UPDATE, one SELECT, one INSERT; BEGIN and END excluded from query unit. No vacuum during load; max-tries=1, zero failed transactions.",
+    "estimated_usd_per_1000_queries": 4.296875e-05,
+    "estimated_usd_per_10000_queries": 0.00042968750000000006,
+    "class_a_per_1000_queries": 8.59375,
+    "class_b_per_1000_queries": 0.0,
+    "normalization_is_forecast": false
+  },
+  "cleanup": {
+    "failures": [],
+    "nbd31_detached": true,
+    "mount_absent": true,
+    "container_removed": true
+  },
+  "local_test_data_removed_after_verified_restarts": [
+    "local-0",
+    "local-1"
+  ]
+}

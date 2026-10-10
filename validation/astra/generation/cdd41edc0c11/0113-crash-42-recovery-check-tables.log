@@ -1,0 +1,6 @@
+bench.sbtest1	check	status	OK
+bench.sbtest2	check	status	OK
+bench.sbtest3	check	status	OK
+bench.sbtest4	check	status	OK
+bench.witness	check	status	OK
+bench.commits	check	status	OK

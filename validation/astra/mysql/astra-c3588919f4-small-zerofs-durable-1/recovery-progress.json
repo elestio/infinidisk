@@ -1,0 +1,127 @@
+{
+  "phase": "astra-c3588919f4-small-zerofs-durable-1",
+  "purpose": "Read-only CPU and I/O snapshots while waiting for MySQL crash recovery; no change to timeout or workload.",
+  "samples": [
+    {
+      "utc": "2026-10-10T12:07:22.754049+00:00",
+      "monotonic_ns": 61959566217599,
+      "processes": {
+        "zerofs": {
+          "pid": 309967,
+          "start_ticks": 6145999,
+          "user_ticks": 2113,
+          "system_ticks": 467,
+          "clock_ticks_per_second": 100,
+          "state": "S",
+          "io": {
+            "rchar": 38928434,
+            "wchar": 246062836,
+            "syscr": 2561,
+            "syscw": 321019,
+            "read_bytes": 61374464,
+            "write_bytes": 102400,
+            "cancelled_write_bytes": 0
+          },
+          "wchan_counts": {
+            "futex_do_wait": 20,
+            "ep_poll": 2
+          }
+        },
+        "mysql": {
+          "pid": 317278,
+          "start_ticks": 6171120,
+          "user_ticks": 40,
+          "system_ticks": 47,
+          "clock_ticks_per_second": 100,
+          "state": "D",
+          "io": {
+            "rchar": 43654375,
+            "wchar": 21391269,
+            "syscr": 3802,
+            "syscw": 1036,
+            "read_bytes": 38686720,
+            "write_bytes": 25669632,
+            "cancelled_write_bytes": 16384
+          },
+          "wchan_counts": {
+            "jbd2_log_wait_commit": 1,
+            "read_events": 8,
+            "submit_bio_wait": 1,
+            "do_get_write_access": 1,
+            "futex_do_wait": 17,
+            "hrtimer_nanosleep": 5
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-10T12:08:24.408475+00:00",
+      "monotonic_ns": 62021220634319,
+      "processes": {
+        "zerofs": {
+          "pid": 309967,
+          "start_ticks": 6145999,
+          "user_ticks": 2441,
+          "system_ticks": 537,
+          "clock_ticks_per_second": 100,
+          "state": "S",
+          "io": {
+            "rchar": 39471866,
+            "wchar": 271007836,
+            "syscr": 2583,
+            "syscw": 376545,
+            "read_bytes": 61771776,
+            "write_bytes": 114688,
+            "cancelled_write_bytes": 0
+          }
+        },
+        "mysql": {
+          "pid": 317278,
+          "start_ticks": 6171120,
+          "user_ticks": 98,
+          "system_ticks": 84,
+          "clock_ticks_per_second": 100,
+          "state": "S",
+          "io": {
+            "rchar": 52562833,
+            "wchar": 24320496,
+            "syscr": 4387,
+            "syscw": 1114,
+            "read_bytes": 62099456,
+            "write_bytes": 31621120,
+            "cancelled_write_bytes": 16384
+          }
+        }
+      },
+      "seconds_since_previous": 61.65441672,
+      "deltas": {
+        "zerofs": {
+          "cpu_ticks": 398,
+          "io": {
+            "rchar": 543432,
+            "wchar": 24945000,
+            "syscr": 22,
+            "syscw": 55526,
+            "read_bytes": 397312,
+            "write_bytes": 12288,
+            "cancelled_write_bytes": 0
+          }
+        },
+        "mysql": {
+          "cpu_ticks": 95,
+          "io": {
+            "rchar": 8908458,
+            "wchar": 2929227,
+            "syscr": 585,
+            "syscw": 78,
+            "read_bytes": 23412736,
+            "write_bytes": 5951488,
+            "cancelled_write_bytes": 0
+          }
+        }
+      },
+      "server_log_bytes": 46281,
+      "server_log_modified_ns": 1791634103745082947
+    }
+  ]
+}
