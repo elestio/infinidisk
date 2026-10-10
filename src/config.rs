@@ -21,6 +21,8 @@ pub struct Config {
     /// Conservative accounting cap for the current in-memory page index.
     pub max_index_mib: usize,
     pub read_extent_kib: u64,
+    /// Choose bounded physical read groups from the requested pages' locality.
+    pub adaptive_reads: bool,
     pub max_pending_mib: u64,
     pub segment_mib: u64,
     pub max_inflight: usize,
@@ -77,6 +79,7 @@ impl Default for Config {
             hot_wal_mib: 1024,
             max_index_mib: 1024,
             read_extent_kib: 64,
+            adaptive_reads: false,
             max_pending_mib: 8192,
             segment_mib: 16,
             max_inflight: 128,
@@ -102,6 +105,29 @@ impl Default for Config {
     }
 }
 impl Config {
+    /// Explicit settings for newly generated configs. Deserializing an older
+    /// config retains historical defaults for omitted fields.
+    pub fn recommended() -> Self {
+        Self {
+            disk_cache_mib: 4096,
+            hot_wal_mib: 64,
+            max_index_mib: 128,
+            max_pending_mib: 1024,
+            segment_mib: 32,
+            logical_cache: true,
+            wal_commit_records: true,
+            wal_fixed_size: true,
+            async_cache: true,
+            fast_local_reads: true,
+            checkpoint_pipeline: true,
+            selective_sync: true,
+            ublk_fast_path: true,
+            paged_index: true,
+            adaptive_reads: true,
+            ..Self::default()
+        }
+    }
+
     pub fn load(path: &Path) -> Result<Self> {
         let c: Self = toml::from_str(&std::fs::read_to_string(path).context("read config")?)?;
         ensure!(c.local_dir.is_absolute(), "local_dir must be absolute");
@@ -131,6 +157,10 @@ impl Config {
         ensure!(
             [16, 64, 256].contains(&c.read_extent_kib),
             "read_extent_kib must be 16, 64 or 256"
+        );
+        ensure!(
+            !c.adaptive_reads || (c.logical_cache && c.fast_local_reads),
+            "adaptive_reads requires logical_cache and fast_local_reads"
         );
         ensure!(
             c.max_pending_mib >= c.segment_mib * 2,

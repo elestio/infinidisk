@@ -1,0 +1,12 @@
+   Compiling infinidisk2 v0.1.0 (/root/infinidisk2)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.27s
+     Running unittests src/lib.rs (target/debug/deps/infinidisk2-94c38aa628d9e8b0)
+
+running 4 tests
+test engine::adaptive_tests::adaptive_grouping_keeps_fragmented_reads_small ... ok
+test engine::adaptive_tests::adaptive_random_uses_small_ranges_and_reuses_verified_large_ranges ... ok
+test engine::adaptive_tests::adaptive_group_checks_all_pages_before_installing_any_payload ... ok
+test engine::adaptive_tests::adaptive_dense_read_owns_ranges_with_zero_ram_and_retains_verified_pages ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 67 filtered out; finished in 0.09s
+

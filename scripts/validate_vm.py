@@ -12,7 +12,7 @@ ENGINE_BOOLEAN_OPTIONS={
     'sync_data_only','wal_preallocate','wal_writev','logical_cache',
     'wal_commit_records','wal_fixed_size','async_cache','fast_local_reads',
     'checkpoint_pipeline','selective_sync','ublk_fast_path','generation_mode',
-    'paged_index','compact_checkpoints','aligned_wal',
+    'paged_index','compact_checkpoints','aligned_wal','adaptive_reads',
 }
 
 ENGINE_INTEGER_OPTIONS={
@@ -64,6 +64,7 @@ parser.add_argument('--logical-cache',action='store_true',default=None)
 parser.add_argument('--wal-fixed-size',action='store_true',default=None)
 parser.add_argument('--wal-commit-records',action='store_true',default=None)
 parser.add_argument('--postgres',action='store_true')
+parser.add_argument('--checks-only',action='store_true',help='Keep CRC and crash/recovery checks; skip redundant throughput benchmarks')
 parser.add_argument('--binary',type=pathlib.Path,help='InfiniDisk2 executable; defaults to this checkout target/release/infinidisk2')
 parser.add_argument('--engine-options',type=pathlib.Path,help='JSON object containing allowlisted non-secret settings; generation_mode=true is refused')
 parser.add_argument('--resume-report',type=pathlib.Path,help='repeat remote recovery/cache tests of an existing completed run')
@@ -132,6 +133,7 @@ devices=[pathlib.Path(f'/dev/nbd{n}') for n in range(31,1,-1) if pathlib.Path(f'
 if not devices:raise RuntimeError('no unused NBD device; existing devices will never be disconnected')
 device=devices[0]
 report={'binary_sha256':hashlib.sha256(BIN.read_bytes()).hexdigest(),'script_sha256':hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(),'id':run_id,'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'backend':store,'device':str(device),'tests':{},'benchmarks':{},'config':str(config)}
+report['checks_only']=args.checks_only
 if args.resume_report:
     WORK=args.resume_report.resolve().parent
     if ROOT/'test-output' not in WORK.parents:raise RuntimeError('resume report must be under test-output')
@@ -227,11 +229,12 @@ try:
         report['tests']['durable_file_sha256']=hashlib.sha256(payload).hexdigest()
         # Verified writes exercise real ext4 and compare every fio data block.
         fio('verify-write-read',MOUNT/'fio.bin',rw='write',bs='128k',size='256m',iodepth=16,verify='crc32c',do_verify=1,verify_fatal=1,fsync_on_close=1)
-        fio('randread-hot',MOUNT/'fio.bin',rw='randread',bs='4k',size='256m',iodepth=32,numjobs=4,runtime=10,time_based=1)
-        fio('randwrite-fsync',MOUNT/'fsync.bin',rw='randwrite',bs='4k',size='64m',iodepth=1,numjobs=4,fsync=1,runtime=10,time_based=1)
-        # Same physical VM disk, same fio settings; no global page-cache flush.
-        fio('baseline-randwrite-fsync',WORK/'baseline.bin',rw='randwrite',bs='4k',size='64m',iodepth=1,numjobs=4,fsync=1,runtime=10,time_based=1)
-        fio('seqread-hot',MOUNT/'fio.bin',rw='read',bs='1m',size='256m',iodepth=16,runtime=10,time_based=1)
+        if not args.checks_only:
+            fio('randread-hot',MOUNT/'fio.bin',rw='randread',bs='4k',size='256m',iodepth=32,numjobs=4,runtime=10,time_based=1)
+            fio('randwrite-fsync',MOUNT/'fsync.bin',rw='randwrite',bs='4k',size='64m',iodepth=1,numjobs=4,fsync=1,runtime=10,time_based=1)
+            # Same physical VM disk, same fio settings; no global page-cache flush.
+            fio('baseline-randwrite-fsync',WORK/'baseline.bin',rw='randwrite',bs='4k',size='64m',iodepth=1,numjobs=4,fsync=1,runtime=10,time_based=1)
+            fio('seqread-hot',MOUNT/'fio.bin',rw='read',bs='1m',size='256m',iodepth=16,runtime=10,time_based=1)
         # Abrupt server death after application fsync; only this new test mount is affected.
         server.kill();server.wait();server=None
         command(['umount','-l',MOUNT],'crash-unmount');mounted=False
@@ -256,8 +259,9 @@ try:
             else:raise RuntimeError('PostgreSQL startup failed')
             command(['docker','exec',postgres_name,'psql','-U','postgres','-c','CREATE DATABASE bench;'],'postgres-createdb')
             command(['docker','exec',postgres_name,'pgbench','-U','postgres','-i','-s','2','bench'],'pgbench-init')
-            r=command(['docker','exec',postgres_name,'pgbench','-U','postgres','-c','4','-j','4','-T','15','bench'],'pgbench-durable',timeout=45)
-            report['benchmarks']['pgbench-durable']=r.stdout
+            duration=['-t','16'] if args.checks_only else ['-T','15']
+            r=command(['docker','exec',postgres_name,'pgbench','-U','postgres','-c','4','-j','4',*duration,'bench'],'pgbench-durable',timeout=45)
+            report['tests' if args.checks_only else 'benchmarks']['pgbench-durable']=r.stdout
             settings=command(['docker','exec',postgres_name,'psql','-U','postgres','-At','-c',"SELECT name||'='||setting FROM pg_settings WHERE name IN ('fsync','full_page_writes','synchronous_commit');"],'postgres-durability-settings').stdout
             assert 'fsync=on' in settings and 'full_page_writes=on' in settings and 'synchronous_commit=on' in settings
             report['tests']['postgres_settings']=settings
@@ -324,13 +328,17 @@ try:
         command(['docker','exec',postgres_name,'pg_amcheck','-U','postgres','--database','bench','--install-missing'],'postgres-remote-amcheck',timeout=180)
         report['tests']['remote_only_postgres_amcheck']='passed'
         command(['docker','rm','-f',postgres_name],'postgres-remote-remove')
-    fio('randread-cold-remote',MOUNT/'fio.bin',rw='randread',bs='4k',size='256m',iodepth=32,numjobs=4,runtime=10,time_based=1)
-    fio('randread-undersized-cache-pass2',MOUNT/'fio.bin',rw='randread',bs='4k',size='256m',iodepth=32,numjobs=4,runtime=10,time_based=1)
-    stop()
-    config.write_text(config.read_text().replace('disk_cache_mib = 128','disk_cache_mib = 512'))
-    start();mount()
-    fio('prime-512m-cache',MOUNT/'fio.bin',rw='read',bs='1m',size='256m',iodepth=16)
-    fio('randread-fully-warm-cache',MOUNT/'fio.bin',rw='randread',bs='4k',size='256m',iodepth=32,numjobs=4,runtime=10,time_based=1)
+    if args.checks_only:
+        fio('verify-remote-restored',MOUNT/'fio.bin',rw='read',bs='128k',size='256m',iodepth=16,verify='crc32c',verify_only=1,verify_fatal=1)
+        report['tests']['remote_fio_crc32c']='passed'
+    else:
+        fio('randread-cold-remote',MOUNT/'fio.bin',rw='randread',bs='4k',size='256m',iodepth=32,numjobs=4,runtime=10,time_based=1)
+        fio('randread-undersized-cache-pass2',MOUNT/'fio.bin',rw='randread',bs='4k',size='256m',iodepth=32,numjobs=4,runtime=10,time_based=1)
+        stop()
+        config.write_text(config.read_text().replace('disk_cache_mib = 128','disk_cache_mib = 512'))
+        start();mount()
+        fio('prime-512m-cache',MOUNT/'fio.bin',rw='read',bs='1m',size='256m',iodepth=16)
+        fio('randread-fully-warm-cache',MOUNT/'fio.bin',rw='randread',bs='4k',size='256m',iodepth=32,numjobs=4,runtime=10,time_based=1)
     stop()
     report['passed']=True
     report.pop('error',None)

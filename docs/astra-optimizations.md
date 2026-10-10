@@ -1,5 +1,7 @@
 # InfiniDisk2 — optimisations Astra
 
+Cette page décrit la campagne historique du binaire `b39b705f43b6`. Pour les défauts désormais générés, le lecteur adaptatif et la correction de l’erreur d’index sur écriture partielle, consulter [la nouvelle qualification](adaptive-reads.md). Les preuves du rapport Astra restent inchangées.
+
 Autorisation de Joseph : réaliser et mesurer les six pistes proposées le 10 octobre 2026. Branche `astra-optimizations`, référence `29b45441c0050fa3d3a40bb21c57e0ab25788cb1`. Aucun service de production ne participe aux essais.
 
 ## Réalisation

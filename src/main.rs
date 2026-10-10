@@ -14,8 +14,12 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Command {
-    /// Write an example configuration (refuses to overwrite).
-    Config,
+    /// Write the recommended configuration (refuses to overwrite).
+    Config {
+        /// Generate the original conservative settings for compatibility tests.
+        #[arg(long)]
+        legacy: bool,
+    },
     /// Create a brand-new unformatted block volume; never replaces remote data.
     Init {
         #[arg(long,value_parser=parse_size)]
@@ -32,7 +36,7 @@ enum Command {
     /// Offline: cache all allocated logical pages (must fit the SSD budget).
     Warm {
         /// Maximum concurrent physical ranges (including cache probes/fills).
-        #[arg(long, default_value_t = 32, value_parser = clap::value_parser!(u16).range(1..=128))]
+        #[arg(long, default_value_t = 128, value_parser = clap::value_parser!(u16).range(1..=128))]
         concurrency: u16,
     },
     #[cfg(feature = "ublk")]
@@ -97,13 +101,18 @@ async fn main() -> Result<()> {
         )
         .init();
     let cli = Cli::parse();
-    if matches!(cli.command, Command::Config) {
+    if let Command::Config { legacy } = &cli.command {
         use std::io::Write;
         let mut f = std::fs::OpenOptions::new()
             .create_new(true)
             .write(true)
             .open(&cli.config)?;
-        f.write_all(toml::to_string_pretty(&Config::default())?.as_bytes())?;
+        let config = if *legacy {
+            Config::default()
+        } else {
+            Config::recommended()
+        };
+        f.write_all(toml::to_string_pretty(&config)?.as_bytes())?;
         f.sync_all()?;
         println!("Configuration: {}", cli.config.display());
         return Ok(());
@@ -147,6 +156,8 @@ async fn main() -> Result<()> {
             // Checkpoint includes the durable barrier. The generation-mode
             // admission barrier cannot run here: its publisher has stopped.
             e.checkpoint().await?;
+            let status = serde_json::to_string(&e.status().await)?;
+            tracing::info!(%status, "volume final status");
         }
         #[cfg(feature = "ublk")]
         Command::UblkDelete { id } => {
@@ -218,9 +229,11 @@ async fn main() -> Result<()> {
             tokio::time::timeout(Duration::from_secs(60), e.checkpoint())
                 .await
                 .context("shutdown checkpoint timed out; local WAL retained")??;
+            let status = serde_json::to_string(&e.status().await)?;
+            tracing::info!(%status, "volume final status");
             result?;
         }
-        Command::Config => unreachable!(),
+        Command::Config { .. } => unreachable!(),
     }
     Ok(())
 }

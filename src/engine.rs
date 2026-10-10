@@ -9,14 +9,12 @@ use anyhow::{Context, Result, ensure};
 use bytes::Bytes;
 use fs2::FileExt as _;
 use futures::{StreamExt, TryStreamExt, stream};
-use lru::LruCache;
 use object_store::UpdateVersion;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{
     collections::{BTreeMap, BTreeSet, HashMap, VecDeque},
     fs::{File, OpenOptions},
-    num::NonZeroUsize,
     os::unix::fs::FileExt as UnixFileExt,
     sync::{
         Arc,
@@ -29,7 +27,20 @@ use uuid::Uuid;
 
 const SHARD_PAGES: u64 = 4096;
 const MAX_HEAD_BYTES: u64 = 64 * 1024 * 1024;
+const SMALL_READ: u64 = 16 * 1024;
+const LARGE_READ: u64 = 256 * 1024;
+#[cfg(test)]
+#[path = "../tests/support/adaptive_reads.rs"]
+mod adaptive_tests;
 type ScrubGroups = BTreeMap<(Uuid, u64), (u64, Vec<(u64, u32)>)>;
+type ReadMiss = (u64, Option<Ref>, Option<Arc<File>>);
+
+struct ReadGroup {
+    segment: Uuid,
+    start: u64,
+    extent: u64,
+    pages: Vec<(u64, Ref)>,
+}
 
 /// Offline warm owns each physical range until all of its logical pages land
 /// in the SSD cache. These buffers never depend on the online extent LRU.
@@ -125,6 +136,9 @@ pub struct Status {
     pub logical_cache_hits: u64,
     pub remote_gets: u64,
     pub remote_bytes: u64,
+    pub range_cache_bytes: usize,
+    pub adaptive_small_gets: u64,
+    pub adaptive_large_gets: u64,
     pub checkpoint_wal_bytes: u64,
     pub uploaded_segment_bytes: u64,
     pub index: crate::index::IndexStats,
@@ -145,6 +159,8 @@ struct FlushMetrics {
     page_hits: AtomicU64,
     remote_gets: AtomicU64,
     remote_bytes: AtomicU64,
+    adaptive_small_gets: AtomicU64,
+    adaptive_large_gets: AtomicU64,
     checkpoint_wal_bytes: AtomicU64,
     uploaded_segment_bytes: AtomicU64,
 }
@@ -157,7 +173,7 @@ pub struct Engine {
     remote: Mutex<Remote>,
     flush_lock: Mutex<()>,
     checkpoint_lock: Mutex<()>,
-    cache: std::sync::Mutex<LruCache<(Uuid, u64), Bytes>>,
+    cache: std::sync::Mutex<crate::read_cache::ReadCache>,
     fetch_locks: Vec<Mutex<()>>,
     disk_cache: DiskCache,
     page_cache: Option<Arc<crate::page_cache::PageCache>>,
@@ -502,13 +518,7 @@ impl Engine {
             active.initialize_capacity(crate::wal_pool::capacity(&c))?;
         }
         local.insert(active.id, Arc::new(active.file.try_clone()?));
-        let cache = LruCache::new(
-            NonZeroUsize::new(
-                (c.memory_cache_mib * 1024 * 1024 / (c.read_extent_kib as usize * 1024 + PAGE))
-                    .max(1),
-            )
-            .unwrap(),
-        );
+        let cache = crate::read_cache::ReadCache::new(c.memory_cache_mib * 1024 * 1024);
         let disk_cache = DiskCache::open(
             c.local_dir.join("cache"),
             if c.logical_cache {
@@ -780,6 +790,153 @@ impl Engine {
         let start = (offset % PAGE as u64) as usize;
         Ok(output[start..start + len].to_vec())
     }
+
+    /// Adapt to physical locality, not merely the size of a logical request.
+    /// Sixteen requested pages in a 256 KiB region amortize a large GET. Sparse
+    /// regions remain 16 KiB, including fragmented large logical reads.
+    fn read_groups(misses: Vec<ReadMiss>) -> Result<Vec<ReadGroup>> {
+        let mut regions = BTreeMap::<(Uuid, u64), Vec<(u64, Ref)>>::new();
+        for (page, reference, _) in misses {
+            let r = reference.context("missing reference in remote read")?;
+            ensure!(r.segment_len > 0, "unpublished local page is missing");
+            regions
+                .entry((r.segment, r.offset / LARGE_READ * LARGE_READ))
+                .or_default()
+                .push((page, r));
+        }
+        let mut groups = Vec::new();
+        for ((segment, start), pages) in regions {
+            if pages.len() >= 16 {
+                groups.push(ReadGroup {
+                    segment,
+                    start,
+                    extent: LARGE_READ,
+                    pages,
+                });
+            } else {
+                let mut small = BTreeMap::<u64, Vec<(u64, Ref)>>::new();
+                for (page, r) in pages {
+                    small
+                        .entry(r.offset / SMALL_READ * SMALL_READ)
+                        .or_default()
+                        .push((page, r));
+                }
+                groups.extend(small.into_iter().map(|(start, pages)| ReadGroup {
+                    segment,
+                    start,
+                    extent: SMALL_READ,
+                    pages,
+                }));
+            }
+        }
+        Ok(groups)
+    }
+
+    async fn fetch_group(&self, group: ReadGroup) -> Result<Vec<(u64, Bytes)>> {
+        let segment_len = group.pages[0].1.segment_len;
+        ensure!(
+            group
+                .pages
+                .iter()
+                .all(|(_, r)| r.segment == group.segment && r.segment_len == segment_len),
+            "inconsistent remote read group"
+        );
+        let valid = |start: u64, data: &Bytes| {
+            group.pages.iter().all(|(_, r)| {
+                r.offset
+                    .checked_sub(start)
+                    .and_then(|n| usize::try_from(n).ok())
+                    .and_then(|n| data.get(n..n.saturating_add(PAGE)))
+                    .is_some_and(|page| crc32fast::hash(page) == r.crc)
+            })
+        };
+        // Both sizes share a lock for their containing 256 KiB region. A small
+        // read can reuse a preceding large fetch without another network call.
+        let large_start = group.start / LARGE_READ * LARGE_READ;
+        let stripe = ((group.segment.as_u128() as u64 ^ (large_start / LARGE_READ)) % 256) as usize;
+        let guard = self.fetch_locks[stripe].lock().await;
+        let mut cached = None;
+        {
+            let mut cache = self.cache.lock().unwrap();
+            for start in [large_start, group.start] {
+                if let Some(bytes) = cache.get(&(group.segment, start)).cloned()
+                    && valid(start, &bytes)
+                {
+                    cached = Some((start, bytes));
+                    break;
+                }
+            }
+        }
+        let (start, data) = if let Some(cached) = cached {
+            cached
+        } else {
+            let end = group
+                .start
+                .saturating_add(group.extent + PAGE as u64)
+                .min(segment_len);
+            let bytes = self
+                .store
+                .range(&format!("segments/{}", group.segment), group.start..end)
+                .await?;
+            self.flush_metrics
+                .remote_gets
+                .fetch_add(1, Ordering::Relaxed);
+            self.flush_metrics
+                .remote_bytes
+                .fetch_add(bytes.len() as u64, Ordering::Relaxed);
+            if group.extent == LARGE_READ {
+                self.flush_metrics
+                    .adaptive_large_gets
+                    .fetch_add(1, Ordering::Relaxed);
+            } else {
+                self.flush_metrics
+                    .adaptive_small_gets
+                    .fetch_add(1, Ordering::Relaxed);
+            }
+            ensure!(
+                valid(group.start, &bytes),
+                "remote page checksum mismatch in adaptive read"
+            );
+            self.cache
+                .lock()
+                .unwrap()
+                .put((group.segment, group.start), bytes.clone());
+            (group.start, bytes)
+        };
+        drop(guard);
+        // Validate every requested page before returning or caching any of them.
+        // The owned range survives even with a disabled RAM cache.
+        let pages: Vec<_> = group
+            .pages
+            .iter()
+            .map(|(page, r)| {
+                let offset = (r.offset - start) as usize;
+                (*page, data.slice(offset..offset + PAGE))
+            })
+            .collect();
+        if let Some(writer) = &self.cache_writer {
+            let mut packed = Vec::with_capacity(pages.len() * PAGE);
+            for (_, bytes) in &pages {
+                packed.extend_from_slice(bytes);
+            }
+            writer.enqueue_packed(group.pages, packed.into());
+        } else if let Some(cache) = &self.page_cache {
+            let cache = cache.clone();
+            let versions = group.pages;
+            let payload = pages.clone();
+            let result = tokio::task::spawn_blocking(move || {
+                for ((page, version), (_, bytes)) in versions.iter().zip(&payload) {
+                    cache.put(*page, version, bytes)?;
+                }
+                Ok::<_, anyhow::Error>(())
+            })
+            .await?;
+            if let Err(error) = result {
+                tracing::warn!(%error, "disposable grouped cache fill failed");
+            }
+        }
+        Ok(pages)
+    }
     /// Owned buffer crosses the local I/O worker once, including ublk buffers.
     /// Only partial edge pages need a scratch page; full pages go to the caller.
     pub async fn read_buffer<B: AsMut<[u8]> + Send + 'static>(
@@ -865,6 +1022,21 @@ impl Engine {
         self.flush_metrics
             .page_hits
             .fetch_add(hits, Ordering::Relaxed);
+        if self.config.adaptive_reads {
+            let groups = Self::read_groups(misses).inspect_err(|_| self.fail_closed())?;
+            let mut fetched = stream::iter(groups.into_iter().map(|group| self.fetch_group(group)))
+                .buffer_unordered(8);
+            while let Some(pages) = fetched.try_next().await? {
+                for (p, bytes) in pages {
+                    let start = (p * PAGE as u64).max(offset);
+                    let end = ((p + 1) * PAGE as u64).min(offset + len as u64);
+                    let source = (start - p * PAGE as u64) as usize;
+                    output.as_mut()[(start - offset) as usize..(end - offset) as usize]
+                        .copy_from_slice(&bytes[source..source + (end - start) as usize]);
+                }
+            }
+            return Ok(output);
+        }
         let mut fetched = stream::iter(misses.into_iter().map(|(p, r, f)| async move {
             Ok::<_, anyhow::Error>((p, self.page(p, r, f).await?))
         }))
@@ -896,7 +1068,7 @@ impl Engine {
         let start = (offset % PAGE as u64) as usize;
         if start != 0 || !data.len().is_multiple_of(PAGE) {
             for p in [first, end - 1] {
-                let r = s.reference(p)?;
+                let r = s.reference(p).inspect_err(|_| self.fail_closed())?;
                 let f = r.as_ref().and_then(|r| s.local.get(&r.segment)).cloned();
                 let b = self.page(p, r, f).await?;
                 let dest = (p - first) as usize * PAGE;
@@ -1438,6 +1610,15 @@ impl Engine {
             logical_cache_hits: self.flush_metrics.page_hits.load(Ordering::Relaxed),
             remote_gets: self.flush_metrics.remote_gets.load(Ordering::Relaxed),
             remote_bytes: self.flush_metrics.remote_bytes.load(Ordering::Relaxed),
+            range_cache_bytes: self.cache.lock().unwrap().bytes(),
+            adaptive_small_gets: self
+                .flush_metrics
+                .adaptive_small_gets
+                .load(Ordering::Relaxed),
+            adaptive_large_gets: self
+                .flush_metrics
+                .adaptive_large_gets
+                .load(Ordering::Relaxed),
             checkpoint_wal_bytes: self
                 .flush_metrics
                 .checkpoint_wal_bytes
@@ -1461,7 +1642,7 @@ impl Engine {
     }
     /// Offline only: opening takes the exclusive volume lock.
     pub async fn warm(c: Config) -> Result<usize> {
-        Self::warm_with_concurrency(c, 32).await
+        Self::warm_with_concurrency(c, 128).await
     }
     /// Concurrency limits physical groups, including their cache probes/fills.
     pub async fn warm_with_concurrency(mut c: Config, concurrency: usize) -> Result<usize> {

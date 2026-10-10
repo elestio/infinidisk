@@ -11,7 +11,7 @@ ENGINE_BOOLEAN_OPTIONS={
     'sync_data_only','wal_preallocate','wal_writev','logical_cache',
     'wal_commit_records','wal_fixed_size','async_cache','fast_local_reads',
     'checkpoint_pipeline','selective_sync','ublk_fast_path','generation_mode',
-    'paged_index','compact_checkpoints','aligned_wal',
+    'paged_index','compact_checkpoints','aligned_wal','adaptive_reads',
 }
 ENGINE_INTEGER_OPTIONS={
     'cache_queue_mib':(1,128),'max_index_mib':(1,65536),
@@ -24,7 +24,7 @@ ENGINE_INTEGER_OPTIONS={
 ASTRA_OPTIONS={
     'async_cache','cache_queue_mib','fast_local_reads','checkpoint_pipeline',
     'selective_sync','ublk_fast_path','generation_mode','generation_max_lag_seconds',
-    'paged_index','compact_checkpoints','aligned_wal',
+    'paged_index','compact_checkpoints','aligned_wal','adaptive_reads',
 }
 
 def load_engine_options(path):

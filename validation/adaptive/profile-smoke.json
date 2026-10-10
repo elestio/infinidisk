@@ -1,0 +1,14 @@
+{
+  "config_cli": "recommended and --legacy passed",
+  "production_services": {
+    "data": "active",
+    "bench": "active"
+  },
+  "nbd_pids": {
+    "0": "5299",
+    "1": "9216",
+    "31": null
+  },
+  "ublk31_absent": true,
+  "public_config_fixture": "/root/infinidisk2/test-output/profile-smoke-b19cdb33f53c"
+}

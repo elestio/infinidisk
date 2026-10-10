@@ -5,6 +5,7 @@ pub mod index;
 pub mod linux;
 pub mod nbd;
 pub mod page_cache;
+mod read_cache;
 pub mod store;
 #[cfg(feature = "ublk")]
 pub mod ublk;

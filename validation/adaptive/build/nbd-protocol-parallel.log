@@ -1,0 +1,23 @@
+   Compiling infinidisk2 v0.1.0 (/root/infinidisk2)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.11s
+     Running tests/nbd_protocol.rs (target/debug/deps/nbd_protocol-f8c0016db1097a88)
+
+running 2 tests
+test multiple_connections_share_flush_fua_and_large_trim ... FAILED
+test orderly_shutdown_publishes_a_generation_after_its_lag_limit ... ok
+
+failures:
+
+---- multiple_connections_share_flush_fua_and_large_trim stdout ----
+Error: local directory is already in use
+
+Caused by:
+    Resource temporarily unavailable (os error 11)
+
+
+failures:
+    multiple_connections_share_flush_fua_and_large_trim
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.37s
+
+error: test failed, to rerun pass `--test nbd_protocol`

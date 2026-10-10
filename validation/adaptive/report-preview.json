@@ -1,0 +1,16 @@
+{
+  "desktop": {
+    "width": 1440,
+    "scrollWidth": 1440,
+    "charts": 4,
+    "broken_images": 0
+  },
+  "mobile": {
+    "width": 390,
+    "scrollWidth": 390,
+    "charts": 4,
+    "broken_images": 0
+  },
+  "method": "Playwright internal browser; same self-contained HTML injected in separate viewport iframes; all images decoded",
+  "relative_links_checked": 17
+}

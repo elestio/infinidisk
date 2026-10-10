@@ -1,0 +1,15 @@
+{
+  "file_count": 6268,
+  "inventory_sha256": "fc6bac38e5da3e752a065bdc722d352d9f190a90e4e2d8f52f27bc4dc691e827",
+  "known_credentials_found": 0,
+  "credential_hit_files": [],
+  "candidate_sha256": "2eb31a6845c083d9955bc171fe6c4ccaf7af6e8f927ffd4ebb9ace1f25f01aa5",
+  "complete": true,
+  "inventory_scope": "All tracked/non-ignored repository files before this audit file; local and VM identical",
+  "build_checks": "30 targeted Rust tests + fmt + clippy + release with ublk",
+  "recovery_checks_passed": 7,
+  "report_proofs_verified": 184,
+  "base_commit": "202f8ddcee06c9beaa331f3075fde4206eaaf490",
+  "production_state_file": "profile-smoke.json",
+  "visual_preview": "report-preview.json"
+}

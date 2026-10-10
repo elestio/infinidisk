@@ -69,13 +69,13 @@ def load_profiles():
     allowed = helpers["ENGINE_BOOLEAN_OPTIONS"] | helpers["ENGINE_INTEGER_OPTIONS"].keys()
     profiles = {name: helpers["load_engine_options"](path) for name, path in PROFILES.items()}
     for name, options in profiles.items():
-        if set(options) != allowed:
+        if set(options) != allowed - {"adaptive_reads"}:
             raise ValueError("qualification profile must specify every allowlisted option: " + name)
         if options["generation_mode"] or options["ublk_fast_path"]:
             raise ValueError("durable qualification requires generation_mode=false and NBD")
         if options["max_pending_mib"] != 1024 or options["max_index_mib"] != 64:
             raise ValueError("qualification budgets differ from the agreed profile")
-    different = {key for key in allowed if profiles["core"][key] != profiles["aligned"][key]}
+    different = {key for key in profiles["core"] if profiles["core"][key] != profiles["aligned"][key]}
     if different != {"aligned_wal"} or profiles["core"]["aligned_wal"]:
         raise ValueError("qualification profiles must differ only in aligned_wal")
     return profiles

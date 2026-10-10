@@ -221,7 +221,7 @@ impl PageCache {
 }
 
 struct Fill {
-    first: u64,
+    first: Option<u64>,
     versions: Vec<(u64, Ref)>,
     data: Bytes,
     charge: usize,
@@ -259,13 +259,14 @@ impl CacheWriter {
                     // may cause a later miss; expected-version checks forbid stale data.
                     let mut latest = std::collections::HashMap::new();
                     for (i, fill) in batch.iter().enumerate() {
-                        for (p, r) in &fill.versions {
-                            latest.insert(*p, (i, r));
+                        for (position, (p, r)) in fill.versions.iter().enumerate() {
+                            latest.insert(*p, (i, position, r));
                         }
                     }
-                    for (p, (i, r)) in latest {
+                    for (p, (i, position, r)) in latest {
                         let fill = &batch[i];
-                        let start = (p - fill.first) as usize * PAGE;
+                        let start =
+                            fill.first.map_or(position, |first| (p - first) as usize) * PAGE;
                         if cache.put(p, r, &fill.data[start..start + PAGE]).is_err() {
                             fill.counters.errors.fetch_add(1, Ordering::Relaxed);
                         }
@@ -280,6 +281,14 @@ impl CacheWriter {
         })
     }
     pub fn enqueue(&self, first: u64, versions: Vec<(u64, Ref)>, data: Bytes) {
+        self.enqueue_layout(Some(first), versions, data);
+    }
+    /// A read group can contain distant logical pages. Its payload follows the
+    /// versions vector, avoiding a sparse allocation between those pages.
+    pub fn enqueue_packed(&self, versions: Vec<(u64, Ref)>, data: Bytes) {
+        self.enqueue_layout(None, versions, data);
+    }
+    fn enqueue_layout(&self, first: Option<u64>, versions: Vec<(u64, Ref)>, data: Bytes) {
         let charge = data.len() + versions.len() * (std::mem::size_of::<(u64, Ref)>() + 64);
         if self
             .counters
@@ -325,6 +334,38 @@ impl Drop for CacheWriter {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn packed_read_fills_preserve_sparse_pages_and_latest_versions() -> Result<()> {
+        let directory = tempfile::tempdir()?;
+        let cache = Arc::new(PageCache::open(
+            directory.path(),
+            Uuid::new_v4(),
+            1024 * 1024,
+        )?);
+        let reference = |value: u8| Ref {
+            segment: Uuid::new_v4(),
+            offset: 96,
+            segment_len: 8192,
+            crc: crc32fast::hash(&[value; PAGE]),
+        };
+        let a = reference(1);
+        let b = reference(2);
+        let newer = reference(3);
+        let writer = CacheWriter::start(cache.clone(), 1024 * 1024)?;
+        let mut data = vec![1; PAGE];
+        data.extend_from_slice(&[2; PAGE]);
+        writer.enqueue_packed(vec![(9, a.clone()), (50000, b.clone())], data.into());
+        writer.enqueue(
+            50000,
+            vec![(50000, newer.clone())],
+            Bytes::from(vec![3; PAGE]),
+        );
+        drop(writer);
+        assert_eq!(cache.get(9, &a).unwrap().as_ref(), &[1; PAGE]);
+        assert_eq!(cache.get(50000, &newer).unwrap().as_ref(), &[3; PAGE]);
+        assert!(cache.get(50000, &b).is_none());
+        Ok(())
+    }
     #[test]
     fn versions_eviction_reopen_and_torn_payload() -> Result<()> {
         let d = tempfile::tempdir()?;
