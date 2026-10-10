@@ -11,3 +11,6 @@
 
 __pycache__/
 /validation/astra/fio-comparison.lock
+
+# internal benchmark outputs (not for the public repo)
+/validation/

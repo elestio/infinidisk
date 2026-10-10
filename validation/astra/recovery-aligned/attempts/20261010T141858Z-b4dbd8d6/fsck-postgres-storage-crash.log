@@ -1,3 +1,0 @@
-/dev/nbd31: recovering journal
-/dev/nbd31: Inode 15 extent tree (at level 2) could be narrower.  IGNORED.
-/dev/nbd31: 1327/131072 files (9.9% non-contiguous), 141490/524288 blocks

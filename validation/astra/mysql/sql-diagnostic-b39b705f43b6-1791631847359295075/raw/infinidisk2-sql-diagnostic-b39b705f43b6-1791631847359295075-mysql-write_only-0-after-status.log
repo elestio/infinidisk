@@ -1,8 +1,0 @@
-Innodb_data_fsyncs	111187
-Innodb_data_reads	2408
-Innodb_data_writes	220611
-Innodb_log_waits	0
-Innodb_row_lock_current_waits	0
-Innodb_row_lock_time	13394
-Innodb_row_lock_waits	5429
-Uptime	133

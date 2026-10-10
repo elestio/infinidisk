@@ -36,7 +36,7 @@ The comparisons need three pieces of context:
 - **Caches matter.** InfiniDisk's warm reads can use Linux's page cache, while native fio uses `O_DIRECT` on a regular file. The read charts do not establish superiority over a physical SSD. ZeroFS also retained its compression and encryption settings.
 - **Scope is explicit.** PostgreSQL and fio use 3 × 15-second runs; MySQL uses 3 × 30 seconds. Database CPU quotas exclude the separate storage process. These short tests on a shared VM are observations, not capacity guarantees.
 
-Read the [English benchmark guide](docs/benchmarks.md) for exact values, profiles, samples and source files. It also identifies excluded SQL-error runs. The [complete comparison report](validation/astra/rapport.html) retains the wider matrix and recovery evidence; download and open the HTML locally to view it.
+Read the [English benchmark guide](docs/benchmarks.md) for exact values, profiles, samples and source files. It also identifies excluded SQL-error runs.
 
 ### Less unnecessary S3 work
 
@@ -79,7 +79,18 @@ S3 contains InfiniDisk's **private block-volume format**. Existing objects in a 
 
 ## Quick start
 
-### 1. Build the engine
+### 1. Install
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/elestio/infinidisk/main/install.sh | sudo bash
+```
+
+This downloads the prebuilt `infinidisk` binary, sets up the Linux `nbd` module and installs it to `/usr/local/bin`. Pin a version with `INFINIDISK_VERSION=v0.1.0`.
+
+<details>
+<summary>Or build from source</summary>
+
+### Build the engine
 
 Requirements: Linux, a Rust toolchain supporting edition 2024, a C toolchain, local SSD space and access to an S3-compatible endpoint with atomic object writes and conditional updates. The validation environment used Linux x86_64 and Rust 1.99.0. NBD requires the Linux `nbd` module.
 
@@ -91,6 +102,8 @@ sudo install -m 0755 target/release/infinidisk /usr/local/bin/infinidisk
 ```
 
 The commands below run in **root shells**. Supply `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and, when needed, `AWS_SESSION_TOKEN` to the storage process through its environment. Keep credentials out of the configuration and repository. For a local protocol sandbox, the engine also supports `file://` storage.
+
+</details>
 
 ### 2. Configure a new volume
 
@@ -226,7 +239,6 @@ The validation archive includes process-kill recovery, ext4 checks, PostgreSQL `
 | [Recommended configuration](configs/recommended.toml) | Complete settings for new volumes. |
 | [Architecture and design decisions](docs/architecture.md) | Original detailed specification and trade-offs, in French. |
 | [Adaptive reads](docs/adaptive-reads.md) · [Index cache](docs/index-cache.md) · [Download admission](docs/download-admission.md) | Implementation details and selection records, in French. |
-| [Full comparison](validation/astra/rapport.html) · [Latest download report](validation/downloads/rapport.html) | Standalone HTML reports with raw evidence links, in French; download and open locally. |
 
 The current engine does not provide online resize, named user snapshots, application-level encryption, multiwriter access or transparent migration from the earlier ZeroFS-based InfiniDisk wrapper. Migrate through file copying or database backup/restore into a separate new volume. Large fully allocated volumes also face a **64 MiB remote-root limit**; a multilevel root remains future work.
 

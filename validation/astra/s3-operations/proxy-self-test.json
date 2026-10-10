@@ -1,1 +1,0 @@
-{"self_test": "passed", "backend_requests": 18, "exact_counts": true, "sigv4_verified": true, "max_concurrent": 4, "secret_redaction": true, "scope_and_body_bounds": true, "spools_removed": true}

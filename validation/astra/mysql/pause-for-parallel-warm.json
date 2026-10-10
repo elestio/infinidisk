@@ -1,5 +1,0 @@
-{
-  "utc": "2026-10-10T10:44:17.092662+00:00",
-  "reason": "Finish active baseline-after warm, measurement and clean shutdown. Pause before small-qualified-baseline for explicit warm-only build revision requested by Joseph; no interruption of active workload.",
-  "current_stage": "astra-c3588919f4-large-screen-baseline-after-1"
-}

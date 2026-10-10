@@ -1,4 +1,0 @@
-lock_deadlocks	1
-lock_row_lock_time	13394
-lock_row_lock_waits	5429
-lock_timeouts	0

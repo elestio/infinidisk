@@ -1,3 +1,0 @@
-[2m2026-10-09T21:15:23.323316Z[0m [32m INFO[0m [2minfinidisk2::nbd[0m[2m:[0m NBD listening [3mlisten[0m[2m=[0m127.0.0.1:11991 [3msize[0m[2m=[0m2147483648
-[2m2026-10-09T21:15:23.324380Z[0m [32m INFO[0m [2minfinidisk2[0m[2m:[0m volume status [3mstatus[0m[2m=[0m{"volume":"52f2b056-3225-4e79-bdc7-f6a79d8f84eb","size":2147483648,"sequence":1401794,"local_durable_sequence":1401794,"remote_sequence":1401794,"remote_generation":24,"pending_bytes":64,"allocated_pages":131072,"poisoned":false,"uptime_seconds":0,"hot_wal_bytes":0}
-[2m2026-10-09T21:15:23.523319Z[0m [33m WARN[0m [2minfinidisk2::nbd[0m[2m:[0m NBD connection ended [3mpeer[0m[2m=[0m127.0.0.1:47908 [3merror[0m[2m=[0mBroken pipe (os error 32)

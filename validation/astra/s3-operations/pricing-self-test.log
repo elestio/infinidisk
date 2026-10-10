@@ -1,8 +1,0 @@
-test_attempts_exempt_status_and_uncertainty (__main__.self_test.<locals>.AccountingTests.test_attempts_exempt_status_and_uncertainty) ... ok
-test_prices_and_global_allowances (__main__.self_test.<locals>.AccountingTests.test_prices_and_global_allowances) ... ok
-test_rest_and_safe_output (__main__.self_test.<locals>.AccountingTests.test_rest_and_safe_output) ... ok
-
-----------------------------------------------------------------------
-Ran 3 tests in 0.001s
-
-OK

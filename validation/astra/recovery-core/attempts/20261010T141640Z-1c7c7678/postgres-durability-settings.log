@@ -1,3 +1,0 @@
-fsync=on
-full_page_writes=on
-synchronous_commit=on

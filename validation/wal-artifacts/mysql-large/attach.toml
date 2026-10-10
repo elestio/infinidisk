@@ -1,3 +1,0 @@
-local_dir = "/root/infinidisk2/test-output/comparison-be4ba51a4a38/unused"
-store = "file:///root/infinidisk2/test-output/comparison-be4ba51a4a38/unused-objects"
-listen = "127.0.0.1:11991"

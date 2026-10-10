@@ -1,7 +1,0 @@
-{
-  "operation": "one read-only direct block request then clean ublk deletion with trace and full backtrace",
-  "server_pid": 284824,
-  "read_returncode": 0,
-  "delete_returncode": 0,
-  "server_returncode": -6
-}

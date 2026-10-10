@@ -1,3 +1,0 @@
-pgbench (16.15 (Debian 16.15-1.pgdg13+2))
-starting vacuum...end.
-pgbench: error: client 2 aborted in command 8 (SQL) of script 0; perhaps the backend died while processing

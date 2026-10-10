@@ -1,8 +1,0 @@
-    Finished `release` profile [optimized] target(s) in 0.08s
-     Running tests/astra_warm_cli.rs (target/release/deps/astra_warm_cli-5e236bf1d2100f1a)
-
-running 1 test
-test warm_cli_rejects_out_of_range_concurrency_before_opening_config ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
-

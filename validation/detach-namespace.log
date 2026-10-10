@@ -1,8 +1,0 @@
-[2m2026-10-09T20:31:07.567562Z[0m [32m INFO[0m [2minfinidisk2::nbd[0m[2m:[0m NBD listening [3mlisten[0m[2m=[0m127.0.0.1:11990 [3msize[0m[2m=[0m2147483648
-[2m2026-10-09T20:31:07.568620Z[0m [32m INFO[0m [2minfinidisk2[0m[2m:[0m volume status [3mstatus[0m[2m=[0m{"volume":"9e8364ac-7d5d-4a3a-bb50-e3ae7d73af99","size":2147483648,"sequence":41395,"local_durable_sequence":41395,"remote_sequence":41395,"remote_generation":32,"pending_bytes":64,"allocated_pages":119579,"poisoned":false,"uptime_seconds":0,"hot_wal_bytes":42917408}
-[2m2026-10-09T20:31:07.604360Z[0m [33m WARN[0m [2minfinidisk2::nbd[0m[2m:[0m NBD connection ended [3mpeer[0m[2m=[0m127.0.0.1:59216 [3merror[0m[2m=[0mBroken pipe (os error 32)
-[2m2026-10-09T20:31:07.659892Z[0m [32m INFO[0m [2minfinidisk2::linux[0m[2m:[0m entering Linux NBD_DO_IT; keep this process running [3mdevice[0m[2m=[0m/dev/nbd31 [3mconnections[0m[2m=[0m8 [3msize[0m[2m=[0m2147483648
-Error: device is still claimed (filesystem, partition, namespace or mapper); unmount all consumers first
-
-Caused by:
-    Device or resource busy (os error 16)

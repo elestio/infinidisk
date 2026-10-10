@@ -1,2 +1,0 @@
-[2m2026-10-10T13:08:29.418541Z[0m [32m INFO[0m [2minfinidisk2::engine[0m[2m:[0m offline cache warm completed [3mpages[0m[2m=[0m478770 [3mgroups[0m[2m=[0m66369 [3mconcurrency[0m[2m=[0m128 [3mremote_gets[0m[2m=[0m0 [3mremote_bytes[0m[2m=[0m0 [3mmax_range_inflight[0m[2m=[0m0
-Warmed 478770 allocated pages

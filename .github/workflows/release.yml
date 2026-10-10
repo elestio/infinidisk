@@ -1,0 +1,21 @@
+name: release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build
+        run: cargo build --release --locked
+      - name: Name the binary per OS/arch
+        run: cp target/release/infinidisk infinidisk-linux-amd64
+      - name: Publish release with the binary
+        uses: softprops/action-gh-release@v2
+        with:
+          files: infinidisk-linux-amd64
+          generate_release_notes: true
