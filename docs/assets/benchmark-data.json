@@ -1,0 +1,223 @@
+{
+  "schema": "infinidisk.readme-figures.v1",
+  "aggregation": "median; no normalization across panels",
+  "reference_binary_sha256": "b39b705f43b626563d76e1065b48f6891227ad2016f1df120977b4eda4b23151",
+  "comparisons": [
+    {
+      "title": "PostgreSQL",
+      "subtitle": "pgbench · scale 2 · read / write",
+      "unit": "transactions / second",
+      "note": "1 CPU database · 3 × 15 s\nLocal WAL commits vs. S3 commits vs. VM disk.",
+      "rows": [
+        {
+          "label": "InfiniDisk · NBD",
+          "color": "#58dfc6",
+          "samples": [
+            2671.645579,
+            3010.109295,
+            2937.57224
+          ],
+          "median": 2937.57224,
+          "source": "validation/astra/postgres/report.json"
+        },
+        {
+          "label": "ZeroFS · S3 fsync",
+          "color": "#ae98f4",
+          "samples": [
+            0.612606,
+            0.822977,
+            0.863655
+          ],
+          "median": 0.822977,
+          "source": "validation/astra/postgres/report.json"
+        },
+        {
+          "label": "Native VM disk",
+          "color": "#91a6bc",
+          "samples": [
+            4974.314817,
+            4810.153659,
+            4833.823164
+          ],
+          "median": 4833.823164,
+          "source": "validation/astra/postgres/report.json"
+        }
+      ]
+    },
+    {
+      "title": "fio · cached reads",
+      "subtitle": "4 KiB random · depth 32 × 4 jobs",
+      "unit": "IOPS",
+      "note": "Warm data · 3 × 15 s\nHost page cache benefits InfiniDisk; native uses O_DIRECT.",
+      "rows": [
+        {
+          "label": "InfiniDisk · NBD",
+          "color": "#58dfc6",
+          "samples": [
+            71057.525663,
+            54429.142781,
+            51897.360704
+          ],
+          "median": 54429.142781,
+          "source": "validation/astra/fio/report.json"
+        },
+        {
+          "label": "ZeroFS",
+          "color": "#ae98f4",
+          "samples": [
+            14350.63637,
+            16330.023987,
+            18530.250533
+          ],
+          "median": 16330.023987,
+          "source": "validation/astra/fio/report.json"
+        },
+        {
+          "label": "Native VM file",
+          "color": "#91a6bc",
+          "samples": [
+            15097.741355,
+            15097.874609,
+            15098.874009
+          ],
+          "median": 15097.874609,
+          "source": "validation/astra/fio/report.json"
+        }
+      ]
+    },
+    {
+      "title": "MySQL · read-only",
+      "subtitle": "Large fixture · uniform access · warm data",
+      "unit": "transactions / second",
+      "note": "2 CPU database · 3 × 30 s\nZeroFS: not measured in this fixture. Cache paths differ.",
+      "rows": [
+        {
+          "label": "InfiniDisk · NBD",
+          "color": "#58dfc6",
+          "samples": [
+            1422.52,
+            1528.42,
+            1589.23
+          ],
+          "median": 1528.42,
+          "source": "validation/astra/mysql/astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1/comparison.json"
+        },
+        {
+          "label": "InfiniDisk · ublk",
+          "color": "#75bef0",
+          "samples": [
+            2549.8,
+            2552.45,
+            2540.66
+          ],
+          "median": 2549.8,
+          "source": "validation/astra/mysql/astra-c3588919f4-large-ublk-cpu2-b39b705f43b6-1/comparison.json"
+        },
+        {
+          "label": "Native VM disk",
+          "color": "#91a6bc",
+          "samples": [
+            1058.89,
+            1058.56,
+            1058.95
+          ],
+          "median": 1058.89,
+          "source": "validation/astra/mysql/astra-c3588919f4-cpu2-b39b705f43b6-large-native-1/comparison.json"
+        }
+      ]
+    },
+    {
+      "title": "fio · synchronized writes",
+      "subtitle": "4 KiB write + fsync · depth 1 × 4 jobs",
+      "unit": "IOPS",
+      "note": "3 × 15 s · different durability boundaries\nInfiniDisk: local WAL. ZeroFS: S3. Native: VM disk.",
+      "rows": [
+        {
+          "label": "InfiniDisk · NBD",
+          "color": "#58dfc6",
+          "samples": [
+            10117.792147,
+            9462.035864,
+            8906.812425
+          ],
+          "median": 9462.035864,
+          "source": "validation/astra/fio/report.json"
+        },
+        {
+          "label": "ZeroFS · S3 fsync",
+          "color": "#ae98f4",
+          "samples": [
+            1.464226,
+            1.717986,
+            1.492181
+          ],
+          "median": 1.492181,
+          "source": "validation/astra/fio/report.json"
+        },
+        {
+          "label": "Native VM file",
+          "color": "#91a6bc",
+          "samples": [
+            13092.527165,
+            13091.527232,
+            13097.860143
+          ],
+          "median": 13092.527165,
+          "source": "validation/astra/fio/report.json"
+        }
+      ]
+    }
+  ],
+  "efficiency": [
+    {
+      "title": "Sequential data GETs",
+      "before": 4096.0,
+      "after": 1024.0,
+      "unit": "requests",
+      "labels": [
+        "Fixed 64 KiB",
+        "Adaptive"
+      ],
+      "headline": "75% fewer",
+      "foot": "Fresh-cache fixture · 2 samples / variant\nSequential p99 increased 19%.",
+      "source": "validation/adaptive/summary.json"
+    },
+    {
+      "title": "Warm-open metadata reads",
+      "before": 15.0,
+      "after": 1.0,
+      "unit": "Class-B reads",
+      "labels": [
+        "Index cache off",
+        "Index cache on"
+      ],
+      "headline": "15 → 1",
+      "foot": "Unchanged HEAD · metadata-only ABBA\nHEAD is still read; timing gain unproven.",
+      "source": "validation/index-cache/summary.json"
+    },
+    {
+      "title": "Mixed random-read p99",
+      "before": 152.829952,
+      "after": 130.285568,
+      "unit": "milliseconds",
+      "labels": [
+        "Budget off",
+        "8 MiB budget"
+      ],
+      "headline": "14.8% lower",
+      "foot": "Direct HTTPS · 2 samples / variant\nSequential-only p99 increased 1%.",
+      "source": "validation/downloads/summary.json"
+    }
+  ],
+  "source_files_sha256": {
+    "validation/astra/summary.json": "af90eed769c14374c6eb767762a9756265cfef43e1a6b79c875a9d36e4c8e7c9",
+    "validation/astra/postgres/report.json": "a38cf512a43fa8ececaabbea7ae4149d08a3234e091456f8a21906bb948dbed5",
+    "validation/astra/fio/report.json": "f7725c3445a79ac73b03b2db95a871eaa986a855c3b528a7682f54ca8c0800f7",
+    "validation/astra/mysql/astra-c3588919f4-cpu2-b39b705f43b6-large-compact-1/comparison.json": "d08d005ac3a2eb69bb642c6665d5be4615decd148215943afee60cc61599d888",
+    "validation/astra/mysql/astra-c3588919f4-large-ublk-cpu2-b39b705f43b6-1/comparison.json": "2446bd6ad43036736200fcedd128a28e41cf36f96fbc7e587212e5d27f636305",
+    "validation/astra/mysql/astra-c3588919f4-cpu2-b39b705f43b6-large-native-1/comparison.json": "5638c774369d451d99ca45f3555c0fb55c4eb472cfd5ba4bf2a40b89681ad851",
+    "validation/adaptive/summary.json": "6e0cc9ebb00dc73a81a4aa819a7b8b4308b2f96af4274b1ff26b9691761e823b",
+    "validation/index-cache/summary.json": "d35ffded6dd9b19a27de7ad875453f157a8de1762165936b6646c5c42369dec4",
+    "validation/downloads/summary.json": "e1a3f00e726aadb334cc52da922e6065c92c732fe55f0a8c107e8aed57809ac1"
+  }
+}

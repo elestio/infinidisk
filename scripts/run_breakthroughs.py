@@ -11,7 +11,7 @@ small=root/'test-output/comparison-323bb1097b47/report.json'
 large=root/'test-output/comparison-be4ba51a4a38/report.json'
 for p in (small,large):
     if not json.loads(p.read_text()).get('complete'):raise RuntimeError('fixture is incomplete')
-binary=hashlib.sha256((root/'target/release/infinidisk2').read_bytes()).hexdigest()
+binary=hashlib.sha256((root/'target/release/infinidisk').read_bytes()).hexdigest()
 report=json.loads(a.resume.read_text()) if a.resume else {'binary_sha256':binary,'work':str(work),'stages':[],'complete':False}
 if a.resume and report.get('complete'):raise RuntimeError('campaign already complete')
 files=sorted([root/'Cargo.toml',root/'Cargo.lock',*root.glob('src/*.rs'),*root.glob('tests/*.rs')])

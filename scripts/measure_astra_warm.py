@@ -128,7 +128,7 @@ def credential_env(path):
             values = shlex.split(value, comments=True)
             require(len(values) == 1, "invalid private AWS credential format")
             env[key] = values[0]
-    env.update(RUST_LOG="infinidisk2=info,libublk=warn", NO_COLOR="1", TERM="dumb")
+    env.update(RUST_LOG="infinidisk=info,infinidisk2=info,libublk=warn", NO_COLOR="1", TERM="dumb")
     return env
 
 

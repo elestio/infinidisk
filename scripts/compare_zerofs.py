@@ -154,7 +154,7 @@ def parse_sysbench_sample(output,percentile):
             'ignored_errors':int(errors[1]) if errors else None}
 
 parser=argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--binary',type=pathlib.Path,help='InfiniDisk2 executable; defaults to this checkout target/release/infinidisk2')
+parser.add_argument('--binary',type=pathlib.Path,help='InfiniDisk executable; defaults to this checkout target/release/infinidisk')
 parser.add_argument('--engine-options',type=pathlib.Path,help='JSON object containing allowlisted non-secret InfiniDisk2 settings')
 parser.add_argument('--legacy-config',action='store_true',help='remove Astra-only keys for an old binary; rejects active Astra options and explicit Astra numeric parameters')
 parser.add_argument('--postgres-only',action='store_true')
@@ -217,7 +217,7 @@ if sum(bool(x) for x in (ARGS.verify_report,ARGS.warm_memory_report,ARGS.postgre
 EXISTING=ARGS.verify_report or ARGS.warm_memory_report or ARGS.postgres_roomy_report or ARGS.mysql_recovery_report or ARGS.mysql_repeat_report or ARGS.mysql_resume_report
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-BIN=(ARGS.binary or ROOT/'target/release/infinidisk2').resolve()
+BIN=(ARGS.binary or ROOT/'target/release/infinidisk').resolve()
 if not BIN.is_file() or not os.access(BIN,os.X_OK):parser.error('InfiniDisk2 binary is missing or not executable: '+str(BIN))
 W=EXISTING.resolve().parent if EXISTING else ROOT/'test-output'/('comparison-'+uuid.uuid4().hex[:12])
 if EXISTING:

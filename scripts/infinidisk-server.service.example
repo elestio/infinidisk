@@ -1,13 +1,13 @@
 [Unit]
-Description=InfiniDisk2 Rust block server
+Description=InfiniDisk Rust block server
 Wants=network-online.target
 After=network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=/root/infinidisk2
-EnvironmentFile=/root/infinidisk2/credentials.env
-ExecStart=/root/infinidisk2/target/release/infinidisk2 -c /root/infinidisk2/volume.toml serve
+WorkingDirectory=/
+EnvironmentFile=/etc/infinidisk/credentials.env
+ExecStart=/usr/local/bin/infinidisk -c /etc/infinidisk/volume.toml serve
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=180

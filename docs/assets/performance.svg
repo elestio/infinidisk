@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1152pt" height="756pt" viewBox="0 0 1152 756" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 756 
+L 1152 756 
+L 1152 0 
+L 0 0 
+z
+" style="fill: #0b1220"/>
+  </g>
+  <g id="patch_2">
+   <path d="M 50.688 398.412 
+L 564.48 398.412 
+Q 578.304 398.412 578.304 389.34 
+L 578.304 129.276 
+Q 578.304 120.204 564.48 120.204 
+L 50.688 120.204 
+Q 36.864 120.204 36.864 129.276 
+L 36.864 389.34 
+Q 36.864 398.412 50.688 398.412 
+z
+" style="fill: #121e30; stroke: #26364b; stroke-width: 0.7; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_3">
+   <path d="M 614.016 398.412 
+L 1127.808 398.412 
+Q 1141.632 398.412 1141.632 389.34 
+L 1141.632 129.276 
+Q 1141.632 120.204 1127.808 120.204 
+L 614.016 120.204 
+Q 600.192 120.204 600.192 129.276 
+L 600.192 389.34 
+Q 600.192 398.412 614.016 398.412 
+z
+" style="fill: #121e30; stroke: #26364b; stroke-width: 0.7; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_4">
+   <path d="M 50.688 701.568 
+L 564.48 701.568 
+Q 578.304 701.568 578.304 692.496 
+L 578.304 432.432 
+Q 578.304 423.36 564.48 423.36 
+L 50.688 423.36 
+Q 36.864 423.36 36.864 432.432 
+L 36.864 692.496 
+Q 36.864 701.568 50.688 701.568 
+z
+" style="fill: #121e30; stroke: #26364b; stroke-width: 0.7; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_5">
+   <path d="M 614.016 701.568 
+L 1127.808 701.568 
+Q 1141.632 701.568 1141.632 692.496 
+L 1141.632 432.432 
+Q 1141.632 423.36 1127.808 423.36 
+L 614.016 423.36 
+Q 600.192 423.36 600.192 432.432 
+L 600.192 692.496 
+Q 600.192 701.568 614.016 701.568 
+z
+" style="fill: #121e30; stroke: #26364b; stroke-width: 0.7; stroke-linejoin: miter"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_6">
+    <path d="M 196.992 308.448 
+L 540.288 308.448 
+L 540.288 192.024 
+L 196.992 192.024 
+z
+" style="fill: #121e30"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 196.992 308.448 
+L 196.992 192.024 
+" clip-path="url(#p773a66e8c8)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2"/>
+     <g id="text_1">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="196.992" y="325.805422" transform="rotate(-0 196.992 325.805422)">0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 308.833829 308.448 
+L 308.833829 192.024 
+" clip-path="url(#p773a66e8c8)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4"/>
+     <g id="text_2">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="308.833829" y="325.806281" transform="rotate(-0 308.833829 325.806281)">2k</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 420.675657 308.448 
+L 420.675657 192.024 
+" clip-path="url(#p773a66e8c8)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6"/>
+     <g id="text_3">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="420.675657" y="325.806281" transform="rotate(-0 420.675657 325.806281)">4k</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_7">
+      <path d="M 532.517486 308.448 
+L 532.517486 192.024 
+" clip-path="url(#p773a66e8c8)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8"/>
+     <g id="text_4">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="532.517486" y="325.806281" transform="rotate(-0 532.517486 325.806281)">6k</text>
+     </g>
+    </g>
+    <g id="text_5">
+     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="368.64" y="343.047297" transform="rotate(-0 368.64 343.047297)">transactions / second</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_9"/>
+     <g id="text_6">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #edf5ff" x="187.992" y="211.215141" transform="rotate(-0 187.992 211.215141)">InfiniDisk · NBD</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_10"/>
+     <g id="text_7">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #edf5ff" x="187.992" y="254.415141" transform="rotate(-0 187.992 254.415141)">ZeroFS · S3 fsync</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_11"/>
+     <g id="text_8">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #edf5ff" x="187.992" y="297.615141" transform="rotate(-0 187.992 297.615141)">Native VM disk</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_7">
+    <path d="M 196.992 197.316 
+L 361.263726 197.316 
+L 361.263726 216.756 
+L 196.992 216.756 
+z
+" clip-path="url(#p773a66e8c8)" style="fill: #58dfc6"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 196.992 240.516 
+L 197.038022 240.516 
+L 197.038022 259.956 
+L 196.992 259.956 
+z
+" clip-path="url(#p773a66e8c8)" style="fill: #ae98f4"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 196.992 283.716 
+L 467.303811 283.716 
+L 467.303811 303.156 
+L 196.992 303.156 
+z
+" clip-path="url(#p773a66e8c8)" style="fill: #91a6bc"/>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="369.846126" y="210.153188" transform="rotate(-0 369.846126 210.153188)">2,938</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="205.620422" y="253.353188" transform="rotate(-0 205.620422 253.353188)">0.823</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="475.886211" y="296.553188" transform="rotate(-0 475.886211 296.553188)">4,834</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_10">
+    <path d="M 760.32 308.448 
+L 1103.616 308.448 
+L 1103.616 192.024 
+L 760.32 192.024 
+z
+" style="fill: #121e30"/>
+   </g>
+   <g id="matplotlib.axis_3">
+    <g id="xtick_5">
+     <g id="line2d_12">
+      <path d="M 760.32 308.448 
+L 760.32 192.024 
+" clip-path="url(#p33df401a90)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_13"/>
+     <g id="text_12">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="760.32" y="325.805422" transform="rotate(-0 760.32 325.805422)">0</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_14">
+      <path d="M 859.646132 308.448 
+L 859.646132 192.024 
+" clip-path="url(#p33df401a90)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_15"/>
+     <g id="text_13">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="859.646132" y="325.806281" transform="rotate(-0 859.646132 325.806281)">20k</text>
+     </g>
+    </g>
+    <g id="xtick_7">
+     <g id="line2d_16">
+      <path d="M 958.972264 308.448 
+L 958.972264 192.024 
+" clip-path="url(#p33df401a90)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_17"/>
+     <g id="text_14">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="958.972264" y="325.806281" transform="rotate(-0 958.972264 325.806281)">40k</text>
+     </g>
+    </g>
+    <g id="xtick_8">
+     <g id="line2d_18">
+      <path d="M 1058.298396 308.448 
+L 1058.298396 192.024 
+" clip-path="url(#p33df401a90)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_19"/>
+     <g id="text_15">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="1058.298396" y="325.806281" transform="rotate(-0 1058.298396 325.806281)">60k</text>
+     </g>
+    </g>
+    <g id="text_16">
+     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="931.968" y="343.046516" transform="rotate(-0 931.968 343.046516)">IOPS</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_4">
+    <g id="ytick_4">
+     <g id="line2d_20"/>
+     <g id="text_17">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #edf5ff" x="751.32" y="211.215141" transform="rotate(-0 751.32 211.215141)">InfiniDisk · NBD</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_21"/>
+     <g id="text_18">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #edf5ff" x="751.32" y="254.414711" transform="rotate(-0 751.32 254.414711)">ZeroFS</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_22"/>
+     <g id="text_19">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #edf5ff" x="751.32" y="297.615141" transform="rotate(-0 751.32 297.615141)">Native VM file</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_11">
+    <path d="M 760.32 197.316 
+L 1030.631811 197.316 
+L 1030.631811 216.756 
+L 760.32 216.756 
+z
+" clip-path="url(#p33df401a90)" style="fill: #58dfc6"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 760.32 240.516 
+L 841.419906 240.516 
+L 841.419906 259.956 
+L 760.32 259.956 
+z
+" clip-path="url(#p33df401a90)" style="fill: #ae98f4"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 760.32 283.716 
+L 835.300674 283.716 
+L 835.300674 303.156 
+L 760.32 303.156 
+z
+" clip-path="url(#p33df401a90)" style="fill: #91a6bc"/>
+   </g>
+   <g id="text_20">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="1039.214211" y="210.153188" transform="rotate(-0 1039.214211 210.153188)">54,429</text>
+   </g>
+   <g id="text_21">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="850.002306" y="253.353188" transform="rotate(-0 850.002306 253.353188)">16,330</text>
+   </g>
+   <g id="text_22">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="843.883074" y="296.553188" transform="rotate(-0 843.883074 296.553188)">15,098</text>
+   </g>
+  </g>
+  <g id="axes_3">
+   <g id="patch_14">
+    <path d="M 196.992 611.604 
+L 540.288 611.604 
+L 540.288 495.18 
+L 196.992 495.18 
+z
+" style="fill: #121e30"/>
+   </g>
+   <g id="matplotlib.axis_5">
+    <g id="xtick_9">
+     <g id="line2d_23">
+      <path d="M 196.992 611.604 
+L 196.992 495.18 
+" clip-path="url(#p91263c7790)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_24"/>
+     <g id="text_23">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="196.992" y="628.961422" transform="rotate(-0 196.992 628.961422)">0</text>
+     </g>
+    </g>
+    <g id="xtick_10">
+     <g id="line2d_25">
+      <path d="M 303.004947 611.604 
+L 303.004947 495.18 
+" clip-path="url(#p91263c7790)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_26"/>
+     <g id="text_24">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="303.004947" y="628.962281" transform="rotate(-0 303.004947 628.962281)">1k</text>
+     </g>
+    </g>
+    <g id="xtick_11">
+     <g id="line2d_27">
+      <path d="M 409.017893 611.604 
+L 409.017893 495.18 
+" clip-path="url(#p91263c7790)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_28"/>
+     <g id="text_25">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="409.017893" y="628.962281" transform="rotate(-0 409.017893 628.962281)">2k</text>
+     </g>
+    </g>
+    <g id="xtick_12">
+     <g id="line2d_29">
+      <path d="M 515.03084 611.604 
+L 515.03084 495.18 
+" clip-path="url(#p91263c7790)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_30"/>
+     <g id="text_26">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="515.03084" y="628.962281" transform="rotate(-0 515.03084 628.962281)">3k</text>
+     </g>
+    </g>
+    <g id="text_27">
+     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="368.64" y="646.203297" transform="rotate(-0 368.64 646.203297)">transactions / second</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_6">
+    <g id="ytick_7">
+     <g id="line2d_31"/>
+     <g id="text_28">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #edf5ff" x="187.992" y="514.371141" transform="rotate(-0 187.992 514.371141)">InfiniDisk · NBD</text>
+     </g>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_32"/>
+     <g id="text_29">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #edf5ff" x="187.992" y="557.571141" transform="rotate(-0 187.992 557.571141)">InfiniDisk · ublk</text>
+     </g>
+    </g>
+    <g id="ytick_9">
+     <g id="line2d_33"/>
+     <g id="text_30">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #edf5ff" x="187.992" y="600.771141" transform="rotate(-0 187.992 600.771141)">Native VM disk</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_15">
+    <path d="M 196.992 500.472 
+L 359.024308 500.472 
+L 359.024308 519.912 
+L 196.992 519.912 
+z
+" clip-path="url(#p91263c7790)" style="fill: #58dfc6"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 196.992 543.672 
+L 467.303811 543.672 
+L 467.303811 563.112 
+L 196.992 563.112 
+z
+" clip-path="url(#p91263c7790)" style="fill: #75bef0"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 196.992 586.872 
+L 309.248049 586.872 
+L 309.248049 606.312 
+L 196.992 606.312 
+z
+" clip-path="url(#p91263c7790)" style="fill: #91a6bc"/>
+   </g>
+   <g id="text_31">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="367.606708" y="513.309188" transform="rotate(-0 367.606708 513.309188)">1,528</text>
+   </g>
+   <g id="text_32">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="475.886211" y="556.509188" transform="rotate(-0 475.886211 556.509188)">2,550</text>
+   </g>
+   <g id="text_33">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="317.830449" y="599.709188" transform="rotate(-0 317.830449 599.709188)">1,059</text>
+   </g>
+  </g>
+  <g id="axes_4">
+   <g id="patch_18">
+    <path d="M 760.32 611.604 
+L 1103.616 611.604 
+L 1103.616 495.18 
+L 760.32 495.18 
+z
+" style="fill: #121e30"/>
+   </g>
+   <g id="matplotlib.axis_7">
+    <g id="xtick_13">
+     <g id="line2d_34">
+      <path d="M 760.32 611.604 
+L 760.32 495.18 
+" clip-path="url(#p21e239b197)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_35"/>
+     <g id="text_34">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="760.32" y="628.961422" transform="rotate(-0 760.32 628.961422)">0</text>
+     </g>
+    </g>
+    <g id="xtick_14">
+     <g id="line2d_36">
+      <path d="M 863.551335 611.604 
+L 863.551335 495.18 
+" clip-path="url(#p21e239b197)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_37"/>
+     <g id="text_35">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="863.551335" y="628.962281" transform="rotate(-0 863.551335 628.962281)">5k</text>
+     </g>
+    </g>
+    <g id="xtick_15">
+     <g id="line2d_38">
+      <path d="M 966.78267 611.604 
+L 966.78267 495.18 
+" clip-path="url(#p21e239b197)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_39"/>
+     <g id="text_36">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="966.78267" y="628.962281" transform="rotate(-0 966.78267 628.962281)">10k</text>
+     </g>
+    </g>
+    <g id="xtick_16">
+     <g id="line2d_40">
+      <path d="M 1070.014004 611.604 
+L 1070.014004 495.18 
+" clip-path="url(#p21e239b197)" style="fill: none; stroke: #2b3a4e; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_41"/>
+     <g id="text_37">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="1070.014004" y="628.962281" transform="rotate(-0 1070.014004 628.962281)">15k</text>
+     </g>
+    </g>
+    <g id="text_38">
+     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aabbd0" x="931.968" y="646.202516" transform="rotate(-0 931.968 646.202516)">IOPS</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_8">
+    <g id="ytick_10">
+     <g id="line2d_42"/>
+     <g id="text_39">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #edf5ff" x="751.32" y="514.371141" transform="rotate(-0 751.32 514.371141)">InfiniDisk · NBD</text>
+     </g>
+    </g>
+    <g id="ytick_11">
+     <g id="line2d_43"/>
+     <g id="text_40">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #edf5ff" x="751.32" y="557.571141" transform="rotate(-0 751.32 557.571141)">ZeroFS · S3 fsync</text>
+     </g>
+    </g>
+    <g id="ytick_12">
+     <g id="line2d_44"/>
+     <g id="text_41">
+      <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #edf5ff" x="751.32" y="600.771141" transform="rotate(-0 751.32 600.771141)">Native VM file</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_19">
+    <path d="M 760.32 500.472 
+L 955.675718 500.472 
+L 955.675718 519.912 
+L 760.32 519.912 
+z
+" clip-path="url(#p21e239b197)" style="fill: #58dfc6"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 760.32 543.672 
+L 760.350808 543.672 
+L 760.350808 563.112 
+L 760.32 563.112 
+z
+" clip-path="url(#p21e239b197)" style="fill: #ae98f4"/>
+   </g>
+   <g id="patch_21">
+    <path d="M 760.32 586.872 
+L 1030.631811 586.872 
+L 1030.631811 606.312 
+L 760.32 606.312 
+z
+" clip-path="url(#p21e239b197)" style="fill: #91a6bc"/>
+   </g>
+   <g id="text_42">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="964.258118" y="513.309188" transform="rotate(-0 964.258118 513.309188)">9,462</text>
+   </g>
+   <g id="text_43">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="768.933208" y="556.509188" transform="rotate(-0 768.933208 556.509188)">1.492</text>
+   </g>
+   <g id="text_44">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="1039.214211" y="599.709188" transform="rotate(-0 1039.214211 599.709188)">13,093</text>
+   </g>
+  </g>
+  <g id="text_45">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #58dfc6" x="49.536" y="37.8" transform="rotate(-0 49.536 37.8)">THE PERFORMANCE RECORD</text>
+  </g>
+  <g id="text_46">
+   <text style="font-weight: 700; font-size: 28px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="49.536" y="72.576" transform="rotate(-0 49.536 72.576)">Real workloads. Traceable results.</text>
+  </g>
+  <g id="text_47">
+   <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #aabbd0" x="49.536" y="98.28" transform="rotate(-0 49.536 98.28)">Historical reference • 10 Oct 2026 • medians of 3 runs • higher is better</text>
+  </g>
+  <g id="text_48">
+   <text style="font-weight: 700; font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="57.6" y="152.712" transform="rotate(-0 57.6 152.712)">PostgreSQL</text>
+  </g>
+  <g id="text_49">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #aabbd0" x="57.6" y="173.88" transform="rotate(-0 57.6 173.88)">pgbench · scale 2 · read / write</text>
+  </g>
+  <g id="text_50">
+   <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; fill: #aabbd0" transform="translate(57.6 360.738)">1 CPU database · 3 × 15 s</text>
+   <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; fill: #aabbd0" transform="translate(57.6 376.488)">Local WAL commits vs. S3 commits vs. VM disk.</text>
+  </g>
+  <g id="text_51">
+   <text style="font-weight: 700; font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="620.928" y="152.712" transform="rotate(-0 620.928 152.712)">fio · cached reads</text>
+  </g>
+  <g id="text_52">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #aabbd0" x="620.928" y="173.88" transform="rotate(-0 620.928 173.88)">4 KiB random · depth 32 × 4 jobs</text>
+  </g>
+  <g id="text_53">
+   <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; fill: #aabbd0" transform="translate(620.928 361.901203)">Warm data · 3 × 15 s</text>
+   <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; fill: #aabbd0" transform="translate(620.928 376.488)">Host page cache benefits InfiniDisk; native uses O_DIRECT.</text>
+  </g>
+  <g id="text_54">
+   <text style="font-weight: 700; font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="57.6" y="455.868" transform="rotate(-0 57.6 455.868)">MySQL · read-only</text>
+  </g>
+  <g id="text_55">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #aabbd0" x="57.6" y="477.036" transform="rotate(-0 57.6 477.036)">Large fixture · uniform access · warm data</text>
+  </g>
+  <g id="text_56">
+   <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; fill: #aabbd0" transform="translate(57.6 664.911188)">2 CPU database · 3 × 30 s</text>
+   <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; fill: #aabbd0" transform="translate(57.6 679.644)">ZeroFS: not measured in this fixture. Cache paths differ.</text>
+  </g>
+  <g id="text_57">
+   <text style="font-weight: 700; font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="620.928" y="455.868" transform="rotate(-0 620.928 455.868)">fio · synchronized writes</text>
+  </g>
+  <g id="text_58">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #aabbd0" x="620.928" y="477.036" transform="rotate(-0 620.928 477.036)">4 KiB write + fsync · depth 1 × 4 jobs</text>
+  </g>
+  <g id="text_59">
+   <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; fill: #aabbd0" transform="translate(620.928 662.876813)">3 × 15 s · different durability boundaries</text>
+   <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; fill: #aabbd0" transform="translate(620.928 679.644)">InfiniDisk: local WAL. ZeroFS: S3. Native: VM disk.</text>
+  </g>
+  <g id="text_60">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #aabbd0" x="49.536" y="731.808" transform="rotate(-0 49.536 731.808)">Different durability and cache paths: read the methodology before comparing. Current defaults were qualified separately.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p773a66e8c8">
+   <rect x="196.992" y="192.024" width="343.296" height="116.424"/>
+  </clipPath>
+  <clipPath id="p33df401a90">
+   <rect x="760.32" y="192.024" width="343.296" height="116.424"/>
+  </clipPath>
+  <clipPath id="p91263c7790">
+   <rect x="196.992" y="495.18" width="343.296" height="116.424"/>
+  </clipPath>
+  <clipPath id="p21e239b197">
+   <rect x="760.32" y="495.18" width="343.296" height="116.424"/>
+  </clipPath>
+ </defs>
+</svg>

@@ -1,0 +1,11 @@
+{
+  "markdown_files": [
+    "README.md",
+    "docs/operations.md",
+    "docs/benchmarks.md"
+  ],
+  "existing_relative_links": 51,
+  "shell_blocks_syntax_checked": 15,
+  "chart_sources_hash_checked": 9,
+  "source": "Source data reused; no performance benchmarks run for this documentation/CLI change."
+}

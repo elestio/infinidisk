@@ -5,6 +5,10 @@ edition = "2024"
 publish = false
 description = "Linux block storage backed by a local durable WAL and S3 checkpoints"
 
+[[bin]]
+name = "infinidisk"
+path = "src/main.rs"
+
 [features]
 default = []
 ublk = ["dep:libublk"]

@@ -6,7 +6,7 @@ import json,os,pathlib,signal,socket,subprocess,sys,time,uuid
 root=pathlib.Path(__file__).resolve().parents[1]
 config=pathlib.Path(sys.argv[1]).resolve()
 if root/'test-output' not in config.parents:raise SystemExit('test config must be inside test-output')
-binary=root/'target/release/infinidisk2';device='/dev/nbd31'
+binary=root/'target/release/infinidisk';device='/dev/nbd31'
 if pathlib.Path('/sys/class/block/nbd31/pid').exists():raise SystemExit('nbd31 already in use')
 work=root/'validation';work.mkdir(exist_ok=True)
 mount=work/'namespace-mount';mount.mkdir(exist_ok=True)

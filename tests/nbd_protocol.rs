@@ -149,11 +149,11 @@ async fn orderly_shutdown_publishes_a_generation_after_its_lag_limit() -> Result
     std::fs::write(&obstruction, "temporarily unavailable object prefix")?;
     let log_path = t.path().join("server.log");
     let log = std::fs::File::create(&log_path)?;
-    let mut child = tokio::process::Command::new(env!("CARGO_BIN_EXE_infinidisk2"))
+    let mut child = tokio::process::Command::new(env!("CARGO_BIN_EXE_infinidisk"))
         .arg("-c")
         .arg(&config)
         .arg("serve")
-        .env("RUST_LOG", "infinidisk2=info")
+        .env("RUST_LOG", "infinidisk=info,infinidisk2=info")
         .stdout(Stdio::from(log.try_clone()?))
         .stderr(Stdio::from(log))
         .kill_on_drop(true)

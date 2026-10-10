@@ -1,0 +1,36 @@
+[
+  {
+    "width": 1440,
+    "scrollWidth": 1440,
+    "imageCount": 3,
+    "imagesLoaded": true,
+    "missingAnchors": [],
+    "mermaidRendered": true,
+    "headings": [
+      "Performance",
+      "How it works",
+      "Quick start",
+      "Durability",
+      "The default profile",
+      "Operations at a glance",
+      "Evidence, limits and development"
+    ]
+  },
+  {
+    "width": 390,
+    "scrollWidth": 390,
+    "imageCount": 3,
+    "imagesLoaded": true,
+    "missingAnchors": [],
+    "mermaidRendered": true,
+    "headings": [
+      "Performance",
+      "How it works",
+      "Quick start",
+      "Durability",
+      "The default profile",
+      "Operations at a glance",
+      "Evidence, limits and development"
+    ]
+  }
+]

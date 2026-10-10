@@ -5,9 +5,9 @@ use std::{path::PathBuf, time::Duration};
 use tokio::sync::watch;
 
 #[derive(Parser)]
-#[command(version, about)]
+#[command(name = "infinidisk", version, about)]
 struct Cli {
-    #[arg(short, long, default_value = "infinidisk2.toml")]
+    #[arg(short, long, default_value = "infinidisk.toml")]
     config: PathBuf,
     #[command(subcommand)]
     command: Command,
@@ -97,7 +97,7 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "infinidisk2=info,libublk=warn".into()),
+                .unwrap_or_else(|_| "infinidisk=info,infinidisk2=info,libublk=warn".into()),
         )
         .init();
     let cli = Cli::parse();

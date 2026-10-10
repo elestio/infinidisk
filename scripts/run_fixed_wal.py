@@ -19,7 +19,7 @@ with (work/('build-checks'+suffix+'.log')).open('w') as log:
         (work/('build-checks'+suffix+'.json')).write_text(json.dumps(checks,indent=2))
         if result.returncode:raise RuntimeError('build/check failed: '+str(work/'build-checks.log'))
 small=root/'test-output/comparison-323bb1097b47/report.json';large=root/'test-output/comparison-be4ba51a4a38/report.json'
-binary=hashlib.sha256((root/'target/release/infinidisk2').read_bytes()).hexdigest()
+binary=hashlib.sha256((root/'target/release/infinidisk').read_bytes()).hexdigest()
 report=json.loads(a.resume.read_text()) if a.resume else {'work':str(work),'binary_sha256':binary,'stages':[],'complete':False}
 if a.resume:
     if report.get('complete'):raise RuntimeError('campaign already complete')
@@ -40,7 +40,7 @@ def run(label,args):
 try:
     save()
     if a.resume and pathlib.Path('/dev/ublkc31').exists():
-        run('ublk-stale-control-cleanup',[str(root/'target/release/infinidisk2'),'-c',str(small.parent/'infinidisk2.toml'),'ublk-delete','--id','31'])
+        run('ublk-stale-control-cleanup',[str(root/'target/release/infinidisk'),'-c',str(small.parent/'infinidisk2.toml'),'ublk-delete','--id','31'])
     for label,fixed,commit in [('fixed-reference','off','off'),('fixed-only','on','off'),('fixed-growing-one-barrier','off','on'),('fixed-one-barrier','on','on'),('fixed-reference-after','off','off')]:
         run(label,[sys.executable,'scripts/compare_zerofs.py','--mysql-repeat-report',str(small),'--phase-label',label,'--engine','infinidisk2','--mysql-workloads','write_only','--logical-cache','off','--wal-fixed-size',fixed,'--wal-commit-records',commit,'--flush-batch-us','0','--mysql-warm-seconds','10'])
     run('native-final',[sys.executable,'scripts/compare_zerofs.py','--mysql-repeat-report',str(large),'--phase-label','native-final','--engine','native','--mysql-workloads','read_only','read_write','write_only','--mysql-rand-type','uniform','--mysql-warm-seconds','60'])

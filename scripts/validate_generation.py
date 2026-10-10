@@ -169,7 +169,7 @@ class Campaign:
         self.binary = args.binary.resolve()
         self.helpers = comparison_helpers()
         self.env = read_credentials(args.credentials, os.environ)
-        self.env['RUST_LOG'] = 'infinidisk2=info'
+        self.env['RUST_LOG'] = 'infinidisk=info,infinidisk2=info'
         self.run_id = uuid.uuid4().hex[:12]
         self.work = ROOT / 'test-output' / ('generation-' + self.run_id)
         self.work.mkdir(parents=True, mode=0o700)

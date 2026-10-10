@@ -61,7 +61,7 @@ def main():
                 raise RuntimeError('failed build check: ' + name)
         if any(digest(ROOT / name) != sha for name, sha in sources.items()):
             raise RuntimeError('source changed during build')
-        binary = ROOT / 'target/release/infinidisk2'
+        binary = ROOT / 'target/release/infinidisk'
         sha = digest(binary)
         frozen = binary.with_name('infinidisk2-downloads-' + sha[:12])
         shutil.copy2(binary, frozen)

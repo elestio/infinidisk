@@ -6,7 +6,7 @@ use std::process::Command;
 fn generated_profile_is_explicit_and_old_configs_keep_their_contract() -> Result<()> {
     let directory = tempfile::tempdir()?;
     let path = directory.path().join("config.toml");
-    let executable = env!("CARGO_BIN_EXE_infinidisk2");
+    let executable = env!("CARGO_BIN_EXE_infinidisk");
     assert!(
         Command::new(executable)
             .args(["-c", path.to_str().unwrap(), "config"])

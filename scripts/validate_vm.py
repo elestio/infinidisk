@@ -56,7 +56,7 @@ def public_engine_options(text):
             if key in ENGINE_BOOLEAN_OPTIONS or key in ENGINE_INTEGER_OPTIONS}
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-BIN=ROOT/'target/release/infinidisk2'
+BIN=ROOT/'target/release/infinidisk'
 parser=argparse.ArgumentParser()
 parser.add_argument('--s3',action='store_true')
 parser.add_argument('--credentials',type=pathlib.Path)
@@ -67,7 +67,7 @@ parser.add_argument('--wal-fixed-size',action='store_true',default=None)
 parser.add_argument('--wal-commit-records',action='store_true',default=None)
 parser.add_argument('--postgres',action='store_true')
 parser.add_argument('--checks-only',action='store_true',help='Keep CRC and crash/recovery checks; skip redundant throughput benchmarks')
-parser.add_argument('--binary',type=pathlib.Path,help='InfiniDisk2 executable; defaults to this checkout target/release/infinidisk2')
+parser.add_argument('--binary',type=pathlib.Path,help='InfiniDisk executable; defaults to this checkout target/release/infinidisk')
 parser.add_argument('--engine-options',type=pathlib.Path,help='JSON object containing allowlisted non-secret settings; generation_mode=true is refused')
 parser.add_argument('--resume-report',type=pathlib.Path,help='repeat remote recovery/cache tests of an existing completed run')
 args=parser.parse_args()

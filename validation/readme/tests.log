@@ -1,0 +1,19 @@
+   Compiling infinidisk2 v0.1.0 (/root/infinidisk2)
+    Finished `release` profile [optimized] target(s) in 49.03s
+     Running tests/nbd_protocol.rs (target/release/deps/nbd_protocol-565a479f4483c9e0)
+
+running 2 tests
+test multiple_connections_share_flush_fua_and_large_trim ... ok
+test orderly_shutdown_publishes_a_generation_after_its_lag_limit ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.35s
+
+     Running tests/selected_profile.rs (target/release/deps/selected_profile-2c5e558760d8676a)
+
+running 1 test
+Configuration: /tmp/.tmpv1YpxW/config.toml
+Error: File exists (os error 17)
+test generated_profile_is_explicit_and_old_configs_keep_their_contract ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

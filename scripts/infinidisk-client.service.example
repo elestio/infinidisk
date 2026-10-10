@@ -1,0 +1,17 @@
+[Unit]
+Description=InfiniDisk native Linux NBD attachment
+After=infinidisk-server.service
+Requires=infinidisk-server.service
+
+[Service]
+Type=simple
+ExecStartPre=/sbin/modprobe nbd
+ExecStart=/usr/local/bin/infinidisk -c /etc/infinidisk/volume.toml attach --device /dev/nbd31 --connections 8
+# Unmount the filesystem before stopping this service. Keep the same NBD reserved.
+ExecStop=/usr/local/bin/infinidisk -c /etc/infinidisk/volume.toml detach --device /dev/nbd31
+Restart=no
+TimeoutStopSec=70
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

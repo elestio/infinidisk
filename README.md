@@ -1,223 +1,243 @@
-# InfiniDisk2
+<p align="center">
+  <img src="docs/assets/infinidisk-hero.svg" width="100%" alt="InfiniDisk — Local speed. An S3-backed foundation. A Linux block storage engine built in Rust.">
+</p>
 
-Moteur bloc Linux autonome en Rust : journal SSD local, cache borné et persistance asynchrone sur S3. Il expose un disque NBD et fournit son propre client Linux multiconnexion. Aucun processus ZeroFS, wrapper Bash ou `nbd-client` ne participe au chemin des données.
+<p align="center">
+  <strong>Linux block storage · Rust · Local durable WAL · Asynchronous S3 checkpoints</strong><br>
+  NBD included. Experimental ublk / io_uring available.
+</p>
 
-Version **0.1.0 expérimentale**, fonctionnelle de bout en bout. Le [rapport du cache d’index et des redémarrages](validation/index-cache/rapport.html) présente la dernière itération et ses appels S3. Le [rapport des lectures adaptatives](validation/adaptive/rapport.html) conserve les comparaisons précédentes. Le [rapport Astra](validation/astra/rapport.html) conserve la comparaison complète MySQL, PostgreSQL, fio, les appels S3 et les reprises de la campagne précédente. Le [rapport initial](validation/rapport.html) conserve les premiers essais ext4/PostgreSQL. Cette version ne constitue pas une certification de sûreté pour toutes les bases de données ou tous les fournisseurs S3.
+<p align="center">
+  <a href="#performance">Performance</a> ·
+  <a href="#how-it-works">Architecture</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#durability">Durability</a> ·
+  <a href="#the-default-profile">Defaults</a> ·
+  <a href="docs/operations.md">Operations</a>
+</p>
 
-## Contrat de stockage par défaut
+**InfiniDisk turns a dedicated S3 prefix into a Linux block device.** Put ext4 on it, mount it, and use ordinary files, PostgreSQL or MySQL. A local SSD write-ahead log handles the commit path; verified caches serve the working set; immutable checkpoints carry the volume to object storage.
 
-* `WRITE` normal : append au journal local avant réponse ; les écritures non synchronisées peuvent être perdues lors d'une panne.
-* `FLUSH` / `WRITE FUA` : synchronisation du journal et d'un marqueur de durabilité local avant réponse. Ce contrat s'applique au mode local durable, qui reste le défaut.
-* Publication distante : segments immuables, index vérifiés, puis remplacement conditionnel atomique de `HEAD`. La restauration utilise un préfixe cohérent du journal.
-* Perte complète de la VM et de son disque : retour à la dernière génération S3 publiée. L'intervalle de 5 secondes est une cible de lancement, **pas une borne garantie de perte** : le transfert et une panne réseau peuvent accroître le retard.
-* Corruption détectée : une copie de cache est reconstruite depuis une copie distante vérifiée ; une donnée faisant autorité qui échoue au contrôle d'intégrité produit une erreur. Elle n'est jamais remplacée silencieusement par des zéros.
-* Un seul hôte écrivain. Une reprise sur un autre hôte nécessite l'arrêt ou le fencing externe de l'ancien hôte. Aucun basculement automatique avec bail distribué n'est promis.
+This is the second-generation, standalone Rust engine. Its executable is **`infinidisk`**. The data path includes its own Linux NBD client and requires no ZeroFS process.
 
-Les garanties supposent un disque local qui respecte `fsync`, un stockage objet qui respecte les PUT atomiques/conditionnels et une configuration correcte du système de fichiers et de la base. S3 contient un **format de volume privé** ; les objets d'un bucket existant ne deviennent pas automatiquement des fichiers Linux.
+> **Status: experimental · v0.1.0.** Database workloads and recovery scenarios have been exercised, but production safety across all hardware, filesystems and S3 providers has not been established. The default acknowledges durability on the **local disk**; S3 persistence follows asynchronously.
 
-Le [mode expérimental par générations](docs/generation-mode.md) utilise un volume neuf de format 2. Ses FLUSH/FUA ordonnent les écritures sans promettre leur persistance individuelle ; après arrêt complet de l'application et du montage, il revient uniquement à un HEAD S3 complet. Des transactions acquittées peuvent disparaître. Ce mode ne s'active pas sur un volume durable existant.
+## Performance
 
-## Compilation sur la VM de développement
+### PostgreSQL. MySQL. fio. The measurements are included.
 
-```sh
-cd /root/infinidisk2
-export CARGO_HOME=/root/infinidisk2/.cargo
-export RUSTUP_HOME=/root/infinidisk2/.rustup
-export PATH=/root/infinidisk2/.cargo/bin:$PATH
-cargo build --release --locked -j 2
-cargo test --locked -j 2
-cargo clippy --locked --all-targets -j 2 -- -D warnings
-cargo fmt --all --check
+![Historical comparison of InfiniDisk, ZeroFS and native storage: PostgreSQL throughput, cached fio reads, MySQL read-only throughput and synchronized fio writes.](docs/assets/performance.png)
+
+**Reference campaign: 10 October 2026, historical `b39b705f43b6` build.** Bars show medians of three runs on one shared VM. These are reference measurements, not a rerun of today's default profile. MySQL's large-fixture chart includes NBD and ublk; ZeroFS was not measured in that fixture.
+
+The comparisons need three pieces of context:
+
+- **Commit contracts differ.** InfiniDisk confirms local WAL durability; the ZeroFS series waits for S3 on `fsync`; native storage relies on the VM disk. The write charts do not measure equal remote durability.
+- **Caches matter.** InfiniDisk's warm reads can use Linux's page cache, while native fio uses `O_DIRECT` on a regular file. The read charts do not establish superiority over a physical SSD. ZeroFS also retained its compression and encryption settings.
+- **Scope is explicit.** PostgreSQL and fio use 3 × 15-second runs; MySQL uses 3 × 30 seconds. Database CPU quotas exclude the separate storage process. These short tests on a shared VM are observations, not capacity guarantees.
+
+Read the [English benchmark guide](docs/benchmarks.md) for exact values, profiles, samples and source files. It also identifies excluded SQL-error runs. The [complete comparison report](validation/astra/rapport.html) retains the wider matrix and recovery evidence; download and open the HTML locally to view it.
+
+### Less unnecessary S3 work
+
+![Measured optimizations: sequential data GETs fall from 4096 to 1024, warm-open metadata reads from 15 to 1, and mixed-workload random-read p99 from 152.83 to 130.29 milliseconds.](docs/assets/efficiency.png)
+
+These are **three separate, controlled experiments**, not additive savings or a forecast of a cloud bill:
+
+| Improvement now enabled in new configurations | Observed result | Trade-off / scope |
+| :--- | :--- | :--- |
+| Adaptive 16 / 256 KiB reads | **75% fewer data GETs** in the sequential fixture; 80.2 → 105.8 MiB/s | Sequential p99 increased 19.0%; sparse random reads transferred fewer bytes but made 12.2% more GETs. |
+| Verified SSD cache for remote indexes | **15 → 1 metadata reads** on an unchanged warm volume | HEAD is still fetched; no startup-time improvement was demonstrated in this metadata-only test. |
+| Shared 8 MiB download admission budget | **14.8% lower random-read p99** under mixed load | Two samples per variant. Sequential-only p99 increased 1.0%; the original 5% improvement target was not met. |
+
+The budget was selected for bounded transfers and the mixed-workload compromise. [Evidence and methodology →](docs/benchmarks.md#current-profile-improvements)
+
+## How it works
+
+```mermaid
+flowchart LR
+    APP["Applications<br/>PostgreSQL · MySQL · files"] --> FS["Linux filesystem<br/>ext4 tested"]
+    FS --> BLOCK["Block device<br/>NBD or ublk"]
+    BLOCK --> ENGINE["InfiniDisk<br/>Rust engine"]
+    ENGINE --> WAL["Local SSD<br/>write-ahead log"]
+    ENGINE <--> CACHE["Verified caches<br/>RAM + SSD"]
+    WAL -->|Asynchronous checkpoint| S3["S3<br/>immutable data + indexes"]
+    S3 -->|Conditional publication| HEAD["HEAD<br/>committed generation"]
+    classDef local fill:#0c2931,stroke:#38dfc5,color:#efffff
+    classDef remote fill:#24213e,stroke:#a89bff,color:#f5f2ff
+    class ENGINE,WAL,CACHE local
+    class S3,HEAD remote
 ```
 
-Rust 1.99.0, Linux x86_64 et `Cargo.lock` ont été utilisés pour cette livraison. Les dépendances proviennent de crates.io ; l’adaptateur ublk optionnel utilise libublk épinglé à un commit Git. La publication Cargo est désactivée ; aucune licence de distribution du nouveau code n’est imposée par cette livraison interne. Le backend `file://` permet de tester le protocole sans compte S3.
+**Writes stay close.** The engine appends writes to the local WAL. `FLUSH` and `FUA` persist the required records and a durability marker. Prepared segments, vectored writes and selective synchronization reduce work around that barrier.
 
-## Créer et utiliser un volume
+**Reads follow the working set.** Recent WAL data and verified local caches satisfy hot reads. Misses fetch checked S3 ranges. Adaptive grouping uses small ranges for sparse access and larger ranges for dense access; a shared byte budget and a small-read reserve keep concurrent misses bounded.
+
+**Checkpoints publish a complete generation.** The engine uploads immutable data, writes verified indexes, then conditionally updates HEAD. Recovery follows the published generation. CRCs detect data-record corruption; SHA-256 verifies index objects. These checks detect accidental damage, not a malicious storage provider.
+
+S3 contains InfiniDisk's **private block-volume format**. Existing objects in a bucket do not appear as files. Use a dedicated prefix for each volume and a single active writer.
+
+## Quick start
+
+### 1. Build the engine
+
+Requirements: Linux, a Rust toolchain supporting edition 2024, a C toolchain, local SSD space and access to an S3-compatible endpoint with atomic object writes and conditional updates. The validation environment used Linux x86_64 and Rust 1.99.0. NBD requires the Linux `nbd` module.
+
+From a checkout containing this Rust engine's `Cargo.toml`:
 
 ```sh
-./target/release/infinidisk2 -c volume.toml config
+cargo build --release --locked
+sudo install -m 0755 target/release/infinidisk /usr/local/bin/infinidisk
 ```
 
-Cette commande écrit désormais toutes les options du profil recommandé. Voir le [modèle complet](configs/recommended.toml) et [les choix expliqués](docs/adaptive-reads.md). `config --legacy` génère les anciens défauts ; un fichier existant est toujours refusé. Les champs omis dans une ancienne configuration conservent leur comportement historique.
+The commands below run in **root shells**. Supply `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and, when needed, `AWS_SESSION_TOKEN` to the storage process through its environment. Keep credentials out of the configuration and repository. For a local protocol sandbox, the engine also supports `file://` storage.
 
-Adapter le fichier généré avant `init`, en conservant ses autres options :
+### 2. Configure a new volume
+
+```sh
+install -d -m 0700 /etc/infinidisk
+infinidisk -c /etc/infinidisk/volume.toml config
+```
+
+Edit the connection fields in the generated file; retain its other settings:
 
 ```toml
-local_dir = "/var/lib/infinidisk2/volume"
-store = "s3://MON_BUCKET/infinidisk2/volume-01"
-endpoint = "https://storage.elestio.com"
-region = "auto"
+local_dir = "/var/lib/infinidisk/volume-01"
+store = "s3://YOUR-BUCKET/volumes/volume-01"
+endpoint = "https://YOUR-S3-ENDPOINT"
+region = "us-east-1" # Use the region required by your provider.
 listen = "127.0.0.1:11900"
-checkpoint_seconds = 5
-memory_cache_mib = 128
-disk_cache_mib = 4096
-hot_wal_mib = 64
-max_index_mib = 128
-remote_index_cache_mib = 128
-read_extent_kib = 64
-adaptive_reads = true
-download_budget_mib = 8
-download_max_requests = 64
-max_pending_mib = 1024
-segment_mib = 32
-max_inflight = 128
-sync_data_only = true
-wal_preallocate = false
-wal_writev = true
-logical_cache = true
-wal_commit_records = true
-wal_fixed_size = true
-flush_batch_us = 0
-async_cache = true
-cache_queue_mib = 16
-fast_local_reads = true
-checkpoint_pipeline = true
-selective_sync = true
-ublk_fast_path = true
-generation_mode = false
-generation_max_lag_seconds = 30
-paged_index = true
-compact_checkpoints = false
-aligned_wal = false
 ```
 
-Fournir `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` et, si nécessaire, `AWS_SESSION_TOKEN` dans l'environnement du serveur. Aucun secret n'est écrit dans les configs, logs ou rapports du dépôt. Une région AWS standard doit remplacer `auto` pour AWS S3.
+`config` writes the [recommended profile](configs/recommended.toml) and refuses to overwrite an existing file. Reserve a fresh remote prefix and an unused local directory. Each additional volume needs its own directory, prefix and listening port.
+
+### 3. Create, attach and mount
+
+**Terminal 1 — create the unformatted volume, then keep the server running:**
 
 ```sh
-./target/release/infinidisk2 -c volume.toml init --size 10GiB
-./target/release/infinidisk2 -c volume.toml serve
+infinidisk -c /etc/infinidisk/volume.toml init --size 10GiB
+infinidisk -c /etc/infinidisk/volume.toml serve
 ```
 
-Dans un second terminal root, choisir **un NBD libre**, charger le module si nécessaire, puis garder le client en premier plan :
+**Terminal 2 — select a free NBD device, then keep the attachment running:**
 
 ```sh
 modprobe nbd nbds_max=32 max_part=8
-./target/release/infinidisk2 -c volume.toml attach --device /dev/nbd31 --connections 8
+infinidisk -c /etc/infinidisk/volume.toml attach --device /dev/nbd31 --connections 8
 ```
 
-Dans un troisième terminal, uniquement sur ce volume neuf que tu viens de créer :
+**Terminal 3 — format only the brand-new volume created above:**
 
 ```sh
 mkfs.ext4 /dev/nbd31
-mkdir -p /mnt/infinidisk2
-mount -o noatime /dev/nbd31 /mnt/infinidisk2
+mkdir -p /mnt/infinidisk
+mount -o noatime /dev/nbd31 /mnt/infinidisk
+df -h /mnt/infinidisk
 ```
 
-`init` refuse les données distantes existantes ; `attach`, `serve` et `adopt` ne formatent jamais. Aucun `mkfs` automatique. Pour un volume existant, monter son système de fichiers existant après l'attachement. Ne pas supprimer un journal local en attente pour libérer de la place.
+`/dev/nbd31` is an example: confirm it is free before attachment. `init` refuses an existing remote volume; attachment and adoption never format it. For an existing volume, mount its existing filesystem and skip `mkfs`.
 
-Les modèles systemd dans `scripts/` servent à superviser les deux processus. Ils ne sont pas installés ni activés automatiquement sur la VM.
+Files under `/mnt/infinidisk` now use the volume. For a database, keep its normal durability settings enabled and size the SSD cache for its active working set. An S3 cache miss still has network latency.
 
-## Arrêt et reprise
+[Shutdown, recovery, systemd and maintenance →](docs/operations.md)
 
-Le [cache vérifié des objets d’index](docs/index-cache.md) est activé à 128 Mio dans le nouveau profil. Il évite les GET des index déjà présents et valides au redémarrage chaud ; HEAD reste relu et le WAL rejoué. Son budget SSD s’ajoute à celui des données et au scratch de l’index paginé. Les anciennes configs qui omettent `remote_index_cache_mib` gardent la valeur 0.
+<details>
+<summary><strong>Optional: use ublk / io_uring</strong></summary>
 
-Le [budget global des téléchargements](docs/download-admission.md) est activé dans les nouvelles configurations (`download_budget_mib = 8`, `download_max_requests = 64`). Le [rapport ciblé avec graphiques](validation/downloads/rapport.html) montre le compromis : transferts bornés, médianes favorables en charge mixte, p99 séquentiel presque inchangé. Le critère initial de baisse du p99 séquentiel reste non atteint ; après réexamen avec Joseph, le défaut retient le compromis global. Les anciennes configurations qui omettent ce champ gardent 0 ; cette valeur permet aussi de désactiver le limiteur.
-
-
-Arrêt normal : arrêter la base, démonter le système de fichiers, exécuter `detach`, puis envoyer SIGTERM au serveur. Le serveur synchronise localement et tente une publication finale ; son code de sortie signale un échec de publication. Conserver le journal si S3 est indisponible.
+Build with the optional feature; the kernel must support `ublk_drv` and io_uring. Building the pinned libublk dependency also requires C/Clang tooling.
 
 ```sh
-umount /mnt/infinidisk2
-./target/release/infinidisk2 -c volume.toml detach --device /dev/nbd31
+cargo build --release --locked --features ublk
+sudo install -m 0755 target/release/infinidisk /usr/local/bin/infinidisk
+sudo modprobe ublk_drv
+sudo infinidisk -c /etc/infinidisk/volume.toml ublk --id 31 --queues 4
 ```
 
-Après crash du serveur, conserver `local_dir`, redémarrer le serveur et rattacher le disque. Effectuer la récupération normale ext4 et de la base. `e2fsck` doit s'exécuter sur un système de fichiers **démonté**. Ne pas utiliser `norecovery` pour masquer une récupération nécessaire.
+Use this foreground command **instead of** `serve` + `attach`, with the S3 credentials available in its environment. Choose a free ID; it exposes `/dev/ublkb31`. Apply the same new-volume formatting rules. After stopping the application and unmounting, `ublk-delete --id 31` removes the device; it refuses an unrelated or busy device.
 
-Après perte du disque local, arrêter/fencer l'ancien hôte, configurer **un nouveau `local_dir` vide** avec le même `store`, puis :
+</details>
+
+## Durability
+
+**Fast local commits and remote recovery have separate boundaries.** The default profile keeps local durable mode enabled; it does not turn `fsync` into a no-op.
+
+| Event | Default behavior |
+| :--- | :--- |
+| Ordinary `WRITE` completes | Data has been appended locally. Unsynchronized writes may be lost in a crash. |
+| `FLUSH` / `FUA` completes | The local WAL and durability marker have been synchronized. Recovery depends on the local disk honoring these barriers. |
+| S3 checkpoint completes | Immutable data and checked indexes are published through a conditional HEAD update. |
+| Engine process crashes | Retain the local directory, replay the WAL and perform normal filesystem / database recovery. |
+| The entire local disk is lost | Restore the last complete S3 generation. Even locally synchronized commits after that generation can be lost. |
+| S3 is unavailable | Retain pending WAL data. At the backlog limit, writes wait for space and eventually return an I/O error instead of growing without bound. |
+| Integrity verification fails | Rebuild a damaged cache copy from a verified source when possible. Authoritative data that fails verification returns an error, never fabricated zero-filled success. |
+
+The **5-second checkpoint interval is a scheduling target, not a guaranteed recovery-point bound**. Upload time, backlog and outages can extend the gap. The implementation assumes correct disk barriers, S3 conditional-write semantics and normal database/filesystem recovery.
+
+One writer owns a volume. Moving it to another host requires **external fencing of the previous writer** before `adopt --takeover`. That flag does not stop the old host. There is no automatic distributed failover or multiwriter mode.
+
+[Recovery procedures and failure handling →](docs/operations.md#recovery)
+
+## The default profile
+
+New configurations include the selected optimizations. This is what `infinidisk config` generates today:
+
+| Area | Selected default | Purpose |
+| :--- | :--- | :--- |
+| Commit path | `sync_data_only`, `wal_writev`, `wal_commit_records`, `wal_fixed_size` enabled | Persist data with fewer redundant operations and explicit WAL durability records. |
+| Checkpoints | Every **5 s**, **32 MiB** segments; pipeline and selective sync enabled | Amortize object writes while retaining local commit barriers. |
+| Reads | Logical-page cache, grouped local reads, adaptive **16 / 256 KiB** remote ranges | Match transfer size to request density. The 64 KiB fallback remains configured. |
+| Download admission | **8 MiB**, at most **64** admitted data-range requests | Bound concurrent online payloads across connections; reserve capacity for small reads. |
+| RAM data cache | **128 MiB** | Keep reusable remote ranges close. |
+| SSD data cache | **4 GiB** | Retain verified logical pages across restarts. |
+| Hot WAL / pending WAL | **64 MiB / 1 GiB** | Separate recent-data retention from upload backlog. |
+| Paged index | Enabled; **128 MiB** resident budget | Move cold index shards to SSD. |
+| Remote-index SSD cache | **128 MiB** | Reuse verified immutable index objects on warm opens. |
+| Async cache fill | Enabled; **16 MiB** queue | Bound cache-fill work outside the response path. |
+| ublk fast path | Enabled when using ublk | Reuse persistent workers for local I/O. |
+
+These are separate budgets, **not a cap on process RSS or total host memory**. Reserve additional SSD space for prepared WAL segments, index scratch and the host. Download admission does not cover metadata requests or the offline `warm` command.
+
+`generation_mode`, `aligned_wal`, `compact_checkpoints` and `wal_preallocate` remain disabled; `flush_batch_us` is zero. Larger objects and more concurrency are not universally faster or cheaper. [Selection evidence →](docs/benchmarks.md#current-profile-improvements)
+
+**Existing configurations are not silently upgraded.** Omitted fields keep their historical defaults; in particular, an old configuration without `download_budget_mib` retains `0` (disabled). `config --legacy` creates the legacy profile. Review changes deliberately for an existing volume, and retain a compatible binary when using experimental WAL formats.
+
+## Operations at a glance
+
+| Command | Use |
+| :--- | :--- |
+| `status` | Inspect the committed **remote** generation; use server logs for live backlog and local progress. |
+| `scrub` | Verify remote metadata and every referenced data page. |
+| `warm --concurrency 128` | Offline: preload allocated logical pages into an adequately sized SSD cache. |
+| `compact` | Offline: rewrite live remote pages in logical order. |
+| `gc` / `gc --apply` | Offline: preview / remove old unreferenced objects, with a 24-hour minimum age by default. |
+| `adopt --takeover` | Recover a remote generation into an empty local directory after fencing the previous writer. |
+
+Always pass `-c /path/to/volume.toml` before the command. Without `-c`, the CLI reads `infinidisk.toml`. Read the [operations guide](docs/operations.md) before garbage collection or recovery. Never remove a pending WAL to reclaim space.
+
+## Evidence, limits and development
+
+The validation archive includes process-kill recovery, ext4 checks, PostgreSQL `pg_amcheck`, MySQL checks and remote-data CRC verification. The latest download-budget recovery suite passed **7 / 7 scenarios**. These checks do not certify real power failure, faulty storage hardware or long-duration multi-terabyte workloads.
+
+| Resource | Contents |
+| :--- | :--- |
+| [Benchmark guide](docs/benchmarks.md) | English methodology, exact chart values, qualifications and sources. |
+| [Operations guide](docs/operations.md) | English shutdown, recovery, maintenance and deployment notes. |
+| [Recommended configuration](configs/recommended.toml) | Complete settings for new volumes. |
+| [Architecture and design decisions](docs/architecture.md) | Original detailed specification and trade-offs, in French. |
+| [Adaptive reads](docs/adaptive-reads.md) · [Index cache](docs/index-cache.md) · [Download admission](docs/download-admission.md) | Implementation details and selection records, in French. |
+| [Full comparison](validation/astra/rapport.html) · [Latest download report](validation/downloads/rapport.html) | Standalone HTML reports with raw evidence links, in French; download and open locally. |
+
+The current engine does not provide online resize, named user snapshots, application-level encryption, multiwriter access or transparent migration from the earlier ZeroFS-based InfiniDisk wrapper. Migrate through file copying or database backup/restore into a separate new volume. Large fully allocated volumes also face a **64 MiB remote-root limit**; a multilevel root remains future work.
+
+For contributors:
 
 ```sh
-./target/release/infinidisk2 -c recovery.toml adopt --takeover
-./target/release/infinidisk2 -c recovery.toml serve
+cargo fmt --all --check
+cargo test --locked
+cargo clippy --locked --all-targets -- -D warnings
 ```
 
-`--takeover` atteste que l'ancien écrivain a été arrêté/fencé ; il ne l'arrête pas à distance. Ne jamais faire fonctionner deux copies de la même identité locale en parallèle.
+VM integration and comparison scripts live in [`scripts/`](scripts/); their environment-specific prerequisites and evidence are described in the benchmark guide. Use isolated devices and dedicated test prefixes.
 
-## Maintenance
-
-```sh
-./target/release/infinidisk2 -c volume.toml status
-./target/release/infinidisk2 -c volume.toml scrub
-# Serveur arrêté : aperçu des objets non référencés, vieux d'au moins 24 h.
-./target/release/infinidisk2 -c volume.toml gc
-# Appliquer la collecte après examen de l'aperçu.
-./target/release/infinidisk2 -c volume.toml gc --apply
-```
-
-`status` décrit la génération **distante** ; les logs du serveur indiquent les séquences locale et distante et les octets en attente. `scrub` contrôle l'index et toutes les pages référencées, avec GET groupés par étendue.
-
-La collecte est hors ligne, limitée au préfixe du volume et protège les objets référencés par `HEAD`. Pendant les suppressions, `HEAD` porte un écrivain réservé nul : démarrage et adoption sont refusés. Si la collecte est interrompue, reprendre `gc --apply` depuis le même `local_dir` ; son `gc-token.json` permet de retrouver le propriétaire et la génération. Ne jamais supprimer ce token ou lever le fencing manuellement. `--min-age-seconds 0` est réservé aux essais isolés.
-
-## Performances et limites
-
-Le [comptage S3 et le compromis entre tailles](docs/astra-s3-operations.md) présentent les coûts projetés par 1K/10K requêtes SQL, le redémarrage avec cache conservé ou neuf, et les plages de lecture/tailles de WAL. Les appels observés sur Elestio sont tarifés selon la grille Tigris, avant franchise ; le coût du stockage est séparé. Les chronométrages de confirmation sans proxy ne sont pas confondus avec les mesures instrumentées. Une grande plage peut réduire les GET tout en ralentissant les lectures aléatoires.
-
-Le chemin chaud utilise le disque local. Le cache SSD doit couvrir le working set de la base ; une lecture froide S3 conserve la latence du réseau. Les tests mesurent séparément données récentes locales, cache distant insuffisant et cache distant suffisant. Le profil généré active `wal_commit_records=true` : la frontière durable est inscrite dans le WAL, ce qui évite la seconde synchronisation du watermark. L'ancien chemin reste disponible avec `wal_commit_records=false`.
-
-Le défaut `sync_data_only=true` utilise maintenant `fdatasync` pour les segments WAL et le watermark : les données et métadonnées nécessaires à leur lecture restent persistées, sans imposer la persistance des horodatages internes. Les créations, répertoires et écritures atomiques gardent leurs barrières de métadonnées. `sync_data_only=false` conserve le chemin `fsync` initial pour comparaison. Les compteurs `flush_calls`, `flush_groups`, `flush_wait_ns`, `wal_sync_ns` et `watermark_sync_ns` apparaissent dans les statuts périodiques ; ils sont cumulés depuis le démarrage.
-
-Le journal en attente, les segments récents et le cache SSD ont des limites séparées. Un journal plein applique une attente jusqu'à 50 secondes, puis renvoie une erreur si aucune publication ne libère de place. Prévoir l'espace local correspondant aux trois budgets, plus la marge du système hôte.
-
-Le profil recommandé active `paged_index=true` avec un budget résident de 128 Mio. Il conserve les shards froids sur SSD et permet de dépasser la capacité de l'index entièrement en RAM ; les misses SSD peuvent toutefois ralentir les accès dispersés. Son budget ne couvre pas le RSS total du processus. La racine distante reste plafonnée à 64 Mio et une publication trop grande est refusée avant remplacement de HEAD ; un très grand volume rempli nécessitera aussi une racine à plusieurs niveaux.
-
-La collecte supprime des objets entièrement inutilisés. `compact_checkpoints=true` peut publier uniquement les dernières versions des pages du checkpoint, sans retraiter automatiquement tous les anciens segments partiellement vivants. Les objets anciens restent disponibles jusqu'à la collecte hors ligne. Pas de snapshots utilisateur, resize en ligne, chiffrement applicatif, réplication multi-écrivain ou compatibilité démontrée avec toutes les DB. Le nombre de connexions, la concurrence et les caches sont bornés ; leur dimensionnement reste à adapter au matériel.
-
-## Validation reproductible
-
-```sh
-python3 scripts/validate_vm.py --postgres
-# Vérifications de reprise sans répéter les benchmarks de débit :
-python3 scripts/validate_vm.py --postgres --checks-only --engine-options validation/adaptive/selected/selected-options.json
-# S3 : préfixe unique, uniquement des données d'essai, aucun objet du volume existant.
-python3 scripts/validate_vm.py --s3 --credentials /chemin/credentials.env --postgres
-```
-
-Le script vérifie que son export nouvellement créé est vierge avant formatage. Il réalise les tests sur un NBD libre, utilise des conteneurs PostgreSQL isolés sans réseau et laisse les résultats sous `test-output/run-<id>`. Il ne vide jamais le cache global de la VM. Les rapports ne certifient pas une panne électrique réelle, une destruction du disque matériel ou une charge longue de plusieurs téraoctets.
-
-Voir [les spécifications et décisions](docs/architecture.md), [la review et les mesures](validation/rapport.html) et [les résultats bruts](validation/s3-report.json).
-
-## Variantes expérimentales de performance
-
-La [campagne Astra](validation/astra/rapport.html) et [ses spécifications](docs/astra-optimizations.md) ajoutent le cache asynchrone borné, les lectures groupées, les workers ublk persistants, les segments préparés/recyclés, la synchronisation sélective, le WAL aligné, l'index paginé et les checkpoints compacts. Ces rapports décrivent les profils historiques. La génération de configuration active maintenant les options retenues, documentées dans [le profil sélectionné](docs/adaptive-reads.md), et laisse WAL aligné, générations et compaction des checkpoints désactivés. Le rapport identifie chaque binaire, conserve les mesures individuelles et sépare les contrats de durabilité. Le WAL aligné et le mode génération utilisent des fixtures distinctes pour éviter une ouverture avec un ancien lecteur incompatible.
-
-La [spécification des variantes](docs/breakthroughs.md) décrit le cache par page logique, la compaction S3 hors ligne, le journal à marqueurs de commit, les segments entièrement préinitialisés, le préchauffage complet et le transport ublk. Le nouveau profil généré active `logical_cache`, `wal_commit_records` et `wal_fixed_size` ; `flush_batch_us` reste nul. Les fichiers anciens qui omettent ces options gardent leurs anciens défauts. Les formats de journal expérimentaux ne doivent pas être ouverts ensuite par un ancien binaire. Conserver le binaire et le journal associés jusqu’à une migration qualifiée.
-
-La [campagne complète du 10 octobre](validation/breakthroughs/rapport.html) observe ×1,57 en lecture à cache SSD identique et ×28 à ×32 avec le volume préchauffé dans un budget de 4 Gio, ainsi que +59 à +65 % en écriture sur la petite base avec WAL fixe et marqueurs. Le grand dataset reste derrière le disque natif en mixte/écriture. Les coûts de préparation, le page cache Linux, les erreurs et les reprises après crash figurent dans le rapport ; ces chiffres ne sont pas des garanties universelles.
-
-Les commandes hors ligne prennent le verrou exclusif du volume : arrêter le serveur avant de les exécuter. `warm` exige `logical_cache=true` et un cache SSD assez grand pour toutes les pages allouées. Il télécharge les plages S3 par groupes physiques, avec 128 groupes simultanés par défaut ; `--concurrency` accepte 1 à 128. Les pages sont vérifiées avant leur remplissage SSD et les logs exposent la progression et le nombre d'appels de plage actifs. Voir [le préchargement parallèle et ses limites](docs/astra-warm-parallel.md). `compact` réécrit les pages vers de nouveaux objets ; les anciens objets restent présents jusqu’à une collecte ultérieure.
-
-```sh
-./target/release/infinidisk2 -c volume.toml warm --concurrency 128
-./target/release/infinidisk2 -c volume.toml compact
-# Linux avec ublk_drv et io_uring, compilateur C/Clang pour libublk :
-cargo build --release --features ublk --locked -j 2
-modprobe ublk_drv
-# Choisir un identifiant libre ; le serveur reste au premier plan.
-./target/release/infinidisk2 -c volume.toml ublk --id 31 --queues 4
-```
-
-ublk expose `/dev/ublkb31`. Après arrêt de la base et démontage du système de fichiers, `ublk-delete --id 31` supprime uniquement un périphérique identifié comme cible expérimentale InfiniDisk2 et refuse un périphérique encore utilisé. Les commandes de formatage restent des opérations explicites de l’administrateur, limitées à un volume neuf.
-
-## Comparaison avec ZeroFS
-
-La [comparaison mesurée](validation/comparaison-zerofs.html) et son [protocole détaillé](docs/comparaison-zerofs.md) utilisent des volumes S3 neufs sur la même VM, huit connexions NBD et trois répétitions par charge. Les résultats distinguent le `fsync` local d'InfiniDisk2 du `fsync` vers S3 de ZeroFS : leurs garanties après perte du SSD diffèrent.
-
-Sur la VM de validation, avec les credentials privés déjà configurés :
-
-```sh
-python3 scripts/compare_zerofs.py
-python3 scripts/compare_zerofs.py --postgres-only
-```
-
-Les scripts réservent un NBD libre et leurs propres préfixes S3 UUID, sans modifier les volumes existants. Résultats sous `test-output/comparison-<id>` ; les objets de test restent conservés pour audit.
-
-Voir aussi [l’optimisation des commits et MySQL](validation/optimisation-mysql.html), son [protocole et la review](docs/optimisation-mysql.md).
-
-```sh
-python3 scripts/compare_zerofs.py --mysql-only
-```
-
-Ce test lance des conteneurs MySQL isolés sans réseau, vérifie les réglages InnoDB/binlog et mesure les modes ZeroFS S3, ZeroFS qui ignore fsync, InfiniDisk2 et disque natif. Les mots de passe des comptes d’essai sont conservés uniquement dans des fichiers `*.secret` privés sous le répertoire d’essai, exclus des exports de preuves.
-
-Le chemin WAL peut envoyer en-tête et données en un `writev` (`wal_writev=true`), avec reprise correcte des écritures partielles. `wal_preallocate=false` reste le défaut : l’expérience de réservation de blocs ne montre pas de gain sur cette VM. Ce choix `writev` ne modifie pas à lui seul le format WAL ; le nombre de barrières dépend du réglage `wal_commit_records`. Voir [la campagne WAL et grande base MySQL](validation/optimisation-wal.html).
-
-Avant publication, le buffer de chaque segment scellé est vérifié intégralement (identité, longueur, enregistrements, CRC, séquence). Un WAL local endommagé bloque le volume et conserve le précédent checkpoint distant ; le test de régression vérifie sa restauration.
+**Project and executable:** `infinidisk`. The internal Rust library/package remains `infinidisk2`; historical evidence preserves its original names and binary hashes. This checkout is intended for the [elestio/infinidisk](https://github.com/elestio/infinidisk) repository; the commands above target this Rust engine, not the earlier wrapper CLI. A distribution license for the Rust engine has not yet been declared, and Cargo publishing is disabled.
