@@ -16,6 +16,7 @@ ENGINE_BOOLEAN_OPTIONS={
 }
 
 ENGINE_INTEGER_OPTIONS={
+    'remote_index_cache_mib':(0,65536),
     'cache_queue_mib':(1,128),'max_index_mib':(1,65536),
     'generation_max_lag_seconds':(1,3600),'checkpoint_seconds':(1,3600),
     'segment_mib':(1,64),'max_pending_mib':(2,1024*1024),

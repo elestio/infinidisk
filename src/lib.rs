@@ -2,6 +2,7 @@ pub mod cache;
 pub mod config;
 pub mod engine;
 pub mod index;
+mod index_objects;
 pub mod linux;
 pub mod nbd;
 pub mod page_cache;

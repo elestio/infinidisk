@@ -32,6 +32,9 @@ const LARGE_READ: u64 = 256 * 1024;
 #[cfg(test)]
 #[path = "../tests/support/adaptive_reads.rs"]
 mod adaptive_tests;
+#[cfg(test)]
+#[path = "../tests/support/index_objects.rs"]
+mod index_object_tests;
 type ScrubGroups = BTreeMap<(Uuid, u64), (u64, Vec<(u64, u32)>)>;
 type ReadMiss = (u64, Option<Ref>, Option<Arc<File>>);
 
@@ -142,6 +145,7 @@ pub struct Status {
     pub checkpoint_wal_bytes: u64,
     pub uploaded_segment_bytes: u64,
     pub index: crate::index::IndexStats,
+    pub index_object_cache: crate::index_objects::Stats,
     pub wal_pool_bytes: u64,
     pub cache_queue_bytes: usize,
     pub cache_fills_skipped: u64,
@@ -176,6 +180,7 @@ pub struct Engine {
     cache: std::sync::Mutex<crate::read_cache::ReadCache>,
     fetch_locks: Vec<Mutex<()>>,
     disk_cache: DiskCache,
+    index_objects: Arc<crate::index_objects::IndexObjects>,
     page_cache: Option<Arc<crate::page_cache::PageCache>>,
     cache_writer: Option<crate::page_cache::CacheWriter>,
     wal_pool: Option<crate::wal_pool::WalPool>,
@@ -297,7 +302,7 @@ impl Engine {
             "remote writer exists; fence its host, then pass --takeover"
         );
         // Validate the complete remote index before changing ownership.
-        Self::load_index(&store, &h, c).await?;
+        Self::load_index(&store, &h, c, None).await?;
         let i = Identity {
             volume: h.volume,
             writer: Uuid::new_v4(),
@@ -314,9 +319,28 @@ impl Engine {
         )?;
         Ok(i)
     }
-    async fn load_index(store: &Store, h: &Head, c: &Config) -> Result<PageIndex> {
+    async fn load_index(
+        store: &Store,
+        h: &Head,
+        c: &Config,
+        cache: Option<&Arc<crate::index_objects::IndexObjects>>,
+    ) -> Result<PageIndex> {
         let mut parts = stream::iter(h.shards.iter().map(|(&id, s)| async move {
-            let b = store.get(&s.key).await?;
+            let cached = if let Some(cache) = cache {
+                cache.get(h.volume, id, &s.key, &s.hash).await
+            } else {
+                None
+            };
+            let from_cache = cached.is_some();
+            let b = if let Some(bytes) = cached {
+                bytes
+            } else {
+                let bytes = store.get(&s.key).await?;
+                if let Some(cache) = cache {
+                    cache.remote_read(bytes.len());
+                }
+                bytes
+            };
             ensure!(
                 b.len() <= 1024 * 1024 && hex::encode(Sha256::digest(&b)) == s.hash,
                 "index shard checksum/size mismatch"
@@ -332,6 +356,9 @@ impl Engine {
                             .is_some_and(|end| end <= r.segment_len),
                     "invalid index reference"
                 );
+            }
+            if !from_cache && let Some(cache) = cache {
+                cache.put(h.volume, id, &s.key, &s.hash, b).await;
             }
             Ok::<_, anyhow::Error>((id, map))
         }))
@@ -369,7 +396,12 @@ impl Engine {
             head.writer == Some(identity.writer),
             "writer has been fenced; refusing to serve old local state"
         );
-        let mut index = Self::load_index(&store, &head, &c).await?;
+        let index_objects = crate::index_objects::IndexObjects::open(
+            c.local_dir.join("remote-index-cache"),
+            c.remote_index_cache_mib * 1024 * 1024,
+        )
+        .await;
+        let mut index = Self::load_index(&store, &head, &c, Some(&index_objects)).await?;
         let mut paths: Vec<_> = std::fs::read_dir(c.local_dir.join("wal"))?
             .map(|e| e.map(|e| e.path()))
             .collect::<std::io::Result<_>>()?;
@@ -585,6 +617,7 @@ impl Engine {
             cache: std::sync::Mutex::new(cache),
             fetch_locks: (0..256).map(|_| Mutex::new(())).collect(),
             disk_cache,
+            index_objects,
             page_cache,
             cache_writer,
             wal_pool,
@@ -1460,7 +1493,9 @@ impl Engine {
                     let b = bincode::serialize(&map)?;
                     let hash = hex::encode(Sha256::digest(&b));
                     let key = format!("indexes/{id}/{}", Uuid::new_v4());
-                    store.immutable(&key, b.into()).await?;
+                    let b = Bytes::from(b);
+                    store.immutable(&key, b.clone()).await?;
+                    self.index_objects.put(volume, id, &key, &hash, b).await;
                     if !replacements.is_empty() {
                         let mut state = self.state.lock().await;
                         for (p, old, new) in &replacements {
@@ -1628,6 +1663,7 @@ impl Engine {
                 .uploaded_segment_bytes
                 .load(Ordering::Relaxed),
             index: s.index.stats(),
+            index_object_cache: self.index_objects.status(),
             wal_pool_bytes: self.wal_pool.as_ref().map(|p| p.bytes()).unwrap_or(0),
             cache_queue_bytes,
             cache_fills_skipped,
@@ -1945,7 +1981,11 @@ impl Engine {
                 let b = bincode::serialize(rows)?;
                 let hash = hex::encode(Sha256::digest(&b));
                 let key = format!("indexes/{id}/{}", Uuid::new_v4());
-                e.store.immutable(&key, b.into()).await?;
+                let b = Bytes::from(b);
+                e.store.immutable(&key, b.clone()).await?;
+                e.index_objects
+                    .put(e.identity.volume, *id, &key, &hash, b)
+                    .await;
                 h.shards.insert(*id, Shard { key, hash });
             }
             h.generation += 1;
@@ -1994,7 +2034,7 @@ impl Engine {
                 "GC requires the current owner on a stopped volume"
             );
         }
-        let mut index = Self::load_index(&store, &h, c).await?;
+        let mut index = Self::load_index(&store, &h, c, None).await?;
         let mut live: BTreeSet<object_store::path::Path> =
             h.shards.values().map(|s| store.path(&s.key)).collect();
         for (_, r) in index.entries()? {
@@ -2060,7 +2100,7 @@ impl Engine {
     pub async fn verify_remote(c: &Config) -> Result<(u64, usize)> {
         let store = Store::new(c)?;
         let h = decode(&store.head().await?.context("no volume")?.0)?;
-        let mut index = Self::load_index(&store, &h, c).await?;
+        let mut index = Self::load_index(&store, &h, c, None).await?;
         let n = index.len();
         let mut groups = ScrubGroups::new();
         for (_, r) in index.entries()? {

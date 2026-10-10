@@ -2,7 +2,7 @@
 
 Moteur bloc Linux autonome en Rust : journal SSD local, cache borné et persistance asynchrone sur S3. Il expose un disque NBD et fournit son propre client Linux multiconnexion. Aucun processus ZeroFS, wrapper Bash ou `nbd-client` ne participe au chemin des données.
 
-Version **0.1.0 expérimentale**, fonctionnelle de bout en bout. Le [rapport ciblé du profil recommandé et des lectures adaptatives](validation/adaptive/rapport.html) présente la dernière itération. Le [rapport Astra](validation/astra/rapport.html) conserve la comparaison complète MySQL, PostgreSQL, fio, les appels S3 et les reprises de la campagne précédente. Le [rapport initial](validation/rapport.html) conserve les premiers essais ext4/PostgreSQL. Cette version ne constitue pas une certification de sûreté pour toutes les bases de données ou tous les fournisseurs S3.
+Version **0.1.0 expérimentale**, fonctionnelle de bout en bout. Le [rapport du cache d’index et des redémarrages](validation/index-cache/rapport.html) présente la dernière itération et ses appels S3. Le [rapport des lectures adaptatives](validation/adaptive/rapport.html) conserve les comparaisons précédentes. Le [rapport Astra](validation/astra/rapport.html) conserve la comparaison complète MySQL, PostgreSQL, fio, les appels S3 et les reprises de la campagne précédente. Le [rapport initial](validation/rapport.html) conserve les premiers essais ext4/PostgreSQL. Cette version ne constitue pas une certification de sûreté pour toutes les bases de données ou tous les fournisseurs S3.
 
 ## Contrat de stockage par défaut
 
@@ -53,6 +53,7 @@ memory_cache_mib = 128
 disk_cache_mib = 4096
 hot_wal_mib = 64
 max_index_mib = 128
+remote_index_cache_mib = 128
 read_extent_kib = 64
 adaptive_reads = true
 max_pending_mib = 1024
@@ -105,6 +106,8 @@ mount -o noatime /dev/nbd31 /mnt/infinidisk2
 Les modèles systemd dans `scripts/` servent à superviser les deux processus. Ils ne sont pas installés ni activés automatiquement sur la VM.
 
 ## Arrêt et reprise
+
+Le [cache vérifié des objets d’index](docs/index-cache.md) est activé à 128 Mio dans le nouveau profil. Il évite les GET des index déjà présents et valides au redémarrage chaud ; HEAD reste relu et le WAL rejoué. Son budget SSD s’ajoute à celui des données et au scratch de l’index paginé. Les anciennes configs qui omettent `remote_index_cache_mib` gardent la valeur 0.
 
 Arrêt normal : arrêter la base, démonter le système de fichiers, exécuter `detach`, puis envoyer SIGTERM au serveur. Le serveur synchronise localement et tente une publication finale ; son code de sortie signale un échec de publication. Conserver le journal si S3 est indisponible.
 

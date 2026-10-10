@@ -20,6 +20,8 @@ pub struct Config {
     pub hot_wal_mib: u64,
     /// Conservative accounting cap for the current in-memory page index.
     pub max_index_mib: usize,
+    /// Disposable SSD copies of immutable remote index objects; zero bypasses it.
+    pub remote_index_cache_mib: u64,
     pub read_extent_kib: u64,
     /// Choose bounded physical read groups from the requested pages' locality.
     pub adaptive_reads: bool,
@@ -78,6 +80,7 @@ impl Default for Config {
             disk_cache_mib: 2048,
             hot_wal_mib: 1024,
             max_index_mib: 1024,
+            remote_index_cache_mib: 0,
             read_extent_kib: 64,
             adaptive_reads: false,
             max_pending_mib: 8192,
@@ -112,6 +115,7 @@ impl Config {
             disk_cache_mib: 4096,
             hot_wal_mib: 64,
             max_index_mib: 128,
+            remote_index_cache_mib: 128,
             max_pending_mib: 1024,
             segment_mib: 32,
             logical_cache: true,
@@ -170,7 +174,8 @@ impl Config {
             c.segment_mib <= 64
                 && c.max_pending_mib <= 1024 * 1024
                 && c.disk_cache_mib <= 1024 * 1024
-                && c.hot_wal_mib <= 1024 * 1024,
+                && c.hot_wal_mib <= 1024 * 1024
+                && c.remote_index_cache_mib <= 65536,
             "invalid disk/segment limit"
         );
         ensure!(

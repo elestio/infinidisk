@@ -11,6 +11,7 @@ memory_cache_mib = 128
 disk_cache_mib = 4096
 hot_wal_mib = 64
 max_index_mib = 128
+remote_index_cache_mib = 128
 read_extent_kib = 64
 adaptive_reads = true
 max_pending_mib = 1024

@@ -1,0 +1,118 @@
+{
+  "complete": true,
+  "started_utc": "2026-10-10T15:27:52.715501+00:00",
+  "source_sha256": {
+    "Cargo.toml": "617935d27c00b10e4991b84f3f341d91f1e49aed14ecb9d45ea68c95a407b71b",
+    "Cargo.lock": "8ea0caf57be1dc2a3d0279484a6e21d3496f390d36b61304ce5e0975ac14ffd6",
+    "src/cache.rs": "c61e82a9e785450be742e2597d9d91998305d5ee2b75bb5412bc22afddb14d03",
+    "src/config.rs": "ca348d1418a0b7e694da849a9775e367de0fc992804796863a1783d7ea82bb76",
+    "src/engine.rs": "b7ceb155073f675b8302b32ab165bb11b8ec26dbc081e6f5fbfeac9885607716",
+    "src/index.rs": "93283454114e33375e6a6061a50c74abb422e2ef972ac1efee2bcffa699b8a1f",
+    "src/index_objects.rs": "88200949716bfe2b3b1c4cd5fb9a445304337b195b12a0c159ed4d8019f8aaf0",
+    "src/lib.rs": "f0273ace5acf4c8b9ee6aee983cbe6f6e7f1d2ce382142105342f6b4bfd9d3a3",
+    "src/linux.rs": "5fe98e450b80ad8de9ea94790e0ec0a062d38cca87c2b711a2e006dc25388a19",
+    "src/main.rs": "ee7393904c4764f854926823f2248de662240404b5cc6a35291671e3e2461e0d",
+    "src/nbd.rs": "2c74af990d434160d2380921e4ce351917aafa4c565aa39fa7a50cc7964be831",
+    "src/page_cache.rs": "20f55978f029a895477d02635c65e962130211e680bf12c923d874d6c591b436",
+    "src/read_cache.rs": "5000112e019a8c50e5177ef1762d6edab3d603a8a59805d4d75bd0367c702ec9",
+    "src/store.rs": "0ddc3870d720ccb125df06fc1b77ba58010f7c2ac4561d4f9be35790b223403f",
+    "src/ublk.rs": "9a1513395f7dca57f853ceedde5a6f988f86ed70e45d25e3d3a4a50ec786bb9d",
+    "src/wal.rs": "46384bc3ccb9cf7db1945b3a10a60e7a52747ad76a9f74ea788e9e7a2296a1a7",
+    "src/wal_pool.rs": "e61f1d85344633f7ff5d0bad5894643d66b52b8c713403e7b9aa285c8dd73254",
+    "tests/astra_engine.rs": "5736f644cce934b539e6dee9c4f4b736590cd805e6e1d6d178c79f0adf227b45",
+    "tests/astra_regressions.rs": "00ba0eee8ea2248c5670cde82b1d8db119f994a3b8c786baa93bc4f0b6ace690",
+    "tests/astra_warm_cli.rs": "1b162612792582c675eb276a7b9274b07f2b69b6d35c5e8e5172188be1c29096",
+    "tests/nbd_protocol.rs": "a5bb5dfa1098670b7ebd2899ef7b71e97cde2ae18263e39b60330a54ad07cd17",
+    "tests/selected_profile.rs": "d0e1830632676ddabe09b69caa85f86e003a13e752b18406b9d57873902a6ac9",
+    "tests/support/adaptive_reads.rs": "9c2e9bc58b64661b463eef37fdd0821924842d1cc9a1bbae24dbedc85a548ce4",
+    "tests/support/astra_warm.rs": "81e6ad8359658ab4816dcbcbf99feefcd2f5251d9416acb72dad67df3a8b063d",
+    "tests/support/index_objects.rs": "5426df81aaf35057dde9c9eb2bc114e7b57317f4468dcd8095e5ccd4cfbda9d0"
+  },
+  "commands": {
+    "fmt": [
+      "/root/infinidisk2/.cargo/bin/cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "index-cache": [
+      "/root/infinidisk2/.cargo/bin/cargo",
+      "test",
+      "--locked",
+      "--features",
+      "ublk",
+      "--lib",
+      "index_objects"
+    ],
+    "profile": [
+      "/root/infinidisk2/.cargo/bin/cargo",
+      "test",
+      "--locked",
+      "--features",
+      "ublk",
+      "--test",
+      "selected_profile"
+    ],
+    "engine": [
+      "/root/infinidisk2/.cargo/bin/cargo",
+      "test",
+      "--locked",
+      "--features",
+      "ublk",
+      "--test",
+      "astra_engine"
+    ],
+    "clippy": [
+      "/root/infinidisk2/.cargo/bin/cargo",
+      "clippy",
+      "--locked",
+      "--features",
+      "ublk",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "release": [
+      "/root/infinidisk2/.cargo/bin/cargo",
+      "build",
+      "--locked",
+      "--release",
+      "--features",
+      "ublk",
+      "-j",
+      "2"
+    ]
+  },
+  "checks": {
+    "fmt.log": {
+      "returncode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "index-cache.log": {
+      "returncode": 0,
+      "sha256": "615bb9b34eacd8b15cce9a346c35c6f1a408bec02eb97c967338ab3bb8f8b34e"
+    },
+    "profile.log": {
+      "returncode": 0,
+      "sha256": "25fecc4536b6cb3fa2f2a8834f3a0e6086f063524d7bdbf15527c4b4cec6922c"
+    },
+    "engine.log": {
+      "returncode": 0,
+      "sha256": "e84d37a936be73985726c0b2f6e52b31f31949a394c44e80d70abfde82ce3dfc"
+    },
+    "clippy.log": {
+      "returncode": 0,
+      "sha256": "969683b37cad773b2d886c86c390a4db316ed5a04eb6818c818beeb2eb9ff587"
+    },
+    "release.log": {
+      "returncode": 0,
+      "sha256": "7abc619a3b55e41e36f95d5978404c20f1d1ac5ce3d236d889c26184132164a2"
+    }
+  },
+  "scope": "Remote immutable index cache and existing checkpoint/recovery regressions; no full matrix.",
+  "binary_sha256": "69a5dd75b73344d99ec6f467c73467da6f455305673a1482c37257ae44621308",
+  "binary_path": "/root/infinidisk2/target/release/infinidisk2-index-cache-69a5dd75b733",
+  "ended_utc": "2026-10-10T15:28:51.685460+00:00"
+}

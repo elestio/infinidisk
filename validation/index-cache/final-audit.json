@@ -1,0 +1,23 @@
+{
+  "file_count": 6430,
+  "inventory_sha256": "4d031c0e4025b73a7aab8671f682dfa26b1d6dc43f2d0825719ee75f6aa06439",
+  "known_credentials_found": 0,
+  "credential_hit_files": [],
+  "services": {
+    "data": "active",
+    "bench": "active"
+  },
+  "nbd": {
+    "0": "5299",
+    "1": "9216",
+    "31": null
+  },
+  "ublk31_absent": true,
+  "binary_sha256": "69a5dd75b73344d99ec6f467c73467da6f455305673a1482c37257ae44621308",
+  "complete": true,
+  "scope": "All tracked/nonignored repository files; exact local/VM match before this audit file",
+  "rust_tests": 26,
+  "recovery_checks": 7,
+  "proof_files_verified": 144,
+  "base_commit": "4c91458ce13ef4731fc5706e4daad588147b1531"
+}

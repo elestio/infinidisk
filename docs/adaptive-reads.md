@@ -1,5 +1,7 @@
 # Profil sélectionné et lectures adaptatives — 10 octobre 2026
 
+Cette page décrit la livraison `4c91458` et le binaire `2eb31a6845c0`. Depuis, le [cache vérifié des index distants](index-cache.md) a été implémenté et le modèle de configuration courant ajoute `remote_index_cache_mib = 128`. Les mesures ci-dessous conservent leur binaire et leur portée historiques.
+
 Le profil perf/coût est maintenant produit par `infinidisk2 config`. Le modèle complet se trouve dans [configs/recommended.toml](../configs/recommended.toml), les mesures de cette itération dans [le rapport ciblé](../validation/adaptive/rapport.html). Le binaire qualifié est `2eb31a6845c083d9955bc171fe6c4ccaf7af6e8f927ffd4ebb9ace1f25f01aa5`.
 
 ## Choix appliqués
@@ -72,4 +74,4 @@ Une erreur d'index lors de la lecture d'une bordure d'écriture partielle marque
 
 **4. Décider la compaction selon le coût complet.** Mesurer le ratio pages vivantes/bytes WAL, le nombre de petits shards et le coût des relectures. Déclencher une compaction regroupée seulement si les économies de stockage sur l'horizon retenu dépassent PUT/GET et travail CPU. Le coût par 1K/10K SQL doit inclure la fin des uploads différés ; diviser uniquement les appels survenus pendant pgbench sous-estimerait le total. Les compteurs moteur actuels ne suffisent pas pour cette facture : réutiliser le proxy d'opérations une fois sur un lot fixe lors de la qualification du prochain changement.
 
-Ces quatre suites sont des propositions issues du code et des preuves actuelles, pas des fonctions déjà livrées. La priorité recommandée est l'index distant conservé sur SSD : elle vise directement le redémarrage chaud demandé, sans modifier le format des données ni la sémantique des commits.
+Au moment de cette campagne, ces quatre suites étaient des propositions. La première est désormais implémentée et mesurée dans [la campagne du cache d’index](index-cache.md) ; les trois autres restent des pistes. La priorité recommandée est l'index distant conservé sur SSD : elle vise directement le redémarrage chaud demandé, sans modifier le format des données ni la sémantique des commits.

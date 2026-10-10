@@ -1,0 +1,118 @@
+{
+  "complete": true,
+  "binary_sha256": "69a5dd75b73344d99ec6f467c73467da6f455305673a1482c37257ae44621308",
+  "proof_files_verified": 144,
+  "metadata_ABBA": [
+    {
+      "label": "off-r0",
+      "B": 15,
+      "bytes": 1266451,
+      "seconds": 0.3032166850025533,
+      "cost_per_10K_opens": 0.075
+    },
+    {
+      "label": "on-r0",
+      "B": 1,
+      "bytes": 2011,
+      "seconds": 0.30363677100103814,
+      "cost_per_10K_opens": 0.005
+    },
+    {
+      "label": "on-r1",
+      "B": 1,
+      "bytes": 2011,
+      "seconds": 0.30385331899742596,
+      "cost_per_10K_opens": 0.005
+    },
+    {
+      "label": "off-r1",
+      "B": 15,
+      "bytes": 1266451,
+      "seconds": 0.30344075500033796,
+      "cost_per_10K_opens": 0.075
+    }
+  ],
+  "startup_until_database_ready": [
+    [
+      "warm",
+      0,
+      1,
+      "0.576",
+      "0.00000050"
+    ],
+    [
+      "cold",
+      1,
+      166,
+      "5.652",
+      "0.00008800"
+    ]
+  ],
+  "sql_query_cost": {
+    "completed_business_queries": 1280,
+    "all_commands_including_begin_end": 1792,
+    "queries_per_transaction": 5,
+    "basis": "TPC-B-like built-in script: three UPDATE, one SELECT, one INSERT; BEGIN and END excluded from query unit. No vacuum during load; max-tries=1, zero failed transactions.",
+    "estimated_usd_per_1000_queries": 3.90625e-05,
+    "estimated_usd_per_10000_queries": 0.000390625,
+    "class_a_per_1000_queries": 7.8125,
+    "class_b_per_1000_queries": 0.0,
+    "normalization_is_forecast": false
+  },
+  "SQL_load_and_drain": {
+    "total_upstream_attempts": 10,
+    "local_only_requests": 0,
+    "request_classes": {
+      "A": 10,
+      "B": 0,
+      "FREE": 0,
+      "UNKNOWN": 0
+    },
+    "estimated_billable_requests": {
+      "A": 10,
+      "B": 0
+    },
+    "explicitly_nonbillable_status_requests": 0,
+    "transport_uncertain_requests": 0,
+    "unknown_class_requests": 0,
+    "assumed_class_requests": 0,
+    "by_operation": {
+      "PutObject": 10
+    },
+    "by_status": {
+      "200": 10
+    },
+    "by_phase": {
+      "postgres.drain": 10
+    },
+    "by_object_type": {
+      "infinidisk_head": 1,
+      "infinidisk_index": 8,
+      "segment": 1
+    },
+    "request_payload_bytes": 11229719,
+    "response_payload_bytes": 0,
+    "estimated_gross_request_cost_usd": 5e-05,
+    "completed_transactions_for_normalization": 256,
+    "estimated_usd_per_1000_transactions": 0.0001953125,
+    "estimated_usd_per_10000_transactions": 0.001953125,
+    "upstream_attempts_per_million_transactions": 39062.5,
+    "estimated_usd_per_million_transactions": 0.1953125,
+    "cost_has_unpriced_or_uncertain_requests": false,
+    "pricing_source": "https://www.tigrisdata.com/pricing/",
+    "pricing_verified_utc": "2026-10-10",
+    "monthly_free_tier_applied": false,
+    "scope": "Request fees only, projected from observed Elestio API attempts; not a Tigris invoice. Retry attempts are not deduplicated. Unknown classes and transport failures are retained outside the priced subtotal. Multipart class A is explicitly an assumption when not named in the price list. Storage, retrieval, notifications, taxes and negotiated rates are excluded."
+  },
+  "recovery_passed": [
+    "local_SIGKILL_ext4_fsync",
+    "postgres_SIGKILL_amcheck",
+    "storage_engine_SIGKILL_postgres_amcheck",
+    "remote_scrub",
+    "remote_only_ext4_recovery",
+    "remote_only_postgres_amcheck",
+    "remote_fio_crc32c"
+  ],
+  "counter_scope": "All instrumented HTTP attempts, each named phase separately; zero uncertain/unclassified requests.",
+  "limits": "One fixed SQL lot, ABBA two repeats for metadata-only restarts. Instrumented durations do not establish a speedup. Fees projected on Tigris, not billed there."
+}

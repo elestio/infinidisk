@@ -14,6 +14,7 @@ ENGINE_BOOLEAN_OPTIONS={
     'paged_index','compact_checkpoints','aligned_wal','adaptive_reads',
 }
 ENGINE_INTEGER_OPTIONS={
+    'remote_index_cache_mib':(0,65536),
     'cache_queue_mib':(1,128),'max_index_mib':(1,65536),
     'generation_max_lag_seconds':(1,3600),'checkpoint_seconds':(1,3600),
     'segment_mib':(1,64),'max_pending_mib':(2,1024*1024),
@@ -24,7 +25,7 @@ ENGINE_INTEGER_OPTIONS={
 ASTRA_OPTIONS={
     'async_cache','cache_queue_mib','fast_local_reads','checkpoint_pipeline',
     'selective_sync','ublk_fast_path','generation_mode','generation_max_lag_seconds',
-    'paged_index','compact_checkpoints','aligned_wal','adaptive_reads',
+    'paged_index','compact_checkpoints','aligned_wal','adaptive_reads','remote_index_cache_mib',
 }
 
 def load_engine_options(path):
