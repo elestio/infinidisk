@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Render measured cases; missing cases and ignored SQL errors stay visible."""
 import argparse,html,json,pathlib,re,statistics
+from breakthrough_charts import CSS,render
 root=pathlib.Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser();p.add_argument('--conclusion',required=True);p.add_argument('--allow-incomplete',action='store_true');a=p.parse_args()
 v=root/'validation/breakthroughs';raw=v/'raw';summary={'conclusion':a.conclusion,'cases':{}}
@@ -44,6 +45,8 @@ limits='VM partagée, ordre fixe, essais courts et chauffe parfois progressive :
 design='Toutes les variantes restent expérimentales et désactivées par défaut. Le cache packed vérifie version + CRC et reste jetable. La compaction complète est hors ligne, sous verrou exclusif, avec objets vérifiés et HEAD conditionnel publié en dernier. Le WAL avec marqueurs de commit maintient la durabilité locale avant FLUSH/FUA, mais change les enregistrements que comprennent les anciens lecteurs. Le WAL fixe sépare EOF physique et fin logique, et paie son initialisation/rotation. ublk utilise le même moteur avec des copies : aucun zero-copy revendiqué. La réplication S3 reste asynchrone.'
 css='body{margin:0;background:#edf2f7;color:#172839;font:16px/1.6 system-ui}main{max-width:1250px;margin:auto;padding:24px}section{background:white;border-radius:12px;padding:22px;margin:18px 0}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;font-size:14px}td,th{padding:10px;border-bottom:1px solid #ddd;text-align:left}a{color:#056}'
 page='<!doctype html><html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>InfiniDisk2 — breakthroughs</title><style>'+css+'</style><main><h1>InfiniDisk2 : changements d’architecture mesurés</h1>'
+chart_html,summary['charts']=render(root,summary['cases'])
+page=page.replace('</style>',CSS+'</style>')+chart_html
 for title,body in [('Verdict',a.conclusion),('Méthode',method),('Choix techniques',design),('Limites',limits)]:page+='<section><h2>'+title+'</h2><p>'+html.escape(body)+'</p></section>'
 page+='<section><h2>Résultats</h2>'+table(['Cas/charge','Médiane TPS','Trois passages','Médiane p95 ms','Erreurs ignorées','Reprise MySQL'],rows)+'</section>'
 if 'fsync_layout_probe' in summary:
