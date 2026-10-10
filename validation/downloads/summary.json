@@ -1,8 +1,9 @@
 {
   "complete": true,
   "measured_binary_sha256": "bbb6416ee5b9d89947f134f5ba41d9da74cdbf1f8dcd11a52100372b81ab90e6",
-  "final_binary_sha256": "a9b249208c1b95acf7a8698eefc2c8cd0677f042e50bf8f25601997b2be75649",
-  "proof_files_verified": 125,
+  "final_binary_sha256": "bbb6416ee5b9d89947f134f5ba41d9da74cdbf1f8dcd11a52100372b81ab90e6",
+  "proof_files_verified": 127,
+  "intermediate_binary_sha256": "a9b249208c1b95acf7a8698eefc2c8cd0677f042e50bf8f25601997b2be75649",
   "points": [
     {
       "variant": "off-r0",
@@ -333,7 +334,7 @@
     "sequential_throughput_loss_at_most_5pct": true,
     "mixed_random_p99_rises_at_most_5pct": true
   },
-  "selected_download_budget_mib": 0,
-  "experimental_download_budget_mib": 8,
-  "decision": "Keep opt-in. The sequential p99 objective did not pass; no latency-driven controller is claimed."
+  "selected_download_budget_mib": 8,
+  "initial_selected_download_budget_mib": 0,
+  "decision": "Promote 8MiB/64 for the overall tradeoff after Joseph questioned the default. The original sequential p99 criterion remains failed; measurements and thresholds are unchanged."
 }

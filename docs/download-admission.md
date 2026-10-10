@@ -1,6 +1,6 @@
 # Admission des téléchargements — 10 octobre 2026
 
-Le limiteur est implémenté et testé, mais **reste optionnel**. Le profil généré et [le modèle recommandé](../configs/recommended.toml) gardent `download_budget_mib = 0`. Le [modèle expérimental](../configs/downloads-experimental.toml) active 8 Mio / 64 groupes. Les [graphiques et preuves](../validation/downloads/rapport.html) montrent les deux mesures individuelles de chaque mode.
+Après réexamen du compromis global avec Joseph, le limiteur est **activé dans les nouvelles configurations** à `download_budget_mib = 8` et `download_max_requests = 64`. Le [modèle recommandé](../configs/recommended.toml) et le profil généré concordent. Les anciennes configurations qui omettent le champ gardent 0 ; la valeur 0 reste disponible pour désactiver le limiteur. Le [modèle anciennement expérimental](../configs/downloads-experimental.toml) est conservé pour les liens existants. Les [graphiques et preuves](../validation/downloads/rapport.html) montrent les deux mesures individuelles de chaque mode.
 
 ## Résultat et sélection
 
@@ -14,7 +14,7 @@ Comparaison A–B–B–A sur le même binaire, données et budgets de cache ide
 | Séquentiel en charge mixte, p99 ms | 392,17 | 362,81 | −7,5 % |
 | Aléatoire en charge mixte, p99 ms | 152,83 | 130,29 | −14,8 % |
 
-Le critère fixé avant les mesures exigeait un p99 séquentiel amélioré d’au moins 5 %, avec au plus 5 % de perte de débit séquentiel et au plus 5 % de hausse du p99 aléatoire mixte. Le premier critère échoue. Le limiteur n’est donc pas activé par défaut. Ce choix évite de transformer un gain partiel en recommandation générale.
+Le critère fixé avant les mesures exigeait un p99 séquentiel amélioré d’au moins 5 %, avec au plus 5 % de perte de débit séquentiel et au plus 5 % de hausse du p99 aléatoire mixte. Le premier critère échoue : la décision initiale conservait donc le limiteur en option. Après la question de Joseph sur le défaut, la recommandation retient le compromis global : transferts bornés, médianes favorables en charge mixte, variation du p99 séquentiel de +1 %. C’est un changement explicite de politique après examen des mêmes données, pas une réussite rétroactive du critère initial. La preuve brute et le résultat du critère sont conservés.
 
 Le premier débit de référence, 71,91 Mio/s, est sensiblement inférieur au second, 100,08 Mio/s ; les deux mesures bornées sont 99,57 et 107,34 Mio/s. L’environnement partagé et la durée courte empêchent d’attribuer un gain stable de 20 % au seul limiteur. Les points individuels sont conservés, sans retrait de la première mesure ni multiplication des essais jusqu’à obtenir un résultat favorable.
 
@@ -22,7 +22,7 @@ Le séquentiel lit 256 Mio par requêtes de 1 Mio à QD16. Le mixte démarre sim
 
 ## Options et portée
 
-| Option | Défaut historique et recommandé | Essai | Fonction |
+| Option | Ancienne configuration, champ omis | Nouvelle configuration recommandée | Fonction |
 |---|---:|---:|---|
 | `download_budget_mib` | 0 | 8 | Zéro désactive l’admission supplémentaire. Valeurs 1–1024 : budget des payloads de ranges admis, comptés par unités de 4 Kio. |
 | `download_max_requests` | 64 | 64 | Plafond des groupes admis, de 1 à 1024, effectif seulement si le budget est activé. |
@@ -66,14 +66,14 @@ Le limiteur ne lance ni duplication spéculative ni prélecture supplémentaire.
 - Tests de saturation, réserve des petits transferts, annulation d’une attente d’octets ou de requête et interruption de tâche ; aucun permis restant.
 - Tests existants de lectures denses/éparses, cache RAM nul, cache corrompu et rejet d’un groupe distant corrompu, désormais avec admission activée.
 - Profil généré, anciennes configurations, régressions moteur, formatage, Clippy et build ublk : 30 tests ciblés au build mesuré, puis contrôle ciblé du seul changement de valeur par défaut.
-- Une campagne S3 de récupération sur le binaire final avec **8 Mio activés** : 7 contrôles, dont SIGKILL moteur pendant PostgreSQL, vérifications PostgreSQL/ext4 et récupération depuis S3 avec CRC sur 256 Mio.
+- Une campagne S3 de récupération sur le binaire intermédiaire avec **8 Mio activés** : 7 contrôles, dont SIGKILL moteur pendant PostgreSQL, vérifications PostgreSQL/ext4 et récupération depuis S3 avec CRC sur 256 Mio.
 
-Les mesures utilisent le binaire identifié dans `validation/downloads/build/manifest.json`. Le binaire final, identifié dans `build-final/manifest.json`, retire seulement la valeur recommandée de 8 Mio pour revenir à 0 ; les chemins Rust d’exécution sont inchangés. Les deux fichiers modifiés entre builds, réglage et test du profil, sont archivés et vérifiés par le renderer.
+Le binaire recommandé redevient exactement celui mesuré et testé, identifié dans `validation/downloads/build/manifest.json`. La réutilisation est vérifiée par SHA256 de toutes les sources Rust, tests et fichiers Cargo ; le CLI est revérifié sur la VM. Le build intermédiaire `build-final/manifest.json` avait uniquement retiré le défaut de 8 Mio ; la récupération 7/7 y forçait déjà 8 Mio. Les sources intermédiaires sont archivées. Le manifeste `default-profile/manifest.json` trace la promotion, le profil généré et le maintien de 0 pour le profil legacy. Aucun nouveau sweep ni reconstruction debug inutile.
 
 Cette campagne n’est pas une qualification de panne électrique réelle, un benchmark d’une base froide volumineuse ni une garantie universelle contre la corruption. Les services de production nbd0/nbd1 n’ont pas été reconfigurés. Les anciennes configurations omettant ces champs conservent l’admission historique.
 
 ## Recommandation et suite
 
-Conserver `download_budget_mib = 0` pour le profil général. Essayer explicitement 8 Mio / 64 groupes quand la maîtrise des transferts simultanés ou la coexistence de petites et grosses lectures importe ; valider le p99 de la charge concernée avant de généraliser. Utiliser le modèle complet uniquement pour une nouvelle configuration ou reporter les deux options dans celle du volume arrêté, sans changer son identité ni son stockage.
+Utiliser 8 Mio / 64 groupes comme point de départ du profil général. Le réglage reste modifiable, notamment pour un lien S3 à forte latence ou une charge qui aurait besoin de davantage de transferts simultanés ; les essais actuels n’établissent pas un optimum universel. Passer à 0 désactive cette admission supplémentaire. Utiliser le modèle complet uniquement pour une nouvelle configuration ou reporter les deux options dans celle du volume arrêté, sans changer son identité ni son stockage.
 
 Pour réduire réellement le p99 séquentiel, la prochaine mesure utile est la distribution séparée du temps d’attente d’admission et du temps de réponse S3, par taille de range. Elle permettra de distinguer contention interne et objets réellement lents. Un contrôleur de latence ajouté avant ce diagnostic risquerait de réduire le débit sans supprimer les requêtes lentes. Pas de nouveau benchmark MySQL/PostgreSQL/natif/ZeroFS redondant dans cette itération.

@@ -1,0 +1,54 @@
+{
+  "complete": true,
+  "started_utc": "2026-10-10T16:09:34.712627+00:00",
+  "binary_path": "/root/infinidisk2/target/release/infinidisk2-downloads-bbb6416ee5b9",
+  "binary_sha256": "bbb6416ee5b9d89947f134f5ba41d9da74cdbf1f8dcd11a52100372b81ab90e6",
+  "source_sha256": {
+    "Cargo.lock": "8ea0caf57be1dc2a3d0279484a6e21d3496f390d36b61304ce5e0975ac14ffd6",
+    "Cargo.toml": "617935d27c00b10e4991b84f3f341d91f1e49aed14ecb9d45ea68c95a407b71b",
+    "src/cache.rs": "c61e82a9e785450be742e2597d9d91998305d5ee2b75bb5412bc22afddb14d03",
+    "src/config.rs": "93f268e2d1ccfae3c6563f4c0b4a6afb1381517c48491579cf4a2dd2887f44b1",
+    "src/download.rs": "89f7a7b839cda4a6a50a63933f3b02883f8a1cfd33c26de5fdf42f48e61e75ca",
+    "src/engine.rs": "c435c87b04baffb12f1cafdd3ad84e5ed83c5c67020c700c2d1cbc443089a2d8",
+    "src/index.rs": "93283454114e33375e6a6061a50c74abb422e2ef972ac1efee2bcffa699b8a1f",
+    "src/index_objects.rs": "88200949716bfe2b3b1c4cd5fb9a445304337b195b12a0c159ed4d8019f8aaf0",
+    "src/lib.rs": "75e64dc9ff2c72e60b28f42ab0891dce02d81589709be16971dee63a6da0a57d",
+    "src/linux.rs": "5fe98e450b80ad8de9ea94790e0ec0a062d38cca87c2b711a2e006dc25388a19",
+    "src/main.rs": "ee7393904c4764f854926823f2248de662240404b5cc6a35291671e3e2461e0d",
+    "src/nbd.rs": "2c74af990d434160d2380921e4ce351917aafa4c565aa39fa7a50cc7964be831",
+    "src/page_cache.rs": "20f55978f029a895477d02635c65e962130211e680bf12c923d874d6c591b436",
+    "src/read_cache.rs": "5000112e019a8c50e5177ef1762d6edab3d603a8a59805d4d75bd0367c702ec9",
+    "src/store.rs": "0ddc3870d720ccb125df06fc1b77ba58010f7c2ac4561d4f9be35790b223403f",
+    "src/ublk.rs": "9a1513395f7dca57f853ceedde5a6f988f86ed70e45d25e3d3a4a50ec786bb9d",
+    "src/wal.rs": "46384bc3ccb9cf7db1945b3a10a60e7a52747ad76a9f74ea788e9e7a2296a1a7",
+    "src/wal_pool.rs": "e61f1d85344633f7ff5d0bad5894643d66b52b8c713403e7b9aa285c8dd73254",
+    "tests/astra_engine.rs": "5736f644cce934b539e6dee9c4f4b736590cd805e6e1d6d178c79f0adf227b45",
+    "tests/astra_regressions.rs": "00ba0eee8ea2248c5670cde82b1d8db119f994a3b8c786baa93bc4f0b6ace690",
+    "tests/astra_warm_cli.rs": "1b162612792582c675eb276a7b9274b07f2b69b6d35c5e8e5172188be1c29096",
+    "tests/nbd_protocol.rs": "a5bb5dfa1098670b7ebd2899ef7b71e97cde2ae18263e39b60330a54ad07cd17",
+    "tests/selected_profile.rs": "cd5180e7822d481cfc8f9d0f20e8b18aee652e2a1086c2b6705143bda00a5ae3",
+    "tests/support/adaptive_reads.rs": "3b3c3c00f77f4ad48d1b7ed331136873d8c558bf9dfadde8319c68d3a35adc31",
+    "tests/support/astra_warm.rs": "81e6ad8359658ab4816dcbcbf99feefcd2f5251d9416acb72dad67df3a8b063d",
+    "tests/support/index_objects.rs": "5426df81aaf35057dde9c9eb2bc114e7b57317f4468dcd8095e5ccd4cfbda9d0"
+  },
+  "reused_build_manifest_sha256": "07e26fa3b34a43be1c6e99b126bd32112302e3a971fec5a9f0f34cc1d919e471",
+  "checks": {
+    "recommended": {
+      "generated_config_sha256": "34bd1ab016c2cd1285a2bcbbb3fc6724333ea95c4be8ed7fae7d8d52814593fd",
+      "download_budget_mib": 8,
+      "download_max_requests": 64,
+      "overwrite_refused": true
+    },
+    "legacy": {
+      "generated_config_sha256": "0d1344c7de9c3656f5e86458cb65d43eceb0d754d0b41a744eda762edb3415fc",
+      "download_budget_mib": 0,
+      "download_max_requests": 64,
+      "overwrite_refused": true
+    }
+  },
+  "decision": "Promote 8MiB/64 for the overall tradeoff after Joseph questioned the default. The original sequential p99 criterion remains failed; measurements and thresholds are unchanged.",
+  "scope": "New generated configs only; omitted legacy fields retain0. Exact previously measured Rust sources and binary; no repeat perf matrix or debug rebuild.",
+  "previous_checkout_binary_sha256": "a9b249208c1b95acf7a8698eefc2c8cd0677f042e50bf8f25601997b2be75649",
+  "checkout_binary_sha256": "bbb6416ee5b9d89947f134f5ba41d9da74cdbf1f8dcd11a52100372b81ab90e6",
+  "ended_utc": "2026-10-10T16:09:34.758710+00:00"
+}

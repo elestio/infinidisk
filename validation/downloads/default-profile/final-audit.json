@@ -1,0 +1,52 @@
+{
+  "complete": true,
+  "utc": "2026-10-10T16:12:02.536130+00:00",
+  "changed_files_matched": 21,
+  "changed_files_sha256": {
+    "README.md": "4c313584282f2bc95a3bffe3e4c44a81c34921df8692e56b0cc217d8c635d740",
+    "configs/downloads-experimental.toml": "163fd1d9fc03ca7726d2478aa2c7f6714d9e971f339d182db2a8a576d1a31e80",
+    "configs/recommended.toml": "419266c0b893fcdca21c11ee154aed21055e8e99e144162670e9efd21e39a6b7",
+    "docs/adaptive-reads.md": "d51814617180ec1d53ea1ef836d2033969c23404747a22384a0816af6ee4a805",
+    "docs/download-admission.md": "759d422bd7e4e0091f7154c47b59cb906027229c342e9ced6e18b2ca7dadd980",
+    "scripts/promote_download_default.py": "d15edbefaffd6543cdac009b4ab9ea1b058af7f8cf7dc225dbdfc9a655852e72",
+    "scripts/render_downloads.py": "efece751fd1d6fbae36200f481c685930c2af9f13bd892ab61f98287855a0db8",
+    "src/config.rs": "93f268e2d1ccfae3c6563f4c0b4a6afb1381517c48491579cf4a2dd2887f44b1",
+    "tests/selected_profile.rs": "cd5180e7822d481cfc8f9d0f20e8b18aee652e2a1086c2b6705143bda00a5ae3",
+    "validation/downloads/default-profile/legacy.log": "049d7511ca4c383c3fb14acf360c23bf3bd17d3b375605ff1f3961fee272f4a8",
+    "validation/downloads/default-profile/legacy.toml": "0d1344c7de9c3656f5e86458cb65d43eceb0d754d0b41a744eda762edb3415fc",
+    "validation/downloads/default-profile/manifest.json": "639902af2c4abd2ce0a51445f258541d72ac4fb53eeb59c521b296fbdc58db99",
+    "validation/downloads/default-profile/recommended.log": "a85703ef2f49739781b139b9723f712291fc49d22a72361d22e54c102ce248d0",
+    "validation/downloads/default-profile/recommended.toml": "34bd1ab016c2cd1285a2bcbbb3fc6724333ea95c4be8ed7fae7d8d52814593fd",
+    "validation/downloads/default-profile/report-preview.json": "b4dd67de166c9da8c7c99401c0b7e9b167454ff96d69f51410e006ed8a5ff5cf",
+    "validation/downloads/latency.svg": "7c243dccdda7cbc4441841047ae04d04d104e68d984f5fca1746522079bd683e",
+    "validation/downloads/post-measurement-source/src/config.rs": "b3f7048041ea30262d6201daea3248fdfbccb4c95e1cf52a96cbd8c0b79c8e14",
+    "validation/downloads/post-measurement-source/tests/selected_profile.rs": "e115925f6c854c4af7b214634030a5505d231df571cdfe642439d5f52d78bb64",
+    "validation/downloads/rapport.html": "035f5359df89ebfbca1dcbd393dbc333c4a8ec507307f48525958df2633a6082",
+    "validation/downloads/summary.json": "e1a3f00e726aadb334cc52da922e6065c92c732fe55f0a8c107e8aed57809ac1",
+    "validation/downloads/throughput.svg": "ca74c4a5c38b968c379664de8728c9ade4f259d9ede903e3e2fdf9440997e13f"
+  },
+  "known_credentials_found": 0,
+  "production_nbd_pids": {
+    "nbd0": "5299",
+    "nbd1": "9216"
+  },
+  "production_services": "active",
+  "test_devices": "free",
+  "binary_sha256": "bbb6416ee5b9d89947f134f5ba41d9da74cdbf1f8dcd11a52100372b81ab90e6",
+  "profile_checks": {
+    "recommended": {
+      "generated_config_sha256": "34bd1ab016c2cd1285a2bcbbb3fc6724333ea95c4be8ed7fae7d8d52814593fd",
+      "download_budget_mib": 8,
+      "download_max_requests": 64,
+      "overwrite_refused": true
+    },
+    "legacy": {
+      "generated_config_sha256": "0d1344c7de9c3656f5e86458cb65d43eceb0d754d0b41a744eda762edb3415fc",
+      "download_budget_mib": 0,
+      "download_max_requests": 64,
+      "overwrite_refused": true
+    }
+  },
+  "report_preview_passed": true,
+  "scope": "Promotion of the exact originally measured build. No repeated benchmarks, no production reconfiguration."
+}

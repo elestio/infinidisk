@@ -134,7 +134,6 @@ impl Config {
             ublk_fast_path: true,
             paged_index: true,
             adaptive_reads: true,
-            download_budget_mib: 8,
             ..Self::default()
         }
     }

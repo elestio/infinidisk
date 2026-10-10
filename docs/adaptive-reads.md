@@ -77,4 +77,4 @@ Une erreur d'index lors de la lecture d'une bordure d'écriture partielle marque
 Au moment de cette campagne, ces quatre suites étaient des propositions. La première est désormais implémentée et mesurée dans [la campagne du cache d’index](index-cache.md) ; les trois autres restent des pistes. La priorité recommandée est l'index distant conservé sur SSD : elle vise directement le redémarrage chaud demandé, sans modifier le format des données ni la sémantique des commits.
 
 
-Depuis cette campagne, le [budget global des téléchargements](download-admission.md) a été implémenté et mesuré. Il reste optionnel : il améliore les médianes de la charge mixte, mais ne satisfait pas le critère de p99 séquentiel. Le contrôle de concurrence fondé sur la latence reste une piste.
+Depuis cette campagne, le [budget global des téléchargements](download-admission.md) a été implémenté et mesuré. Après réexamen du compromis global avec Joseph, il est activé à 8 Mio / 64 requêtes dans les nouvelles configurations. Le critère initial de baisse du p99 séquentiel reste non atteint. Le contrôle de concurrence fondé sur la latence reste une piste.

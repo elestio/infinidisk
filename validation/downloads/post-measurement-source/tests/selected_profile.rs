@@ -19,7 +19,7 @@ fn generated_profile_is_explicit_and_old_configs_keep_their_contract() -> Result
     assert!(!chosen.generation_mode && !chosen.aligned_wal && !chosen.compact_checkpoints);
     assert_eq!(chosen.segment_mib, 32);
     assert_eq!(chosen.remote_index_cache_mib, 128);
-    assert_eq!(chosen.download_budget_mib, 8);
+    assert_eq!(chosen.download_budget_mib, 0);
     assert_eq!(chosen.download_max_requests, 64);
     let saved = std::fs::read(&path)?;
     assert!(

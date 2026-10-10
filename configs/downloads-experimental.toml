@@ -1,6 +1,6 @@
-# OPTION EXPERIMENTALE : budget global de ranges, non retenu par défaut.
+# Ancien modèle expérimental, maintenant identique au profil recommandé (8 Mio/64).
 # Voir docs/download-admission.md et les deux mesures individuelles du rapport.
-# Dérivé du profil recommandé ; seule la limite de téléchargement est activée.
+# Conservé sous ce nom pour les liens existants. Adapter les coordonnées du stockage.
 # Fournir les credentials par environnement. Aucun secret dans ce fichier.
 # Nouvelle configuration uniquement : ne pas écraser celle d’un volume existant.
 local_dir = "/var/lib/infinidisk2/volume"
