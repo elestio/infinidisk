@@ -1,0 +1,12 @@
+   Compiling infinidisk2 v0.1.0 (/root/infinidisk2)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.28s
+     Running unittests src/lib.rs (target/debug/deps/infinidisk2-94c38aa628d9e8b0)
+
+running 4 tests
+test download::tests::small_read_bypasses_large_waiter_and_cancellation_returns_budget ... ok
+test download::tests::cancellation_while_waiting_for_request_slot_releases_reserved_bytes ... ok
+test download::tests::bounded_even_without_a_cache_and_on_task_abort ... ok
+test engine::warm_tests::fragmented_ram_zero_downloads_each_missing_range_once_and_retains_every_page ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 74 filtered out; finished in 0.40s
+

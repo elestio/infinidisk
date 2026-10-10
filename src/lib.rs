@@ -1,5 +1,6 @@
 pub mod cache;
 pub mod config;
+mod download;
 pub mod engine;
 pub mod index;
 mod index_objects;

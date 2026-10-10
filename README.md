@@ -56,6 +56,8 @@ max_index_mib = 128
 remote_index_cache_mib = 128
 read_extent_kib = 64
 adaptive_reads = true
+download_budget_mib = 0
+download_max_requests = 64
 max_pending_mib = 1024
 segment_mib = 32
 max_inflight = 128
@@ -108,6 +110,9 @@ Les modèles systemd dans `scripts/` servent à superviser les deux processus. I
 ## Arrêt et reprise
 
 Le [cache vérifié des objets d’index](docs/index-cache.md) est activé à 128 Mio dans le nouveau profil. Il évite les GET des index déjà présents et valides au redémarrage chaud ; HEAD reste relu et le WAL rejoué. Son budget SSD s’ajoute à celui des données et au scratch de l’index paginé. Les anciennes configs qui omettent `remote_index_cache_mib` gardent la valeur 0.
+
+Le [budget global des téléchargements](docs/download-admission.md) est disponible en option (`download_budget_mib = 8`, `download_max_requests = 64`). Le [rapport ciblé avec graphiques](validation/downloads/rapport.html) mesure son effet en séquentiel et en charge mixte. Le p99 séquentiel n’ayant pas atteint le critère annoncé, le profil recommandé conserve `download_budget_mib = 0`.
+
 
 Arrêt normal : arrêter la base, démonter le système de fichiers, exécuter `detach`, puis envoyer SIGTERM au serveur. Le serveur synchronise localement et tente une publication finale ; son code de sortie signale un échec de publication. Conserver le journal si S3 est indisponible.
 

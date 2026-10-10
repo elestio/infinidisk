@@ -45,6 +45,12 @@ struct ReadGroup {
     pages: Vec<(u64, Ref)>,
 }
 
+struct FetchedGroup {
+    pages: Vec<(u64, Bytes)>,
+    // Hold admission through CRC, cache fill and copying into the caller's buffer.
+    _permit: Option<crate::download::Permit>,
+}
+
 /// Offline warm owns each physical range until all of its logical pages land
 /// in the SSD cache. These buffers never depend on the online extent LRU.
 struct WarmGroup {
@@ -140,6 +146,7 @@ pub struct Status {
     pub remote_gets: u64,
     pub remote_bytes: u64,
     pub range_cache_bytes: usize,
+    pub downloads: crate::download::Stats,
     pub adaptive_small_gets: u64,
     pub adaptive_large_gets: u64,
     pub checkpoint_wal_bytes: u64,
@@ -179,6 +186,7 @@ pub struct Engine {
     checkpoint_lock: Mutex<()>,
     cache: std::sync::Mutex<crate::read_cache::ReadCache>,
     fetch_locks: Vec<Mutex<()>>,
+    downloads: crate::download::Downloads,
     disk_cache: DiskCache,
     index_objects: Arc<crate::index_objects::IndexObjects>,
     page_cache: Option<Arc<crate::page_cache::PageCache>>,
@@ -593,6 +601,8 @@ impl Engine {
         } else {
             None
         };
+        let downloads =
+            crate::download::Downloads::new(c.download_budget_mib, c.download_max_requests);
         Ok(Arc::new(Self {
             config: c,
             identity,
@@ -616,6 +626,7 @@ impl Engine {
             checkpoint_lock: Mutex::new(()),
             cache: std::sync::Mutex::new(cache),
             fetch_locks: (0..256).map(|_| Mutex::new(())).collect(),
+            downloads,
             disk_cache,
             index_objects,
             page_cache,
@@ -775,6 +786,7 @@ impl Engine {
         }
         self.disk_cache.remove(k);
         let end = (start + extent + PAGE as u64).min(r.segment_len);
+        let _permit = self.downloads.acquire((end - start) as usize).await?;
         let b = self
             .store
             .range(&format!("segments/{}", r.segment), start..end)
@@ -788,7 +800,9 @@ impl Engine {
         ensure!(valid(&b), "remote page checksum mismatch");
         self.disk_cache.put(k, &b).await;
         self.cache.lock().unwrap().put(k, b.clone());
-        Ok(b.slice(offset..offset + PAGE))
+        // Do not keep a full downloaded range alive in callers after admission
+        // ends. The separate RAM LRU may retain its own budgeted copy.
+        Ok(Bytes::copy_from_slice(&b[offset..offset + PAGE]))
     }
     pub async fn read(&self, offset: u64, len: usize) -> Result<Vec<u8>> {
         self.healthy()?;
@@ -865,7 +879,7 @@ impl Engine {
         Ok(groups)
     }
 
-    async fn fetch_group(&self, group: ReadGroup) -> Result<Vec<(u64, Bytes)>> {
+    async fn fetch_group(&self, group: ReadGroup) -> Result<FetchedGroup> {
         let segment_len = group.pages[0].1.segment_len;
         ensure!(
             group
@@ -900,6 +914,7 @@ impl Engine {
                 }
             }
         }
+        let mut permit = None;
         let (start, data) = if let Some(cached) = cached {
             cached
         } else {
@@ -907,6 +922,7 @@ impl Engine {
                 .start
                 .saturating_add(group.extent + PAGE as u64)
                 .min(segment_len);
+            permit = self.downloads.acquire((end - group.start) as usize).await?;
             let bytes = self
                 .store
                 .range(&format!("segments/{}", group.segment), group.start..end)
@@ -968,7 +984,10 @@ impl Engine {
                 tracing::warn!(%error, "disposable grouped cache fill failed");
             }
         }
-        Ok(pages)
+        Ok(FetchedGroup {
+            pages,
+            _permit: permit,
+        })
     }
     /// Owned buffer crosses the local I/O worker once, including ublk buffers.
     /// Only partial edge pages need a scratch page; full pages go to the caller.
@@ -1059,8 +1078,8 @@ impl Engine {
             let groups = Self::read_groups(misses).inspect_err(|_| self.fail_closed())?;
             let mut fetched = stream::iter(groups.into_iter().map(|group| self.fetch_group(group)))
                 .buffer_unordered(8);
-            while let Some(pages) = fetched.try_next().await? {
-                for (p, bytes) in pages {
+            while let Some(group) = fetched.try_next().await? {
+                for (p, bytes) in group.pages {
                     let start = (p * PAGE as u64).max(offset);
                     let end = ((p + 1) * PAGE as u64).min(offset + len as u64);
                     let source = (start - p * PAGE as u64) as usize;
@@ -1646,6 +1665,7 @@ impl Engine {
             remote_gets: self.flush_metrics.remote_gets.load(Ordering::Relaxed),
             remote_bytes: self.flush_metrics.remote_bytes.load(Ordering::Relaxed),
             range_cache_bytes: self.cache.lock().unwrap().bytes(),
+            downloads: self.downloads.status(),
             adaptive_small_gets: self
                 .flush_metrics
                 .adaptive_small_gets

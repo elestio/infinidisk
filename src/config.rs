@@ -25,6 +25,10 @@ pub struct Config {
     pub read_extent_kib: u64,
     /// Choose bounded physical read groups from the requested pages' locality.
     pub adaptive_reads: bool,
+    /// Global online range-payload admission budget; zero keeps legacy admission.
+    pub download_budget_mib: usize,
+    /// Upper bound shared by all online data GETs when the byte budget is enabled.
+    pub download_max_requests: usize,
     pub max_pending_mib: u64,
     pub segment_mib: u64,
     pub max_inflight: usize,
@@ -83,6 +87,8 @@ impl Default for Config {
             remote_index_cache_mib: 0,
             read_extent_kib: 64,
             adaptive_reads: false,
+            download_budget_mib: 0,
+            download_max_requests: 64,
             max_pending_mib: 8192,
             segment_mib: 16,
             max_inflight: 128,
@@ -148,6 +154,10 @@ impl Config {
             "flush batching delay exceeds 5 ms"
         );
         ensure!(c.memory_cache_mib <= 16384, "memory cache too large");
+        ensure!(
+            c.download_budget_mib <= 1024 && (1..=1024).contains(&c.download_max_requests),
+            "invalid download admission limits"
+        );
         ensure!(
             !c.generation_mode
                 || (c.generation_max_lag_seconds >= c.checkpoint_seconds

@@ -75,3 +75,6 @@ Une erreur d'index lors de la lecture d'une bordure d'écriture partielle marque
 **4. Décider la compaction selon le coût complet.** Mesurer le ratio pages vivantes/bytes WAL, le nombre de petits shards et le coût des relectures. Déclencher une compaction regroupée seulement si les économies de stockage sur l'horizon retenu dépassent PUT/GET et travail CPU. Le coût par 1K/10K SQL doit inclure la fin des uploads différés ; diviser uniquement les appels survenus pendant pgbench sous-estimerait le total. Les compteurs moteur actuels ne suffisent pas pour cette facture : réutiliser le proxy d'opérations une fois sur un lot fixe lors de la qualification du prochain changement.
 
 Au moment de cette campagne, ces quatre suites étaient des propositions. La première est désormais implémentée et mesurée dans [la campagne du cache d’index](index-cache.md) ; les trois autres restent des pistes. La priorité recommandée est l'index distant conservé sur SSD : elle vise directement le redémarrage chaud demandé, sans modifier le format des données ni la sémantique des commits.
+
+
+Depuis cette campagne, le [budget global des téléchargements](download-admission.md) a été implémenté et mesuré. Il reste optionnel : il améliore les médianes de la charge mixte, mais ne satisfait pas le critère de p99 séquentiel. Le contrôle de concurrence fondé sur la latence reste une piste.

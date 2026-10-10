@@ -19,6 +19,8 @@ fn generated_profile_is_explicit_and_old_configs_keep_their_contract() -> Result
     assert!(!chosen.generation_mode && !chosen.aligned_wal && !chosen.compact_checkpoints);
     assert_eq!(chosen.segment_mib, 32);
     assert_eq!(chosen.remote_index_cache_mib, 128);
+    assert_eq!(chosen.download_budget_mib, 0);
+    assert_eq!(chosen.download_max_requests, 64);
     let saved = std::fs::read(&path)?;
     assert!(
         !Command::new(executable)
@@ -30,5 +32,6 @@ fn generated_profile_is_explicit_and_old_configs_keep_their_contract() -> Result
     let old: Config = toml::from_str("checkpoint_seconds = 5")?;
     assert!(!old.adaptive_reads && !old.wal_fixed_size && !old.generation_mode);
     assert_eq!(old.remote_index_cache_mib, 0);
+    assert_eq!(old.download_budget_mib, 0);
     Ok(())
 }

@@ -6,6 +6,8 @@ async fn remote_fixture(memory: usize, disk: u64) -> Result<(tempfile::TempDir, 
         local_dir: directory.path().join("writer"),
         store: format!("file://{}", directory.path().join("objects").display()),
         memory_cache_mib: memory,
+        download_budget_mib: 1,
+        download_max_requests: 2,
         disk_cache_mib: disk,
         hot_wal_mib: 0,
         max_index_mib: 1,
@@ -40,6 +42,10 @@ async fn adaptive_dense_read_owns_ranges_with_zero_ram_and_retains_verified_page
     );
     let status = e.status().await;
     assert_eq!(status.range_cache_bytes, 0);
+    assert!(status.downloads.peak_reserved_bytes <= 1024 * 1024);
+    assert!(status.downloads.peak_active <= 2);
+    assert_eq!(status.downloads.reserved_bytes, 0);
+    assert_eq!(status.downloads.active, 0);
     assert!(status.adaptive_large_gets >= 2);
     assert!(
         status.remote_gets <= 4,
@@ -104,6 +110,8 @@ async fn adaptive_group_checks_all_pages_before_installing_any_payload() -> Resu
     let first = e.state.lock().await.reference(0)?.unwrap();
     assert!(e.page_cache.as_ref().unwrap().get(0, &first).is_none());
     assert_eq!(e.status().await.range_cache_bytes, 0);
+    assert_eq!(e.status().await.downloads.reserved_bytes, 0);
+    assert_eq!(e.status().await.downloads.active, 0);
     Ok(())
 }
 

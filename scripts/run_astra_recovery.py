@@ -69,7 +69,7 @@ def load_profiles():
     allowed = helpers["ENGINE_BOOLEAN_OPTIONS"] | helpers["ENGINE_INTEGER_OPTIONS"].keys()
     profiles = {name: helpers["load_engine_options"](path) for name, path in PROFILES.items()}
     for name, options in profiles.items():
-        if set(options) != allowed - {"adaptive_reads", "remote_index_cache_mib"}:
+        if set(options) != allowed - {"adaptive_reads", "remote_index_cache_mib", "download_budget_mib", "download_max_requests"}:
             raise ValueError("qualification profile must specify every allowlisted option: " + name)
         if options["generation_mode"] or options["ublk_fast_path"]:
             raise ValueError("durable qualification requires generation_mode=false and NBD")

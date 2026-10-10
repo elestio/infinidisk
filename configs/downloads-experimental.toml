@@ -1,0 +1,41 @@
+# OPTION EXPERIMENTALE : budget global de ranges, non retenu par défaut.
+# Voir docs/download-admission.md et les deux mesures individuelles du rapport.
+# Dérivé du profil recommandé ; seule la limite de téléchargement est activée.
+# Fournir les credentials par environnement. Aucun secret dans ce fichier.
+# Nouvelle configuration uniquement : ne pas écraser celle d’un volume existant.
+local_dir = "/var/lib/infinidisk2/volume"
+store = "s3://MON_BUCKET/infinidisk2/volume-01"
+endpoint = "https://storage.elestio.com"
+region = "auto"
+listen = "127.0.0.1:11900"
+checkpoint_seconds = 5
+memory_cache_mib = 128
+disk_cache_mib = 4096
+hot_wal_mib = 64
+max_index_mib = 128
+remote_index_cache_mib = 128
+read_extent_kib = 64
+adaptive_reads = true
+download_budget_mib = 8
+download_max_requests = 64
+max_pending_mib = 1024
+segment_mib = 32
+max_inflight = 128
+sync_data_only = true
+wal_preallocate = false
+wal_writev = true
+logical_cache = true
+wal_commit_records = true
+wal_fixed_size = true
+flush_batch_us = 0
+async_cache = true
+cache_queue_mib = 16
+fast_local_reads = true
+checkpoint_pipeline = true
+selective_sync = true
+ublk_fast_path = true
+generation_mode = false
+generation_max_lag_seconds = 30
+paged_index = true
+compact_checkpoints = false
+aligned_wal = false
