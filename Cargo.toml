@@ -1,6 +1,6 @@
 [package]
 name = "infinidisk2"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2024"
 publish = false
 description = "Linux block storage backed by a local durable WAL and S3 checkpoints"

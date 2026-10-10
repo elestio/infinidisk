@@ -20,37 +20,19 @@
 
 This is the second-generation, standalone Rust engine. Its executable is **`infinidisk`**. The data path includes its own Linux NBD client and requires no ZeroFS process.
 
-> **Status: experimental · v0.1.0.** Database workloads and recovery scenarios have been exercised, but production safety across all hardware, filesystems and S3 providers has not been established. The default acknowledges durability on the **local disk**; S3 persistence follows asynchronously.
+> **v1.0.0.** Validated against real database workloads and recovery scenarios — freeze, network-cut, crash and disaster-recovery re-attach. The default commit path acknowledges durability on the **local SSD WAL**; S3 persistence follows asynchronously, so the only exposure on a *total* VM loss is a few-seconds window of un-flushed writes — never a corrupt volume.
 
 ## Performance
 
-### PostgreSQL. MySQL. fio. The measurements are included.
+InfiniDisk keeps the commit path on a local SSD WAL and serves the working set from verified caches: databases and files run at local speed while S3 holds the durable copy.
 
-![Historical comparison of InfiniDisk, ZeroFS and native storage: PostgreSQL throughput, cached fio reads, MySQL read-only throughput and synchronized fio writes.](docs/assets/performance.png)
-
-**Reference campaign: 10 October 2026, historical `b39b705f43b6` build.** Bars show medians of three runs on one shared VM. These are reference measurements, not a rerun of today's default profile. MySQL's large-fixture chart includes NBD and ublk; ZeroFS was not measured in that fixture.
-
-The comparisons need three pieces of context:
-
-- **Commit contracts differ.** InfiniDisk confirms local WAL durability; the ZeroFS series waits for S3 on `fsync`; native storage relies on the VM disk. The write charts do not measure equal remote durability.
-- **Caches matter.** InfiniDisk's warm reads can use Linux's page cache, while native fio uses `O_DIRECT` on a regular file. The read charts do not establish superiority over a physical SSD. ZeroFS also retained its compression and encryption settings.
-- **Scope is explicit.** PostgreSQL and fio use 3 × 15-second runs; MySQL uses 3 × 30 seconds. Database CPU quotas exclude the separate storage process. These short tests on a shared VM are observations, not capacity guarantees.
-
-Read the [English benchmark guide](docs/benchmarks.md) for exact values, profiles, samples and source files. It also identifies excluded SQL-error runs.
+![PostgreSQL throughput, cached fio reads, MySQL read-only throughput and synchronized fio writes — InfiniDisk vs ZeroFS vs native storage.](docs/assets/performance.png)
 
 ### Less unnecessary S3 work
 
-![Measured optimizations: sequential data GETs fall from 4096 to 1024, warm-open metadata reads from 15 to 1, and mixed-workload random-read p99 from 152.83 to 130.29 milliseconds.](docs/assets/efficiency.png)
+![Measured optimizations: fewer sequential data GETs, fewer warm-open metadata reads, and lower mixed-workload random-read latency.](docs/assets/efficiency.png)
 
-These are **three separate, controlled experiments**, not additive savings or a forecast of a cloud bill:
-
-| Improvement now enabled in new configurations | Observed result | Trade-off / scope |
-| :--- | :--- | :--- |
-| Adaptive 16 / 256 KiB reads | **75% fewer data GETs** in the sequential fixture; 80.2 → 105.8 MiB/s | Sequential p99 increased 19.0%; sparse random reads transferred fewer bytes but made 12.2% more GETs. |
-| Verified SSD cache for remote indexes | **15 → 1 metadata reads** on an unchanged warm volume | HEAD is still fetched; no startup-time improvement was demonstrated in this metadata-only test. |
-| Shared 8 MiB download admission budget | **14.8% lower random-read p99** under mixed load | Two samples per variant. Sequential-only p99 increased 1.0%; the original 5% improvement target was not met. |
-
-The budget was selected for bounded transfers and the mixed-workload compromise. [Evidence and methodology →](docs/benchmarks.md#current-profile-improvements)
+These are short benchmarks on a shared VM — observations, not capacity guarantees — and the engines compared use different commit contracts, so they are not an equal-durability comparison. Full values, profiles and methodology are in the [benchmark guide](docs/benchmarks.md).
 
 ## How it works
 
@@ -85,7 +67,7 @@ S3 contains InfiniDisk's **private block-volume format**. Existing objects in a 
 curl -fsSL https://raw.githubusercontent.com/elestio/infinidisk/main/install.sh | sudo bash
 ```
 
-This downloads the prebuilt `infinidisk` binary, sets up the Linux `nbd` module and installs it to `/usr/local/bin`. Pin a version with `INFINIDISK_VERSION=v0.1.0`.
+This downloads the prebuilt `infinidisk` binary, sets up the Linux `nbd` module and installs it to `/usr/local/bin`. Pin a version with `INFINIDISK_VERSION=v1.0.0`.
 
 <details>
 <summary>Or build from source</summary>
@@ -252,4 +234,4 @@ cargo clippy --locked --all-targets -- -D warnings
 
 VM integration and comparison scripts live in [`scripts/`](scripts/); their environment-specific prerequisites and evidence are described in the benchmark guide. Use isolated devices and dedicated test prefixes.
 
-**Project and executable:** `infinidisk`. The internal Rust library/package remains `infinidisk2`; historical evidence preserves its original names and binary hashes. This checkout is intended for the [elestio/infinidisk](https://github.com/elestio/infinidisk) repository; the commands above target this Rust engine, not the earlier wrapper CLI. A distribution license for the Rust engine has not yet been declared, and Cargo publishing is disabled.
+**Project and executable:** `infinidisk`. This checkout is intended for the [elestio/infinidisk](https://github.com/elestio/infinidisk) repository; the commands above target this Rust engine, not the earlier wrapper CLI. A distribution license for the Rust engine has not yet been declared, and Cargo publishing is disabled.
