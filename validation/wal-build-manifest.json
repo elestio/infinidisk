@@ -1,0 +1,30 @@
+{
+  "source_files_sha256": {
+    "Cargo.lock": "0af2b7ca3b4bbadb4e7f0ddb091ce49d0f1773892c3d6064318fb9d9dad5337c",
+    "Cargo.toml": "003d0fb876af3b606200b34fbbf52f6c60c701a77882a783e64678d29047a73c",
+    "src/cache.rs": "c61e82a9e785450be742e2597d9d91998305d5ee2b75bb5412bc22afddb14d03",
+    "src/config.rs": "f869b2cb33951689e144b186c4f1b4bde2ec644ff6cf1294ec0c0b8bc75693bf",
+    "src/engine.rs": "d97707317a8d80560fdfee2c3c06c75c360ec917029e6449f4c10c78640a7a60",
+    "src/lib.rs": "17122c9694729e20bfb57e1eaec9738c5b7c2227e19149517b4c2b592fc2c4d3",
+    "src/linux.rs": "5fe98e450b80ad8de9ea94790e0ec0a062d38cca87c2b711a2e006dc25388a19",
+    "src/main.rs": "af2433deb014e984bc3a7cc1c23ee30499d123cbba692ae12d38457818d9f4a0",
+    "src/nbd.rs": "2c74af990d434160d2380921e4ce351917aafa4c565aa39fa7a50cc7964be831",
+    "src/store.rs": "0ddc3870d720ccb125df06fc1b77ba58010f7c2ac4561d4f9be35790b223403f",
+    "src/wal.rs": "4d348f5490be6e3a302d4d61bd0041e8adb4bc8598d312bbf2f1e44df55c0276",
+    "tests/nbd_protocol.rs": "e464b55c851a9f7838f41fd62814b59cbf4865dbe29ef65ae45de3b65f7e66f9"
+  },
+  "source_sha256": "4012c02ed7e7209320a21862ce3d0f0a582546e53976e8c430f877c3a1ef0f22",
+  "source_hash_algorithm": "SHA256 of UTF-8 JSON mapping relative paths to file SHA256, sorted keys, compact separators",
+  "binary_sha256": "de191e1dcbdcf5b9a6da7cbf471be2135bab58b0cbb7a5d4a1ee8faac7386494",
+  "version": "0.1.0",
+  "rust": "1.99.0",
+  "tests": {
+    "unit": 13,
+    "protocol": 1,
+    "cargo_test": "passed",
+    "clippy_warnings_denied": "passed",
+    "rustfmt": "passed"
+  },
+  "default_wal_writev": true,
+  "default_wal_preallocate": false
+}

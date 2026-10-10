@@ -1,0 +1,83 @@
+
+⠀⠀⠀⠀⠀⣠⣴⣶⣿⣿⣿⣿⣿⣷⣶⣤⣄
+⠀⠀⢀⣴⣿⣿⣿⠿⠛⠛⠋⠉⠙⠻⠿⣿⣿⣿⣦⡀
+⠀⣠⣿⣿⡿⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⡄
+⢰⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢿⣿⣿⡄⠀⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⠀⠀⢠⣶⣿⣿⣿⣿⣶⡆
+⣾⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀⣠⣾⣿⠟⠁⠀⠀⣠⣴⣶⣶⣶⣤⡀⠀⠀⣶⣶⣆⣤⣶⣶⠀⢀⣤⣶⣶⣶⣦⣄⠀⠀⠀⣿⣿⡇⠀⠀⠀⠀⠀⠀⣿⣿⣏⠀⠀⠈⠉⠃
+⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣼⣿⡟⠁⠀⠀⠀⣼⣿⣟⣁⣀⣙⣿⣿⡀⠀⣿⣿⣿⠋⠉⠙⢠⣿⣿⠏⠀⠈⢻⣿⣧⠀⠀⣿⣿⣿⣿⣿⣿⡇⠀⠀⠘⠻⠿⣿⣿⣶⣦⣄
+⢿⢿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⡿⠀⠀⠀⢀⣴⣿⡿⠋⠀⠀⠀⠀⠀⢿⣿⣟⠛⠛⠛⠛⠛⠃⠀⣿⣿⡇⠀⠀⠀⠸⣿⣿⡄⠀⠀⣸⣿⡿⠀⠀⣿⣿⡇⠀⠀⠀⠀⠀⠀⣄⣀⠀⠀⠀⣹⣿⣿
+⠈⠈⢿⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣾⣿⣿⠃⠀⠀⠀⣾⣿⣿⣿⣿⣿⣿⣿⣿⠀⠈⠻⢿⣷⣶⣶⣶⠿⠀⠀⣿⣿⡇⠀⠀⠀⠀⠙⠿⣿⣶⣾⡿⠟⠁⠀⠀⣿⣿⡇⠀⠀⠀⠀⠀⠀⠻⠿⣿⣿⣿⣿⠿⠋
+⠀⠀⠀⠻⣷⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢐⣽⣿⣿⠋
+⠀⠀⠀⠀⠙⢿⣿⣶⣤⣀⣀⣀⣀⣤⣤⣶⣿⣿⠟⠁
+⠀⠀⠀⠀⠀⠀⠉⠛⠿⢿⣿⣿⣿⣿⠿⠟⠋
+
+[2m2026-10-09T21:07:40.313064Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m ZeroFS v2.3.5
+[2m2026-10-09T21:07:40.320475Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m Starting ZeroFS server with AmazonS3(testperf-6czebk) backend
+[2m2026-10-09T21:07:40.320490Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m DB Path: infinidisk2-comparison-8e8464fb817a/zerofs
+[2m2026-10-09T21:07:40.320492Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m Base Cache Directory: /root/infinidisk2/test-output/comparison-8e8464fb817a/cold-zerofs-0-cache
+[2m2026-10-09T21:07:40.320495Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m Cache Size: 0.125 GB
+[2m2026-10-09T21:07:40.320498Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m Checking bucket identity...
+[2m2026-10-09T21:07:40.495690Z[0m [32m INFO[0m [2mzerofs::bucket_identity[0m[2m:[0m Found existing bucket ID: f2a4e1ec-8d6f-4069-87a8-a75a12825788
+[2m2026-10-09T21:07:40.495727Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m Bucket ID: f2a4e1ec-8d6f-4069-87a8-a75a12825788, Cache directory: /root/infinidisk2/test-output/comparison-8e8464fb817a/cold-zerofs-0-cache/bucket_f2a4e1ec
+[2m2026-10-09T21:07:40.507568Z[0m [32m INFO[0m [2mzerofs::storage_compatibility[0m[2m:[0m Checking storage provider compatibility...
+[2m2026-10-09T21:07:40.605181Z[0m [32m INFO[0m [2mzerofs::storage_compatibility[0m[2m:[0m Storage provider compatibility check passed
+[2m2026-10-09T21:07:40.605216Z[0m [32m INFO[0m [2mzerofs::cli::init[0m[2m:[0m Loading or initializing encryption key from object store
+[2m2026-10-09T21:07:40.727166Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Cache allocation - Disk: 0.12GB total (1073 MB decoded-blocks + 1073 MB raw-parts), Memory: 0.06GB total (33 MB decoded-blocks + 33 MB raw-parts)
+[2m2026-10-09T21:07:40.728437Z[0m [32m INFO[0m [2mfoyer_storage::engine::block::recover[0m[2m:[0m Recovers 0 blocks with data, 16 clean blocks, 0 total entries with max sequence as 0..
+[2m2026-10-09T21:07:40.728452Z[0m [32m INFO[0m [2mfoyer_storage::engine::block::recover[0m[2m:[0m [recover] finish in 821.161µs
+[2m2026-10-09T21:07:40.728934Z[0m [32m INFO[0m [2mfoyer_storage::engine::block::recover[0m[2m:[0m Recovers 0 blocks with data, 16 clean blocks, 0 total entries with max sequence as 0..
+[2m2026-10-09T21:07:40.728939Z[0m [32m INFO[0m [2mfoyer_storage::engine::block::recover[0m[2m:[0m [recover] finish in 143.333µs
+[2m2026-10-09T21:07:40.729026Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Opening database in read-write mode
+[2m2026-10-09T21:07:44.830088Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m .nbd directory already exists
+[2m2026-10-09T21:07:44.830147Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Starting NFS server on 127.0.0.1:12991
+[2m2026-10-09T21:07:44.830155Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Starting NBD server on 127.0.0.1:11991 (devices dynamically discovered from .nbd/)
+[2m2026-10-09T21:07:44.832224Z[0m [32m INFO[0m [2mzerofs::db[0m[2m:[0m metadata cache warm: 20 SSTs (0 failed)
+[2m2026-10-09T21:07:44.832243Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::driver[0m[2m:[0m Starting activity-driven segment reclamation task (4 concurrent repack job(s), 256 MiB/job nominal gather budget, 5s activity coalescing)
+[2m2026-10-09T21:07:44.832327Z[0m [32m INFO[0m [2mzerofs::fs::tombstone_cleanup[0m[2m:[0m Starting tombstone cleanup task
+[2m2026-10-09T21:07:44.832917Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Starting stats reporting task (reports to debug every 5 seconds)
+[2m2026-10-09T21:07:44.832936Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Starting periodic flush task (flushes every 5 seconds)
+[2m2026-10-09T21:07:44.832935Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD server listening on 127.0.0.1:11991
+[2m2026-10-09T21:07:44.832973Z[0m [32m INFO[0m [2mzerofs_nfsserve::tcp[0m[2m:[0m Listening on 127.0.0.1:12991
+[2m2026-10-09T21:07:44.832979Z[0m [32m INFO[0m [2mzerofs::nfs[0m[2m:[0m NFS server listening on 127.0.0.1:12991
+[2m2026-10-09T21:07:44.885024Z[0m [32m INFO[0m [2mzerofs::fs::store::extent::reclaim::cycle[0m[2m:[0m segment reclamation: 76 segments, 2.1 GiB appended (405.0 MiB live, ~1.8 GiB reclaimable, 81% dead); deleted 0 dead (~0 B), repacked 0 of 15 candidates in 0 job(s) (0 frames), 57 pending deletion (~1.8 GiB)
+[2m2026-10-09T21:07:44.920246Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:53816
+[2m2026-10-09T21:07:44.920470Z[0m [31mERROR[0m [2mzerofs::nbd::server[0m[2m:[0m Error handling NBD client 127.0.0.1:53816: IO error: early eof
+[2m2026-10-09T21:07:44.922581Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:53822
+[2m2026-10-09T21:07:44.923034Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-09T21:07:44.923075Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:53836
+[2m2026-10-09T21:07:44.923159Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-09T21:07:44.923194Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:53852
+[2m2026-10-09T21:07:44.923261Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-09T21:07:44.923295Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:53866
+[2m2026-10-09T21:07:44.929001Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-09T21:07:44.929011Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:53878
+[2m2026-10-09T21:07:44.929101Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-09T21:07:44.929144Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:53882
+[2m2026-10-09T21:07:44.929215Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-09T21:07:44.929250Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:53894
+[2m2026-10-09T21:07:44.929397Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-09T21:07:44.929428Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD client connected from 127.0.0.1:53904
+[2m2026-10-09T21:07:44.929524Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client selected device: infinidisk2
+[2m2026-10-09T21:08:01.359379Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-09T21:08:01.359401Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-09T21:08:01.359411Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-09T21:08:01.359478Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-09T21:08:01.359490Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-09T21:08:01.359545Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-09T21:08:01.359564Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-09T21:08:01.359497Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m Client disconnecting
+[2m2026-10-09T21:08:01.364311Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Received SIGTERM, initiating graceful shutdown...
+[2m2026-10-09T21:08:01.364327Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Cancelling all servers and background tasks...
+[2m2026-10-09T21:08:01.364341Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Waiting for servers to exit...
+[2m2026-10-09T21:08:01.364388Z[0m [32m INFO[0m [2mzerofs::nbd::server[0m[2m:[0m NBD TCP server shutting down on 127.0.0.1:11991
+[2m2026-10-09T21:08:01.364405Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Periodic flush task shutting down
+[2m2026-10-09T21:08:01.364404Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Stats reporting task shutting down
+[2m2026-10-09T21:08:01.364907Z[0m [32m INFO[0m [2mzerofs::fs::tombstone_cleanup[0m[2m:[0m Tombstone cleanup task shutting down
+[2m2026-10-09T21:08:01.365226Z[0m [32m INFO[0m [2mzerofs_nfsserve::tcp[0m[2m:[0m NFS TCP server shutting down on 127.0.0.1:12991
+[2m2026-10-09T21:08:01.365257Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Waiting for background tasks to exit...
+[2m2026-10-09T21:08:01.365268Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Waiting for deferred orphan reclaims to finish...
+[2m2026-10-09T21:08:01.365299Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Performing final flush and closing database...
+[2m2026-10-09T21:08:01.725472Z[0m [32m INFO[0m [2mzerofs::cli::server[0m[2m:[0m Shutdown complete
+[2m2026-10-09T21:08:01.725714Z[0m [32m INFO[0m [2mfoyer::hybrid::cache[0m[2m:[0m [hybrid]: flush all in-memory cached entries to disk on close [3mbytes[0m[2m=[0m1021828
+[2m2026-10-09T21:08:01.726287Z[0m [32m INFO[0m [2mfoyer::hybrid::cache[0m[2m:[0m [hybrid]: flush all in-memory cached entries to disk on close [3mbytes[0m[2m=[0m32867784
+[2m2026-10-09T21:08:01.726915Z[0m [32m INFO[0m [2mfoyer::hybrid::cache[0m[2m:[0m [hybrid]: close consumes 1.201256ms

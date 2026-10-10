@@ -27,6 +27,10 @@ pub struct Config {
     /// Persist data and retrieval metadata, without unrelated inode timestamps.
     /// false retains the original fsync path for measured comparisons.
     pub sync_data_only: bool,
+    /// Reserve WAL blocks without changing EOF. Experimental; measured separately.
+    pub wal_preallocate: bool,
+    /// Submit each WAL header and payload through one vectored write.
+    pub wal_writev: bool,
 }
 impl Default for Config {
     fn default() -> Self {
@@ -46,6 +50,8 @@ impl Default for Config {
             segment_mib: 16,
             max_inflight: 128,
             sync_data_only: true,
+            wal_preallocate: false,
+            wal_writev: true,
         }
     }
 }

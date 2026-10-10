@@ -51,7 +51,7 @@ if not args.resume_report:
 devices=[pathlib.Path(f'/dev/nbd{n}') for n in range(31,1,-1) if pathlib.Path(f'/dev/nbd{n}').exists() and not pathlib.Path(f'/sys/class/block/nbd{n}/pid').exists()]
 if not devices:raise RuntimeError('no unused NBD device; existing devices will never be disconnected')
 device=devices[0]
-report={'id':run_id,'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'backend':store,'device':str(device),'tests':{},'benchmarks':{},'config':str(config)}
+report={'binary_sha256':hashlib.sha256(BIN.read_bytes()).hexdigest(),'script_sha256':hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(),'id':run_id,'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'backend':store,'device':str(device),'tests':{},'benchmarks':{},'config':str(config)}
 if args.resume_report:
     WORK=args.resume_report.resolve().parent
     if ROOT/'test-output' not in WORK.parents:raise RuntimeError('resume report must be under test-output')

@@ -1,0 +1,208 @@
+{
+  "decision": "writev=true est conserv\u00e9 pour r\u00e9duire les appels syst\u00e8me, sans gain net de d\u00e9bit \u00e9tabli : r\u00e9f\u00e9rences 866,34 et 831,69 TPS, writev seul 874,64 TPS. La pr\u00e9allocation reste d\u00e9sactiv\u00e9e : 849,75 TPS seule, 849,39 combin\u00e9e. Le binaire final confirme 849,13 TPS. Les extents de 64 Kio restent la valeur par d\u00e9faut : le passage 16 Kio ne montre aucun b\u00e9n\u00e9fice dans cette campagne \u00e0 chauffe partielle.",
+  "phases": {
+    "wal-baseline-a": {
+      "tps": [
+        866.34,
+        891.9,
+        862.65
+      ],
+      "median_tps": 866.34,
+      "wal_mean_ms": 0.7387532860995943,
+      "watermark_mean_ms": 0.11147124058222994,
+      "binary_sha256": "de191e1dcbdcf5b9a6da7cbf471be2135bab58b0cbb7a5d4a1ee8faac7386494",
+      "ignored_errors": [
+        0,
+        0,
+        0
+      ]
+    },
+    "wal-prealloc": {
+      "tps": [
+        903.39,
+        849.75,
+        839.89
+      ],
+      "median_tps": 849.75,
+      "wal_mean_ms": 0.735982859214049,
+      "watermark_mean_ms": 0.1129240174706176,
+      "binary_sha256": "de191e1dcbdcf5b9a6da7cbf471be2135bab58b0cbb7a5d4a1ee8faac7386494",
+      "ignored_errors": [
+        0,
+        0,
+        0
+      ]
+    },
+    "wal-writev": {
+      "tps": [
+        887.19,
+        872.22,
+        874.64
+      ],
+      "median_tps": 874.64,
+      "wal_mean_ms": 0.72962337860292,
+      "watermark_mean_ms": 0.10757012583911203,
+      "binary_sha256": "de191e1dcbdcf5b9a6da7cbf471be2135bab58b0cbb7a5d4a1ee8faac7386494",
+      "ignored_errors": [
+        1,
+        0,
+        0
+      ]
+    },
+    "wal-combined": {
+      "tps": [
+        892.36,
+        849.39,
+        805.71
+      ],
+      "median_tps": 849.39,
+      "wal_mean_ms": 0.7778338538596572,
+      "watermark_mean_ms": 0.1081891908347577,
+      "binary_sha256": "de191e1dcbdcf5b9a6da7cbf471be2135bab58b0cbb7a5d4a1ee8faac7386494",
+      "ignored_errors": [
+        0,
+        1,
+        0
+      ]
+    },
+    "wal-baseline-b": {
+      "tps": [
+        819.26,
+        831.69,
+        856.37
+      ],
+      "median_tps": 831.69,
+      "wal_mean_ms": 0.7748745255024255,
+      "watermark_mean_ms": 0.11125542929082928,
+      "binary_sha256": "de191e1dcbdcf5b9a6da7cbf471be2135bab58b0cbb7a5d4a1ee8faac7386494",
+      "ignored_errors": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "large_mysql": {
+    "read_write": {
+      "infinidisk2": {
+        "median_tps": 61.58,
+        "samples": [
+          24.66,
+          61.58,
+          119.86
+        ],
+        "median_p95_ms": 383.33
+      },
+      "native": {
+        "median_tps": 785.61,
+        "samples": [
+          762.13,
+          877.09,
+          785.61
+        ],
+        "median_p95_ms": 59.99
+      }
+    },
+    "read_only": {
+      "infinidisk2": {
+        "median_tps": 303.49,
+        "samples": [
+          150.6,
+          303.49,
+          478.1
+        ],
+        "median_p95_ms": 114.72
+      },
+      "native": {
+        "median_tps": 1716.5,
+        "samples": [
+          1628.71,
+          1716.5,
+          1732.68
+        ],
+        "median_p95_ms": 3.25
+      }
+    },
+    "write_only": {
+      "infinidisk2": {
+        "median_tps": 141.94,
+        "samples": [
+          32.2,
+          141.94,
+          304.16
+        ],
+        "median_p95_ms": 215.44
+      },
+      "native": {
+        "median_tps": 2406.99,
+        "samples": [
+          1991.02,
+          2406.99,
+          2411.64
+        ],
+        "median_p95_ms": 4.82
+      }
+    }
+  },
+  "uniform_read_only": {
+    "cache-uniform-small": {
+      "median_tps": 49.88,
+      "samples": [
+        49.88,
+        26.82,
+        55.8
+      ],
+      "median_p95_ms": 601.29,
+      "startup_seconds": 17.070763142000942,
+      "ssd_cache_bytes_before_samples": 134198112
+    },
+    "cache-uniform-large": {
+      "median_tps": 153.21,
+      "samples": [
+        113.35,
+        153.21,
+        206.85
+      ],
+      "median_p95_ms": 253.35,
+      "startup_seconds": 11.354463548996137,
+      "ssd_cache_bytes_before_samples": 1254560128
+    },
+    "cache-uniform-page16": {
+      "median_tps": 58.56,
+      "samples": [
+        37.31,
+        58.56,
+        64.91
+      ],
+      "median_p95_ms": 719.92,
+      "startup_seconds": 17.726323935996334,
+      "ssd_cache_bytes_before_samples": 390976832
+    },
+    "cache-uniform-native": {
+      "median_tps": 1056.58,
+      "samples": [
+        1061.43,
+        1053.55,
+        1056.58
+      ],
+      "median_p95_ms": 9.56,
+      "startup_seconds": 1.2967607490063529,
+      "ssd_cache_bytes_before_samples": null
+    }
+  },
+  "large_initial_recovery_seconds_estimate": 341.4728810787201,
+  "large_integrity_resume": {
+    "ssd_cache_mib": 2048,
+    "check_timeout_seconds": 1800,
+    "original_timeout_seconds": 300
+  },
+  "post_publication_validation": {
+    "samples": [
+      849.13,
+      843.11,
+      872.47
+    ],
+    "median_tps": 849.13,
+    "binary_sha256": "d683de6979b0d869488e672feadd99eacd2d5b8198e72ca3e28baa1530d4da20"
+  }
+}

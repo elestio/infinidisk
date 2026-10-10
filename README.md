@@ -160,3 +160,7 @@ python3 scripts/compare_zerofs.py --mysql-only
 ```
 
 Ce test lance des conteneurs MySQL isolés sans réseau, vérifie les réglages InnoDB/binlog et mesure les modes ZeroFS S3, ZeroFS qui ignore fsync, InfiniDisk2 et disque natif. Les mots de passe des comptes d’essai sont conservés uniquement dans des fichiers `*.secret` privés sous le répertoire d’essai, exclus des exports de preuves.
+
+Le chemin WAL peut envoyer en-tête et données en un `writev` (`wal_writev=true`), avec reprise correcte des écritures partielles. `wal_preallocate=false` reste le défaut : l’expérience de réservation de blocs ne montre pas de gain sur cette VM. Le format WAL et les deux barrières durables restent inchangés. Voir [la campagne WAL et grande base MySQL](validation/optimisation-wal.html).
+
+Avant publication, le buffer de chaque segment scellé est vérifié intégralement (identité, longueur, enregistrements, CRC, séquence). Un WAL local endommagé bloque le volume et conserve le précédent checkpoint distant ; le test de régression vérifie sa restauration.

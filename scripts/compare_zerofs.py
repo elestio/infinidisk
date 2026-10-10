@@ -9,14 +9,39 @@ parser.add_argument('--postgres-only',action='store_true')
 parser.add_argument('--verify-report',type=pathlib.Path,help='verify unchanged read dataset of a completed comparison')
 parser.add_argument('--warm-memory-report',type=pathlib.Path,help='repeat reads with a 1 GiB RAM cache and 4 GiB SSD budget')
 parser.add_argument('--postgres-roomy-report',type=pathlib.Path,help='repeat existing DBs with roomy caches; ZeroFS fsync ignored, InfiniDisk2 local fsync honored')
-parser.add_argument('--engine',choices=['both','zerofs','infinidisk2'],default='both')
+parser.add_argument('--engine',choices=['both','zerofs','infinidisk2','native'],default='both')
 parser.add_argument('--phase-label',help='preserve a separate optimization result and log set')
 parser.add_argument('--sync-mode',choices=['data','all'],default='data',help='InfiniDisk2 fdatasync or original fsync path')
 parser.add_argument('--mysql-only',action='store_true')
 parser.add_argument('--mysql-recovery-report',type=pathlib.Path,help='crash InfiniDisk2 while an existing disposable MySQL DB is transacting')
+parser.add_argument('--mysql-resume-report',type=pathlib.Path,help='finish integrity checks and native comparison of an interrupted isolated MySQL campaign')
+parser.add_argument('--mysql-repeat-report',type=pathlib.Path,help='repeat selected workloads on an existing disposable MySQL DB')
+parser.add_argument('--mysql-workloads',nargs='+',choices=['read_write','read_only','write_only'],default=['read_write','read_only','write_only'])
+parser.add_argument('--mysql-skip-crash-check',action='store_true',help='only for read-only repeats of an already validated disposable dataset')
+parser.add_argument('--mysql-rand-type',choices=['special','uniform'],default='special')
+parser.add_argument('--mysql-rows',type=int,default=25000)
+parser.add_argument('--mysql-volume-gib',type=int,default=2)
+parser.add_argument('--mysql-memory-cache-mib',type=int,default=1024)
+parser.add_argument('--mysql-disk-cache-mib',type=int,default=4096)
+parser.add_argument('--mysql-samples',type=int,default=3)
+parser.add_argument('--mysql-seconds',type=int,default=15)
+parser.add_argument('--mysql-repeat-memory-cache-mib',type=int)
+parser.add_argument('--mysql-repeat-disk-cache-mib',type=int)
+parser.add_argument('--mysql-warm-seconds',type=int,default=10)
+parser.add_argument('--read-extent-kib',type=int,choices=[16,64,256])
+parser.add_argument('--wal-preallocate',choices=['on','off'])
+parser.add_argument('--wal-writev',choices=['on','off'])
+parser.add_argument('--trace-engine',action='store_true',help='strace aggregate counters; timings are profiling only')
 ARGS=parser.parse_args()
-if sum(bool(x) for x in (ARGS.verify_report,ARGS.warm_memory_report,ARGS.postgres_roomy_report,ARGS.mysql_recovery_report))>1:parser.error('select only one existing-report phase')
-EXISTING=ARGS.verify_report or ARGS.warm_memory_report or ARGS.postgres_roomy_report or ARGS.mysql_recovery_report
+if not 1000<=ARGS.mysql_rows<=2000000 or not 2<=ARGS.mysql_volume_gib<=16 or not 1<=ARGS.mysql_memory_cache_mib<=16384 or not 1<=ARGS.mysql_disk_cache_mib<=65536:parser.error('invalid MySQL dataset/cache limits')
+if ARGS.mysql_skip_crash_check and (not ARGS.mysql_repeat_report or ARGS.mysql_workloads!=['read_only']):parser.error('crash checks can only be skipped for read-only repeats')
+if ARGS.mysql_repeat_report and not ARGS.phase_label:parser.error('MySQL repeat requires a phase label to preserve the original report')
+if not 0<=ARGS.mysql_warm_seconds<=300:parser.error('invalid warmup duration')
+if any(v is not None and not 1<=v<=16384 for v in (ARGS.mysql_repeat_memory_cache_mib,ARGS.mysql_repeat_disk_cache_mib)):parser.error('invalid repeat cache budgets')
+if ARGS.engine=='native' and not ARGS.mysql_repeat_report:parser.error('native is only supported for MySQL repeat')
+if not 1<=ARGS.mysql_samples<=10 or not 5<=ARGS.mysql_seconds<=120:parser.error('invalid MySQL sampling limits')
+if sum(bool(x) for x in (ARGS.verify_report,ARGS.warm_memory_report,ARGS.postgres_roomy_report,ARGS.mysql_recovery_report,ARGS.mysql_repeat_report,ARGS.mysql_resume_report))>1:parser.error('select only one existing-report phase')
+EXISTING=ARGS.verify_report or ARGS.warm_memory_report or ARGS.postgres_roomy_report or ARGS.mysql_recovery_report or ARGS.mysql_repeat_report or ARGS.mysql_resume_report
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 BIN=ROOT/'target/release/infinidisk2'
@@ -35,12 +60,14 @@ DEV=next(pathlib.Path('/dev/nbd'+str(n)) for n in range(31,1,-1) if pathlib.Path
 R={'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'work':str(W),'device':str(DEV),'size_bytes':268435456,'duration_seconds':15,'connections':8,'memory_mib':64,'cold_disk_mib':128,'warm_disk_mib':512,'runs':{},'contracts':{'infinidisk2':'FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog','zerofs':'ignore_fsync=false: explicit FLUSH/FUA seals extents and flushes metadata to S3','zerofs-async':'ignore_fsync=true: explicit FLUSH/FUA ignored; not a durable database configuration'}}
 if EXISTING:
     R=json.loads(EXISTING.read_text())
-    if not R.get('complete'):raise RuntimeError('only verify a completed comparison')
+    if not R.get('complete') and not ARGS.mysql_resume_report:raise RuntimeError('only verify a completed comparison')
 if ARGS.mysql_only:
     R['memory_mib']=1024
-    R['disk_mib']=4096
+    R['disk_mib']=ARGS.mysql_disk_cache_mib
+    R['memory_mib']=ARGS.mysql_memory_cache_mib
+    R['volume_size_bytes']=ARGS.mysql_volume_gib*1024**3
     R['contracts'].update({'zerofs-async':'FLUSH/FUA ignored by ZeroFS, unsafe DB durability mode','zerofs-durable':'ZeroFS FLUSH/FUA publishes S3','native':'native VM ext4 disk; MySQL fsync honored'})
-server=client=None;nfsmounted=False;cfg=None;mounted=False;pgname=None;mysqlname=None;mysql_password=None
+server=client=tracer=None;nfsmounted=False;cfg=None;mounted=False;pgname=None;mysqlname=None;mysql_password=None
 def save(): (W/('optimization-'+ARGS.phase_label+'.json' if ARGS.phase_label else 'report.json')).write_text(json.dumps(R,indent=2))
 def existing_text(engine):
     text=(W/(engine+'.toml')).read_text();data=tomllib.loads(text)
@@ -65,16 +92,20 @@ def waitport(port):
         except OSError:time.sleep(.2)
     raise RuntimeError('startup timeout')
 def start(engine,label):
-    global server,client
+    global server,client,tracer
     f=open(W/(label+'-server.log'),'w')
     a=[BIN,'-c',cfg,'serve'] if engine=='infinidisk2' else ['zerofs','run','-c',cfg]
     server=subprocess.Popen(list(map(str,a)),env=ENV,stdout=f,stderr=subprocess.STDOUT);f.close();waitport(11991)
+    if ARGS.trace_engine and engine=='infinidisk2':
+        tracer=subprocess.Popen(['strace','-f','-c','-w','-e','trace=write,writev,pwrite64,pwritev,fdatasync,fsync,fallocate,futex,clone,openat,close','-p',str(server.pid),'-o',str(W/(label+'-strace.log'))],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        time.sleep(.2)
+        if tracer.poll() is not None:raise RuntimeError('strace attach failed')
     if engine!='infinidisk2' and label.endswith('initial'):
         global nfsmounted
         m=W/'nfs';m.mkdir(exist_ok=True)
         run(['mount','-t','nfs','-o','nolock,vers=3,tcp,port=12991,mountport=12991','127.0.0.1:/',m],label+'-nfs');nfsmounted=True
         (m/'.nbd').mkdir(exist_ok=True)
-        with open(m/'.nbd/infinidisk2','wb') as f:f.truncate(2*1024**3);f.flush();os.fsync(f.fileno())
+        with open(m/'.nbd/infinidisk2','wb') as f:f.truncate((ARGS.mysql_volume_gib if ARGS.mysql_only else 2)*1024**3);f.flush();os.fsync(f.fileno())
         run(['umount',m],label+'-nfs-umount');nfsmounted=False
     # Native Rust attachment is shared by both servers, with the same export name.
     ac=W/'attach.toml';ac.write_text(f'local_dir = "{W}/unused"\nstore = "file://{W}/unused-objects"\nlisten = "127.0.0.1:11991"\n')
@@ -86,7 +117,7 @@ def start(engine,label):
         time.sleep(.1)
     raise RuntimeError('attachment timeout')
 def stop():
-    global server,client,nfsmounted,mounted,pgname,mysqlname
+    global server,client,tracer,nfsmounted,mounted,pgname,mysqlname
     if mysqlname:
         run(['docker','rm','-f',mysqlname],'cleanup-mysql-'+str(time.time_ns()),check=False);mysqlname=None
     if pgname:
@@ -96,6 +127,8 @@ def stop():
     if client:
         if pathlib.Path('/sys/class/block/'+DEV.name+'/pid').exists():run([BIN,'-c',W/'attach.toml','detach','--device',DEV],'detach-'+str(time.time_ns()))
         client.wait(timeout=70);client=None
+    if tracer:
+        tracer.send_signal(signal.SIGINT);tracer.wait(timeout=10);tracer=None
     if server:
         server.send_signal(signal.SIGTERM)
         try:server.wait(timeout=240)
@@ -190,7 +223,7 @@ def postgres(engine,existing=False):
     run(['docker','stop','-t','120',pgname],engine+'-pg-stop',timeout=150)
     run(['docker','rm',pgname],engine+'-pg-remove');pgname=None
     run(['umount',mount],engine+'-unmount');mounted=False;save()
-def mysql(label,native=False,existing=False,measure=True):
+def mysql(label,native=False,existing=False,measure=True,storage_crash=False):
     global mounted,mysqlname,mysql_password,server,client
     import re
     mount=W/'mount';mount.mkdir(exist_ok=True)
@@ -199,6 +232,7 @@ def mysql(label,native=False,existing=False,measure=True):
         if not existing:run(['mkfs.ext4','-F','-E','lazy_itable_init=0,lazy_journal_init=0',DEV],label+'-mkfs',timeout=600)
         run(['mount','-o','noatime',DEV,mount],label+'-mount');mounted=True
         datadir=mount/'mysql';datadir.mkdir(exist_ok=True)
+    rows_per_table=R.get('mysql',{}).get(label.split('-')[0],{}).get('rows_per_table',ARGS.mysql_rows) if existing else ARGS.mysql_rows
     password=uuid.uuid4().hex
     mysqlname='id2-compare-mysql-'+W.name.removeprefix('comparison-')
     # Only the disposable test account, never a production database credential.
@@ -211,10 +245,11 @@ def mysql(label,native=False,existing=False,measure=True):
     ENV['MYSQL_ROOT_PASSWORD']=mysql_password
     ENV['MYSQL_PWD']=ENV['MYSQL_ROOT_PASSWORD']
     startargs=['docker','run','-d','--name',mysqlname,'--network','none','--memory','1g','--cpus','1','-e','MYSQL_ROOT_PASSWORD','-v',str(datadir)+':/var/lib/mysql','mysql:8.0','--socket=/var/lib/mysql/mysql.sock','--innodb-buffer-pool-size=268435456','--innodb-redo-log-capacity=134217728','--innodb-flush-log-at-trx-commit=1','--innodb-doublewrite=ON','--innodb-flush-method=O_DIRECT','--log-bin=mysql-bin','--sync-binlog=1','--binlog-expire-logs-seconds=3600']
+    startup_at=time.monotonic()
     run(startargs,label+'-mysql-start',timeout=120)
-    def sql(q,tag,check=True):return run(['docker','exec','-e','MYSQL_PWD',mysqlname,'mysql','--socket=/var/lib/mysql/mysql.sock','-uroot','-NBe',q],label+'-'+tag,timeout=300,check=check)
+    def sql(q,tag,check=True):return run(['docker','exec','-e','MYSQL_PWD',mysqlname,'mysql','--socket=/var/lib/mysql/mysql.sock','-uroot','-NBe',q],label+'-'+tag,timeout=1800 if tag=='mysql-check' else 300,check=check)
     def ready():
-        for _ in range(900):
+        for _ in range(3600):
             p=sql('SELECT 1','mysql-ready',check=False)
             if 'is not running' in p.stdout:raise RuntimeError('MySQL exited during initialization')
             if p.returncode==0:
@@ -226,56 +261,77 @@ def mysql(label,native=False,existing=False,measure=True):
     ready()
     settings=sql('SELECT @@innodb_flush_log_at_trx_commit,@@sync_binlog,@@innodb_doublewrite,@@innodb_flush_method,@@innodb_buffer_pool_size,@@version,@@log_bin','mysql-settings').stdout.strip().split('\t')
     if settings[:4]!=['1','1','ON','O_DIRECT'] or settings[-1]!='1':raise RuntimeError('InnoDB durability settings unexpected: '+str(settings))
-    R.setdefault('mysql',{})[label]={'settings':settings,'tables':4,'rows_per_table':25000,'threads':8,'cpu_limit':1,'memory_mib':1024,'samples':{}}
+    R.setdefault('mysql',{})[label]={'settings':settings,'tables':4,'rows_per_table':rows_per_table,'threads':8,'cpu_limit':1,'memory_mib':1024,'samples':{},'sample_count':ARGS.mysql_samples,'sample_seconds':ARGS.mysql_seconds,'trace_engine':ARGS.trace_engine,'warmup_seconds':ARGS.mysql_warm_seconds,'startup_seconds':time.monotonic()-startup_at}
     if not existing:sql('CREATE DATABASE bench','mysql-create')
-    common=['sysbench','--db-driver=mysql','--mysql-socket='+str(datadir/'mysql.sock'),'--mysql-user=root','--mysql-password='+ENV['MYSQL_ROOT_PASSWORD'],'--mysql-db=bench','--tables=4','--table-size=25000','--threads=8','--rand-seed=42']
+    common=['sysbench','--db-driver=mysql','--mysql-socket='+str(datadir/'mysql.sock'),'--mysql-user=root','--mysql-password='+ENV['MYSQL_ROOT_PASSWORD'],'--mysql-db=bench','--tables=4','--table-size='+str(rows_per_table),'--threads=8','--rand-seed=42','--rand-type='+ARGS.mysql_rand_type]
     if not existing:run(common+['/usr/share/sysbench/oltp_read_write.lua','prepare'],label+'-mysql-prepare',timeout=900)
+    R['mysql'][label]['table_file_bytes']=sum(p.stat().st_size for p in (datadir/'bench').glob('sbtest*.ibd'))
+    R['mysql'][label]['random_distribution']=ARGS.mysql_rand_type
     # Warm the DB buffer pool before timing; this is a deliberately cached DB case.
-    if measure:run(common+['--time=10','/usr/share/sysbench/oltp_read_only.lua','run'],label+'-mysql-warm',timeout=300)
-    for work in (('read_write','read_only','write_only') if measure else ()):
+    if measure and ARGS.mysql_warm_seconds:run(common+['--time='+str(ARGS.mysql_warm_seconds),'/usr/share/sysbench/oltp_read_only.lua','run'],label+'-mysql-warm',timeout=300)
+    if not native and measure:
+        settings_cache=tomllib.loads(cfg.read_text())
+        if 'local_dir' in settings_cache:
+            cache_dir=pathlib.Path(settings_cache['local_dir'])/'cache'
+            cache_bytes=0
+            for entry in cache_dir.glob('*.cache'):
+                try:cache_bytes+=entry.stat().st_size
+                except FileNotFoundError:pass
+            R['mysql'][label]['ssd_cache_bytes_before_samples']=cache_bytes
+            R['mysql'][label]['engine_memory_cache_mib']=settings_cache.get('memory_cache_mib',128)
+            R['mysql'][label]['engine_disk_cache_mib']=settings_cache.get('disk_cache_mib',2048)
+    for work in (ARGS.mysql_workloads if measure else ()):
         R['mysql'][label]['samples'][work]=[]
-        for i in range(3):
-            p=run(common+['--time=15',f'/usr/share/sysbench/oltp_{work}.lua','run'],f'{label}-mysql-{work}-{i}',timeout=300)
+        for i in range(ARGS.mysql_samples):
+            p=run(common+['--time='+str(ARGS.mysql_seconds),f'/usr/share/sysbench/oltp_{work}.lua','run'],f'{label}-mysql-{work}-{i}',timeout=300)
             t=re.search(r'transactions:\s+\d+\s+\(([\d.]+) per sec',p.stdout)
             avg=re.search(r'avg:\s+([\d.]+)',p.stdout);p95=re.search(r'95th percentile:\s+([\d.]+)',p.stdout)
             err=re.search(r'ignored errors:\s+(\d+)',p.stdout)
             if not t:raise RuntimeError('sysbench result missing')
             R['mysql'][label]['samples'][work].append({'tps':float(t[1]),'avg_ms':float(avg[1]),'p95_ms':float(p95[1]),'ignored_errors':int(err[1]) if err else None});save()
-    run(['docker','kill','--signal','KILL',mysqlname],label+'-mysql-crash')
-    run(['docker','start',mysqlname],label+'-mysql-restart');ready()
-    if not measure:
-        f=open(W/(label+'-active-crash.log'),'w')
-        workload=subprocess.Popen(common+['--time=30','/usr/share/sysbench/oltp_read_write.lua','run'],env=ENV,stdout=f,stderr=subprocess.STDOUT,start_new_session=True);f.close()
-        try:
-            time.sleep(3)
-            if workload.poll() is not None:raise RuntimeError('workload ended before storage crash')
-            server.kill();server.wait();server=None
-            run(['docker','kill','--signal','KILL',mysqlname],label+'-storage-crash-db-kill',check=False)
-            run(['docker','rm','-f',mysqlname],label+'-storage-crash-db-remove')
-            run(['umount','-l',mount],label+'-storage-crash-unmount');mounted=False
-            try:workload.wait(timeout=10)
-            except subprocess.TimeoutExpired:os.killpg(workload.pid,signal.SIGKILL);workload.wait()
-            if pathlib.Path('/sys/class/block/'+DEV.name+'/pid').exists():run([BIN,'-c',W/'attach.toml','detach','--device',DEV],label+'-storage-crash-detach')
-            client.wait(timeout=70);client=None
-            start('infinidisk2',label+'-local-recovery')
-            p=run(['e2fsck','-f','-p',DEV],label+'-storage-crash-fsck',check=False)
-            if p.returncode not in (0,1):raise RuntimeError('ext4 recovery failed after storage crash')
-            run(['mount','-o','noatime',DEV,mount],label+'-storage-crash-remount');mounted=True
-            run(startargs,label+'-storage-crash-mysql-start');ready()
-        finally:
-            if workload.poll() is None:os.killpg(workload.pid,signal.SIGKILL);workload.wait()
-    rows=sql(' UNION ALL '.join(f"SELECT 'sbtest{i}',COUNT(*) FROM bench.sbtest{i}" for i in range(1,5)),'mysql-counts').stdout.strip().splitlines()
-    if len(rows)!=4 or any(int(row.split('\t')[1])!=25000 for row in rows):raise RuntimeError('transactional row counts inconsistent')
-    checks=sql('CHECK TABLE '+','.join(f'bench.sbtest{i}' for i in range(1,5))+' EXTENDED','mysql-check').stdout.strip().splitlines()
-    if len(checks)!=4 or any(not row.endswith('\tOK') for row in checks):raise RuntimeError('InnoDB check failed')
-    R['mysql'][label]['database_SIGKILL_recovery']='passed'
-    if not measure:R['mysql'][label]['storage_engine_SIGKILL_recovery']='passed'
+    if ARGS.mysql_skip_crash_check:
+        R['mysql'][label]['database_SIGKILL_recovery']='not_run_read_only_repeat'
+    else:
+        recovery_at=time.monotonic()
+        run(['docker','kill','--signal','KILL',mysqlname],label+'-mysql-crash')
+        run(['docker','start',mysqlname],label+'-mysql-restart');ready()
+        R['mysql'][label]['database_recovery_seconds']=time.monotonic()-recovery_at
+        if storage_crash:
+            f=open(W/(label+'-active-crash.log'),'w')
+            workload=subprocess.Popen(common+['--time=30','/usr/share/sysbench/oltp_read_write.lua','run'],env=ENV,stdout=f,stderr=subprocess.STDOUT,start_new_session=True);f.close()
+            try:
+                time.sleep(3)
+                if workload.poll() is not None:raise RuntimeError('workload ended before storage crash')
+                server.kill();server.wait();server=None
+                run(['docker','kill','--signal','KILL',mysqlname],label+'-storage-crash-db-kill',check=False)
+                run(['docker','rm','-f',mysqlname],label+'-storage-crash-db-remove')
+                run(['umount','-l',mount],label+'-storage-crash-unmount');mounted=False
+                try:workload.wait(timeout=10)
+                except subprocess.TimeoutExpired:os.killpg(workload.pid,signal.SIGKILL);workload.wait()
+                if pathlib.Path('/sys/class/block/'+DEV.name+'/pid').exists():run([BIN,'-c',W/'attach.toml','detach','--device',DEV],label+'-storage-crash-detach')
+                client.wait(timeout=70);client=None
+                start('infinidisk2',label+'-local-recovery')
+                p=run(['e2fsck','-f','-p',DEV],label+'-storage-crash-fsck',check=False)
+                if p.returncode not in (0,1):raise RuntimeError('ext4 recovery failed after storage crash')
+                run(['mount','-o','noatime',DEV,mount],label+'-storage-crash-remount');mounted=True
+                run(startargs,label+'-storage-crash-mysql-start');ready()
+            finally:
+                if workload.poll() is None:os.killpg(workload.pid,signal.SIGKILL);workload.wait()
+        rows=sql(' UNION ALL '.join(f"SELECT 'sbtest{i}',COUNT(*) FROM bench.sbtest{i}" for i in range(1,5)),'mysql-counts').stdout.strip().splitlines()
+        if len(rows)!=4 or any(int(row.split('\t')[1])!=rows_per_table for row in rows):raise RuntimeError('transactional row counts inconsistent')
+        checks=sql('CHECK TABLE '+','.join(f'bench.sbtest{i}' for i in range(1,5))+' EXTENDED','mysql-check').stdout.strip().splitlines()
+        if len(checks)!=4 or any(not row.endswith('\tOK') for row in checks):raise RuntimeError('InnoDB check failed')
+        R['mysql'][label]['database_SIGKILL_recovery']='passed'
+        if storage_crash:R['mysql'][label]['storage_engine_SIGKILL_recovery']='passed'
     run(['docker','stop','-t','120',mysqlname],label+'-mysql-stop',timeout=150)
     run(['docker','rm',mysqlname],label+'-mysql-remove');mysqlname=None
     if mounted:run(['umount',mount],label+'-mysql-unmount');mounted=False
     save()
 try:
-    R.setdefault('executions',[]).append({'phase':'mysql-storage-crash' if ARGS.mysql_recovery_report else 'mysql' if ARGS.mysql_only else 'verify' if ARGS.verify_report else 'memory-warm' if ARGS.warm_memory_report else 'postgres-roomy' if ARGS.postgres_roomy_report else 'postgres' if ARGS.postgres_only else 'raw','utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'script_sha256':hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(),'load_start':os.getloadavg()})
+    R['complete']=False
+    R.setdefault('executions',[]).append({'phase':'mysql-resume' if ARGS.mysql_resume_report else 'mysql-repeat' if ARGS.mysql_repeat_report else 'mysql-storage-crash' if ARGS.mysql_recovery_report else 'mysql' if ARGS.mysql_only else 'verify' if ARGS.verify_report else 'memory-warm' if ARGS.warm_memory_report else 'postgres-roomy' if ARGS.postgres_roomy_report else 'postgres' if ARGS.postgres_only else 'raw','utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'script_sha256':hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(),'load_start':os.getloadavg()})
+    runner_source=pathlib.Path(__file__).read_text()
+    (W/('runner-'+hashlib.sha256(runner_source.encode()).hexdigest()+'.json')).write_text(json.dumps({'sha256':hashlib.sha256(runner_source.encode()).hexdigest(),'source':runner_source},indent=2))
     R['binary_sha256']={'infinidisk2':hashlib.sha256(BIN.read_bytes()).hexdigest(),'zerofs':hashlib.sha256(pathlib.Path('/usr/local/bin/zerofs').read_bytes()).hexdigest()}
     R['host']=run(['uname','-a'],'host').stdout.strip()
     R['logical_cpus']=os.cpu_count()
@@ -284,14 +340,55 @@ try:
     R['zerofs_version']=run(['zerofs','--version'],'zerofs-version').stdout.strip()
     R['infinidisk2_version']=run([BIN,'--version'],'id2-version').stdout.strip()
     for engine in (('zerofs','infinidisk2') if ARGS.engine=='both' else (ARGS.engine,)):
+        if ARGS.mysql_resume_report:
+            if engine!='infinidisk2':continue
+            original=W/'before-resume-report.json'
+            if not original.exists():original.write_text(EXISTING.read_text())
+            text=existing_text(engine)
+            import re
+            text=re.sub(r'^disk_cache_mib\s*=.*$', 'disk_cache_mib = 2048',text,flags=re.M)
+            cfg=W/'infinidisk2-resume-check-config.toml';cfg.write_text(text)
+            start(engine,'infinidisk2-resume-check')
+            mysql('infinidisk2-resume-check',existing=True,measure=False)
+            R['mysql']['infinidisk2']['database_SIGKILL_recovery']='passed_after_resume_larger_cache'
+            R['mysql']['infinidisk2']['integrity_resume']={'ssd_cache_mib':2048,'check_timeout_seconds':1800,'original_timeout_seconds':300}
+            stop()
+            mysql('native',native=True)
+            continue
+        if ARGS.mysql_repeat_report:
+            label=engine+'-'+(ARGS.phase_label or 'repeat')
+            if engine=='native':
+                mysql(label,native=True,existing=True);stop();continue
+            text=existing_text(engine)
+            if engine=='infinidisk2':
+                import re
+                for key,value in [('wal_preallocate',ARGS.wal_preallocate),('wal_writev',ARGS.wal_writev)]:
+                    if value is not None:
+                        text=re.sub(r'^'+key+r'\s*=.*$', '',text,flags=re.M)
+                        text+='\n'+key+' = '+str(value=='on').lower()+'\n'
+            if engine=='infinidisk2':
+                for key,value in [('memory_cache_mib',ARGS.mysql_repeat_memory_cache_mib),('disk_cache_mib',ARGS.mysql_repeat_disk_cache_mib)]:
+                    if value is not None:
+                        text=re.sub(r'^'+key+r'\s*=.*$', '',text,flags=re.M)+'\n'+key+' = '+str(value)+'\n'
+            if engine=='infinidisk2' and ARGS.read_extent_kib is not None:
+                text=re.sub(r'^read_extent_kib\s*=.*$', '',text,flags=re.M)+'\nread_extent_kib = '+str(ARGS.read_extent_kib)+'\n'
+            cfg=W/(label+'-config.toml');cfg.write_text(text)
+            start(engine,label);mysql(label,existing=True);stop();continue
         if ARGS.mysql_recovery_report:
             if engine!='infinidisk2':continue
             existing_text(engine);cfg=W/(engine+'.toml')
             start(engine,'infinidisk2-storage-recovery')
-            mysql('infinidisk2-storage-recovery',existing=True,measure=False);stop();continue
+            mysql('infinidisk2-storage-recovery',existing=True,measure=False,storage_crash=True);stop();continue
         if ARGS.mysql_only:
-            configuration(engine,'initial-'+engine,disk=4096,async_mode=engine=='zerofs',memory=1024)
-            if engine=='infinidisk2':run([BIN,'-c',cfg,'init','--size','2GiB'],'id2-init')
+            configuration(engine,'initial-'+engine,disk=ARGS.mysql_disk_cache_mib,async_mode=engine=='zerofs',memory=ARGS.mysql_memory_cache_mib)
+            if engine=='infinidisk2':
+                for key,value in [('wal_preallocate',ARGS.wal_preallocate),('wal_writev',ARGS.wal_writev)]:
+                    if value is not None:
+                        with cfg.open('a') as f:f.write('\n'+key+' = '+str(value=='on').lower()+'\n')
+                if ARGS.read_extent_kib is not None:
+                    with cfg.open('a') as f:f.write('\nread_extent_kib = '+str(ARGS.read_extent_kib)+'\n')
+                (W/('initial-'+engine+'-config.toml')).write_text(cfg.read_text())
+                run([BIN,'-c',cfg,'init','--size',str(ARGS.mysql_volume_gib)+'GiB'],'id2-init')
             start(engine,engine+'-initial')
             with open(DEV,'rb',buffering=0) as f:
                 if any(f.read(4096)):raise RuntimeError('MySQL export not blank')
@@ -367,4 +464,4 @@ try:
     R['complete']=True;save()
 finally:
     stop();save()
-    print('REPORT '+str(W/'report.json'),flush=True)
+    print('REPORT '+str(W/('optimization-'+ARGS.phase_label+'.json' if ARGS.phase_label else 'report.json')),flush=True)

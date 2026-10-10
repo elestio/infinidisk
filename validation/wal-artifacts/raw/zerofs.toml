@@ -1,0 +1,21 @@
+[cache]
+dir = "/root/infinidisk2/test-output/comparison-8e8464fb817a/warm-zerofs-cache"
+disk_size_gb = 0.5
+memory_size_gb = 0.0625
+[storage]
+url = "s3://testperf-6czebk/infinidisk2-comparison-8e8464fb817a/zerofs"
+encryption_password = "${ZEROFS_PASSWORD}"
+[servers.nbd]
+addresses = ["127.0.0.1:11991"]
+[servers.nfs]
+addresses = ["127.0.0.1:12991"]
+[aws]
+access_key_id = "${AWS_ACCESS_KEY_ID}"
+secret_access_key = "${AWS_SECRET_ACCESS_KEY}"
+endpoint = "https://storage.elestio.com"
+default_region = "auto"
+[filesystem]
+ignore_fsync = true
+compression = "lz4"
+[lsm]
+flush_interval_secs = 5

@@ -122,3 +122,13 @@ Le code de ZeroFS a servi de référence pour identifier les compromis du premie
 `sync_data_only=true` utilise `File::sync_data` pour les segments WAL puis le watermark, dans cet ordre, en conservant deux barrières durables. Les créations et synchronisations de répertoires conservent leurs fsync. Le format disque ne change pas. `false` permet de mesurer le chemin `sync_all` original. Les compteurs de statut distinguent attentes, WAL et watermark ; les premiers profils ne montrent presque aucun regroupement de FLUSH dans le moteur.
 
 La santé du volume est vérifiée à nouveau après prise du verrou de flush ; une barrière en attente ne peut donc être acquittée après une erreur antérieure. Une erreur ou panique du worker bloque les nouvelles écritures. Les chiffres et limites de la campagne MySQL sont dans [optimisation-mysql.md](optimisation-mysql.md).
+
+## Expérience sur les écritures du WAL
+
+Le chemin `writev` réduit de deux à un les appels d’écriture pour un enregistrement WAL complet. Un résultat partiel est poursuivi à la bonne position dans les deux buffers, EINTR est réessayé et zéro octet écrit est une erreur. Cela ne remplace aucune synchronisation et ne change ni les CRC ni le format.
+
+La réservation optionnelle `wal_preallocate` utilise KEEP_SIZE puis libère les blocs strictement au-delà du dernier bloc de données lors du scellement ou de la reprise. Elle reste désactivée par défaut, faute de gain dans l’expérience MySQL. Si elle est activée, le filesystem Linux doit prendre en charge les deux opérations ; un échec est propagé. L’espace physique du segment actif peut dépasser sa longueur logique jusqu’à la capacité réservée. La campagne et ses limites sont détaillées dans [optimisation-wal.md](optimisation-wal.md).
+
+## Préserver le dernier checkpoint sain
+
+Le publisher vérifie le buffer exact avant upload : identités de volume/segment, longueur connue, enregistrements complets et bornés, CRC et dernière séquence. Une lecture locale impossible ou une validation invalide bloque les nouvelles écritures ; la racine HEAD n’est pas remplacée. Les erreurs de transport S3 restent réessayables comme auparavant. Le test `corrupted_pending_wal_never_replaces_the_last_remote_checkpoint` injecte une corruption après FLUSH, constate le refus de publication puis restaure le checkpoint précédent depuis un nouveau répertoire local. L’injection échouait avant correction : le segment endommagé pouvait jusque-là devenir la nouvelle racine distante.

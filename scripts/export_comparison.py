@@ -6,6 +6,7 @@ p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--raw',required=True,type=pathlib.Path)
 p.add_argument('--postgres',required=True,type=pathlib.Path)
 p.add_argument('--mysql',type=pathlib.Path)
+p.add_argument('--extra-mysql',type=pathlib.Path)
 p.add_argument('--crash',type=pathlib.Path)
 a=p.parse_args()
 secrets=[]
@@ -15,7 +16,7 @@ for line in pathlib.Path('/opt/elestio/infinidisk/bench.env').read_text().splitl
     if k in ('AWS_ACCESS_KEY_ID','AWS_SECRET_ACCESS_KEY','AWS_SESSION_TOKEN','INFINIDISK_PASSWORD'):
         secrets.extend(s.encode() for s in shlex.split(v) if len(s)>8)
 files=[]
-for label,path in [('raw',a.raw),('postgres',a.postgres),('mysql',a.mysql),('crash',a.crash)]:
+for label,path in [('raw',a.raw),('postgres',a.postgres),('mysql',a.mysql),('mysql-large',a.extra_mysql),('crash',a.crash)]:
     if path is None:continue
     work=path.resolve().parent
     if work.parent!=ROOT/'test-output' or not work.name.startswith('run-' if label=='crash' else 'comparison-'):raise RuntimeError('not an isolated comparison')

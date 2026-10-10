@@ -1,0 +1,135 @@
+{
+  "utc": "2026-10-10T04:26:45.554630+00:00",
+  "work": "/root/infinidisk2/test-output/comparison-be4ba51a4a38",
+  "device": "/dev/nbd31",
+  "size_bytes": 268435456,
+  "duration_seconds": 15,
+  "connections": 8,
+  "memory_mib": 64,
+  "cold_disk_mib": 128,
+  "warm_disk_mib": 512,
+  "runs": {},
+  "contracts": {
+    "infinidisk2": "FLUSH/FUA durable on local disk; S3 checkpoint asynchronous every 5 seconds, longer during backlog",
+    "zerofs": "ignore_fsync=false: explicit FLUSH/FUA seals extents and flushes metadata to S3",
+    "zerofs-async": "FLUSH/FUA ignored by ZeroFS, unsafe DB durability mode",
+    "zerofs-durable": "ZeroFS FLUSH/FUA publishes S3",
+    "native": "native VM ext4 disk; MySQL fsync honored"
+  },
+  "disk_mib": 128,
+  "volume_size_bytes": 4294967296,
+  "executions": [
+    {
+      "phase": "mysql",
+      "utc": "2026-10-10T04:26:45.554666+00:00",
+      "script_sha256": "66b4c9899e1e333bf5bf6aa44f50d9e2c309100da8683b21e47a6c2e2ce54587",
+      "load_start": [
+        1.93505859375,
+        2.57568359375,
+        1.5595703125
+      ]
+    }
+  ],
+  "binary_sha256": {
+    "infinidisk2": "de191e1dcbdcf5b9a6da7cbf471be2135bab58b0cbb7a5d4a1ee8faac7386494",
+    "zerofs": "91651cb1894f77f6892d224bc119ac4a9bccabf1207d739f4ec71ff8c4e99e21"
+  },
+  "host": "Linux wordpress-ovh-u3 7.0.0-38-generic #38-Ubuntu SMP PREEMPT_DYNAMIC Fri Sep  4 09:10:14 UTC 2026 x86_64 GNU/Linux",
+  "logical_cpus": 4,
+  "load_start": [
+    1.93505859375,
+    2.57568359375,
+    1.5595703125
+  ],
+  "fio_version": "fio-3.41",
+  "zerofs_version": "zerofs 2.3.5",
+  "infinidisk2_version": "infinidisk2 0.1.0",
+  "prefixes": {
+    "infinidisk2": "s3://testperf-6czebk/infinidisk2-comparison-be4ba51a4a38/infinidisk2"
+  },
+  "mysql": {
+    "infinidisk2": {
+      "settings": [
+        "1",
+        "1",
+        "ON",
+        "O_DIRECT",
+        "268435456",
+        "8.0.46",
+        "1"
+      ],
+      "tables": 4,
+      "rows_per_table": 1000000,
+      "threads": 8,
+      "cpu_limit": 1,
+      "memory_mib": 1024,
+      "samples": {
+        "read_write": [
+          {
+            "tps": 24.66,
+            "avg_ms": 322.86,
+            "p95_ms": 694.45,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 61.58,
+            "avg_ms": 127.39,
+            "p95_ms": 383.33,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 119.86,
+            "avg_ms": 66.13,
+            "p95_ms": 219.36,
+            "ignored_errors": 0
+          }
+        ],
+        "read_only": [
+          {
+            "tps": 150.6,
+            "avg_ms": 52.87,
+            "p95_ms": 189.93,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 303.49,
+            "avg_ms": 26.31,
+            "p95_ms": 114.72,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 478.1,
+            "avg_ms": 16.56,
+            "p95_ms": 81.48,
+            "ignored_errors": 0
+          }
+        ],
+        "write_only": [
+          {
+            "tps": 32.2,
+            "avg_ms": 247.38,
+            "p95_ms": 802.05,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 141.94,
+            "avg_ms": 55.95,
+            "p95_ms": 215.44,
+            "ignored_errors": 0
+          },
+          {
+            "tps": 304.16,
+            "avg_ms": 26.21,
+            "p95_ms": 87.56,
+            "ignored_errors": 0
+          }
+        ]
+      },
+      "sample_count": 3,
+      "sample_seconds": 15,
+      "trace_engine": false,
+      "table_file_bytes": 1006632960,
+      "random_distribution": "sysbench default special"
+    }
+  }
+}

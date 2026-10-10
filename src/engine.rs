@@ -321,6 +321,9 @@ impl Engine {
                 }
                 Err(err) => return Err(err),
             };
+            if c.wal_preallocate {
+                s.release_reservation(c.segment_mib * 1024 * 1024)?;
+            }
             for row in records {
                 if row.seq <= head.seq {
                     continue;
@@ -387,7 +390,17 @@ impl Engine {
                 }
             }
         }
-        let active = Segment::create(&c.local_dir.join("wal"), identity.volume, seq + 1)?;
+        let active = Segment::create_with_options(
+            &c.local_dir.join("wal"),
+            identity.volume,
+            seq + 1,
+            if c.wal_preallocate {
+                c.segment_mib * 1024 * 1024
+            } else {
+                0
+            },
+            c.wal_writev,
+        )?;
         local.insert(active.id, Arc::new(active.file.try_clone()?));
         let cache = LruCache::new(
             NonZeroUsize::new(
@@ -604,14 +617,24 @@ impl Engine {
         Ok(())
     }
     fn rotate(&self, s: &mut State) -> Result<()> {
-        let next = Segment::create(
+        let next = Segment::create_with_options(
             &self.config.local_dir.join("wal"),
             self.identity.volume,
             s.seq + 1,
+            if self.config.wal_preallocate {
+                self.config.segment_mib * 1024 * 1024
+            } else {
+                0
+            },
+            self.config.wal_writev,
         )
         .inspect_err(|_| self.fail_closed())?;
         s.local.insert(next.id, Arc::new(next.file.try_clone()?));
         let old = std::mem::replace(&mut s.active, next);
+        if self.config.wal_preallocate {
+            old.release_reservation(self.config.segment_mib * 1024 * 1024)
+                .inspect_err(|_| self.fail_closed())?;
+        }
         s.pending += old.len;
         s.sealed.push(old);
         Ok(())
@@ -759,20 +782,35 @@ impl Engine {
                 s.seq,
                 s.sealed
                     .iter()
-                    .map(|s| (s.id, s.path.clone()))
+                    .map(|s| (s.id, s.path.clone(), s.len, s.last_seq))
                     .collect::<Vec<_>>(),
                 shards,
                 dirty,
             )
         };
         let result = async {
-            let uploads = segments.clone().into_iter().map(|(id, path)| {
-                let store = self.store.clone();
-                async move {
-                    let b = tokio::fs::read(path).await?;
-                    store.immutable(&format!("segments/{id}"), b.into()).await
-                }
-            });
+            let uploads = segments
+                .clone()
+                .into_iter()
+                .map(|(id, path, len, last_seq)| {
+                    let store = self.store.clone();
+                    async move {
+                        let b = tokio::fs::read(path)
+                            .await
+                            .inspect_err(|_| self.fail_closed())?;
+                        let volume = self.identity.volume;
+                        let size = self.identity.size;
+                        let checked = tokio::task::spawn_blocking(move || {
+                            ensure!(b.len() as u64 == len, "sealed WAL length changed");
+                            wal::validate_upload(&b, volume, id, last_seq, size)?;
+                            Ok::<_, anyhow::Error>(b)
+                        })
+                        .await
+                        .inspect_err(|_| self.fail_closed())?;
+                        let b = checked.inspect_err(|_| self.fail_closed())?;
+                        store.immutable(&format!("segments/{id}"), b.into()).await
+                    }
+                });
             stream::iter(uploads)
                 .buffer_unordered(4)
                 .try_collect::<Vec<_>>()
@@ -1071,6 +1109,37 @@ mod tests {
         let e = Engine::open(other).await?;
         assert_eq!(e.read(0, PAGE * 2).await?, expected);
         assert!(Engine::open(c).await.is_err());
+        Ok(())
+    }
+    #[tokio::test]
+    async fn corrupted_pending_wal_never_replaces_the_last_remote_checkpoint() -> Result<()> {
+        use std::os::unix::fs::FileExt;
+        let t = tempfile::tempdir()?;
+        let c = config(&t);
+        Engine::init(&c, 1024 * 1024).await?;
+        let e = Engine::open(c.clone()).await?;
+        e.write(0, &vec![7; PAGE]).await?;
+        e.checkpoint().await?;
+        let good_remote_seq = e.status().await.remote_sequence;
+        e.write(0, &vec![9; PAGE]).await?;
+        e.flush().await?;
+        {
+            let s = e.state.lock().await;
+            let r = s.index.get(&0).unwrap();
+            s.active.file.write_all_at(&[77], r.offset + 11)?;
+        }
+        ensure!(
+            e.checkpoint().await.is_err(),
+            "corrupted local WAL was published"
+        );
+        assert!(e.status().await.poisoned);
+        assert_eq!(e.status().await.remote_sequence, good_remote_seq);
+        drop(e);
+        let mut recovered = c;
+        recovered.local_dir = t.path().join("remote-recovery");
+        Engine::adopt(&recovered, true).await?;
+        let e = Engine::open(recovered).await?;
+        assert_eq!(e.read(0, PAGE).await?, vec![7; PAGE]);
         Ok(())
     }
     #[tokio::test]

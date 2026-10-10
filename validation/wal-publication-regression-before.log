@@ -1,0 +1,19 @@
+   Compiling infinidisk2 v0.1.0 (/root/infinidisk2)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.87s
+     Running unittests src/lib.rs (target/debug/deps/infinidisk2-ae7d63a71c293a27)
+
+running 1 test
+test engine::tests::corrupted_pending_wal_never_replaces_the_last_remote_checkpoint ... FAILED
+
+failures:
+
+---- engine::tests::corrupted_pending_wal_never_replaces_the_last_remote_checkpoint stdout ----
+Error: corrupted local WAL was published
+
+
+failures:
+    engine::tests::corrupted_pending_wal_never_replaces_the_last_remote_checkpoint
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`
